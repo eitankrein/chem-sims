@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}*,*::before,*::after{box-sizing:border-box}</style>
+<title>מעבדת חוק הס</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a lab notebook — tab strip of the experiment's stages; each part = bench + datalogger beside the protocol */
+:root{
+  --bg:#f3f6f6; --paper:#ffffff; --ink:#18282d; --muted:#5b6d72; --line:#d3dde0;
+  --accent:#19576c; --accent-soft:#e1eef1; --accent-ink:#ffffff;
+  --liquid:#9fd3e3; --liquid-line:#5aa9c2; --cup:#eef2f3;
+  --lcd:#13262b; --lcd-ink:#8ff0c4;
+  --ok:#2f7d4a; --ok-soft:#e3f2e8; --warn:#a2591a; --warn-soft:#fbeedd; --bad:#b03a2e; --bad-soft:#f8e3e0;
+  --display:"Rubik","Assistant",system-ui,sans-serif; --body:"Assistant","Rubik",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10181a; --paper:#172225; --ink:#e3ecee; --muted:#9db0b5; --line:#2b3b3f;
+  --accent:#5fb3cc; --accent-soft:#1c3a43; --accent-ink:#0d1a1d;
+  --liquid:#2d6f86; --liquid-line:#5fb3cc; --cup:#223135;
+  --lcd:#0a1416; --lcd-ink:#8ff0c4;
+  --ok:#6fcf8f; --ok-soft:#173225; --warn:#f0a95e; --warn-soft:#3a2a17; --bad:#f08a7e; --bad-soft:#3d1f1b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10181a; --paper:#172225; --ink:#e3ecee; --muted:#9db0b5; --line:#2b3b3f;
+  --accent:#5fb3cc; --accent-soft:#1c3a43; --accent-ink:#0d1a1d;
+  --liquid:#2d6f86; --liquid-line:#5fb3cc; --cup:#223135;
+  --lcd:#0a1416; --lcd-ink:#8ff0c4;
+  --ok:#6fcf8f; --ok-soft:#173225; --warn:#f0a95e; --warn-soft:#3a2a17; --bad:#f08a7e; --bad-soft:#3d1f1b; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:1.9rem;font-weight:700}
+h2{font-size:1.35rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+.f{direction:ltr;unicode-bidi:isolate;font-family:var(--body);white-space:nowrap}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:.85rem;color:var(--muted);letter-spacing:.04em}
+.mast .who{display:flex;gap:10px;flex-wrap:wrap}
+label.fld{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:2px}
+input[type=text],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:0}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin:16px 0 20px;padding-bottom:4px;scrollbar-width:thin}
+.tab{flex:0 0 auto;font:600 .95rem var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.tab.done .dot{background:var(--ok)}
+.tab[aria-selected=true] .dot{background:var(--accent-ink)}
+.panel{display:flex;flex-direction:column;gap:18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.eq{direction:ltr;text-align:center;font-size:1.1rem;padding:8px;background:var(--accent-soft);border-radius:8px}
+.proto ol{margin:8px 0 0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.proto li{color:var(--muted)}
+.proto li.cur{color:var(--ink);font-weight:600}
+.proto li.past{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.steps{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.steps li{display:flex;gap:8px;align-items:center;color:var(--muted)}
+.steps li::before{content:"";flex:0 0 10px;height:10px;border-radius:50%;border:2px solid var(--line)}
+.steps li.past::before{background:var(--ok);border-color:var(--ok)}
+.steps li.cur{color:var(--ink);font-weight:700}
+.steps li.cur::before{border-color:var(--accent);background:var(--accent-soft)}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:14px;align-items:stretch}
+@media (max-width:560px){.bench{grid-template-columns:minmax(0,1fr)}}
+.bench svg{width:100%;height:auto;max-width:100%}
+.logger{background:var(--lcd);color:var(--lcd-ink);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;font-family:var(--mono)}
+.logger .big{font-size:2.2rem;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+.logger .row{display:flex;justify-content:space-between;font-size:.85rem;direction:ltr;opacity:.85}
+.logger .state{font-family:var(--body);font-size:.85rem;text-align:center;opacity:.9}
+.logger .spd{display:flex;gap:6px;justify-content:center}
+.logger .spdl{font-family:var(--body);font-size:.8rem;text-align:center;opacity:.75;margin-top:4px}
+.logger .spd button{font:500 .8rem var(--mono);background:transparent;color:var(--lcd-ink);border:1px solid currentColor;border-radius:4px;padding:2px 8px;cursor:pointer;opacity:.7}
+.logger .spd button[aria-pressed=true]{opacity:1;background:rgba(143,240,196,.15)}
+.chartbox{position:relative}
+canvas.chart{width:100%;height:240px;display:block;background:var(--paper);border:1px solid var(--line);border-radius:8px;touch-action:none}
+.hint{font-size:.85rem;color:var(--muted)}
+.action{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.action .prompt{font-weight:700;font-family:var(--display)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button.b{font:600 1rem var(--body);border-radius:8px;padding:8px 16px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+button.b.alt{background:transparent;color:var(--accent)}
+button.b[disabled]{opacity:.45;cursor:not-allowed}
+button.chip{font:600 .95rem var(--body);border-radius:999px;padding:6px 12px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+button.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.msg{border-radius:8px;padding:8px 12px;font-size:.95rem}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.bad{background:var(--bad-soft);color:var(--bad)}
+.slider{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.slider input[type=range]{flex:1 1 180px;accent-color:var(--accent)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;vertical-align:middle}
+th{background:var(--accent-soft);font-weight:700}
+td input{width:7.5em;text-align:center;direction:ltr;font-variant-numeric:tabular-nums}
+td.st{min-width:1.5em;font-weight:700}
+.good{color:var(--ok)} .badc{color:var(--bad)}
+.fb{font-size:.85rem;display:block;margin-top:2px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.kv dt{font-weight:700} .kv dd{margin:0}
+.species{display:flex;gap:8px;flex-wrap:wrap}
+.reqs{display:flex;flex-direction:column;gap:6px}
+textarea{width:100%;min-height:90px;resize:vertical;box-sizing:border-box}
+.check{display:flex;gap:8px;align-items:center}
+.check .mk{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;border:2px solid var(--line)}
+.check.on .mk{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);margin:10px 0 14px;padding-block:8px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.part{display:flex;flex-direction:column;gap:12px}
+.phead{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.phead .eq{padding:4px 14px}
+.work{display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(300px,390px) minmax(0,1fr);grid-template-areas:"now bench" "now chart";gap:14px;align-items:start}
+.now{grid-area:now;position:sticky;top:64px;display:flex;flex-direction:column;gap:12px;padding:16px;border:2px solid var(--accent)}
+.benchbox{grid-area:bench;padding:12px}.chartbox{grid-area:chart;padding:12px;align-self:start}
+@media (max-width:820px){.work{grid-template-columns:minmax(0,1fr);grid-template-areas:"bench" "now" "chart"}.now{position:static}}
+.stepline{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;color:var(--muted)}
+.stepline b{color:var(--ink);font-family:var(--display)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.quote{font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.simbox{display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--accent);padding-top:10px}
+.simbox .sl{font-size:.8rem;font-weight:700;letter-spacing:.04em;color:var(--accent)}
+.simbox .action{display:flex;flex-direction:column;gap:10px}
+[hidden]{display:none!important}
+.quote .ql{display:block;font-size:.8rem;letter-spacing:.04em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.action{border:0;padding:0}
+.say{font-size:1.02rem}
+.todo{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:3px;font-size:.95rem}
+.todo li.ok{color:var(--ok)}.todo li.ok::marker{content:"✓  "}
+.stack{display:flex;flex-direction:column;gap:8px}
+button.b.go{width:100%;font-size:1.08rem;padding:11px 16px}
+button.b.go:not([disabled]){animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
+button.b.done{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);width:100%}
+.stack .b.alt{width:100%}
+button.chip.bottle{border-width:2px}
+.vol{font-size:1.1rem;min-width:4.5em;font-variant-numeric:tabular-nums}
+.fine{display:flex;gap:4px}
+.live{border-radius:8px;padding:8px 12px;font-weight:700}
+.live.wait{background:var(--warn-soft);color:var(--warn)}.live.ok{background:var(--ok-soft);color:var(--ok)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cmp div{background:var(--accent-soft);border-radius:8px;padding:8px;text-align:center;display:flex;flex-direction:column}.cmp span{font-size:.85rem;color:var(--muted)}.cmp b{font-size:1.3rem}
+.rform{display:flex;flex-direction:column;gap:8px}
+.rrow{display:grid;grid-template-columns:1fr 7em;gap:4px 10px;align-items:center}
+.rrow input{width:100%;box-sizing:border-box;text-align:center;direction:ltr;font-variant-numeric:tabular-nums}
+.rrow em{grid-column:1/-1;font-style:normal;font-size:.85rem}
+.rrow em:empty{display:none}
+.summ{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.95rem}
+.confirm{background:var(--warn-soft);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.confirm p{color:var(--warn);font-weight:600}
+.eqs{margin-top:8px;background:var(--accent-soft);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.eqr{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:10px;align-items:baseline}
+.eqr .f{text-align:left;font-size:1.05rem;white-space:normal}
+.eqr.sum{border-top:1px solid var(--line);padding-top:6px}
+.dhs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:6px}
+.dhs div{background:var(--accent-soft);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;align-items:center}
+.dhs span{font-size:.85rem;color:var(--muted)}.dhs b{font-size:1.15rem}
+.subst{margin:14px 0 0;padding-inline-start:22px;display:flex;flex-direction:column;gap:12px}
+.subst li::marker{font-weight:700;color:var(--accent)}
+button.check.linkish{font:inherit;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;text-align:start;text-decoration:underline;text-decoration-color:var(--line)}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.92rem}
+details.more ol{margin:6px 0 0;padding-inline-start:20px;font-size:.9rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+details.more li.cur{color:var(--ink);font-weight:600}
+button.link{background:none;border:0;color:var(--muted);text-decoration:underline;font:inherit;font-size:.85rem;cursor:pointer;align-self:flex-start;padding:0}
+.bench{grid-template-columns:minmax(0,1fr) 190px}
+@media (max-width:560px){.bench{grid-template-columns:minmax(0,1fr)}.bench svg{max-height:170px}.logger .big{font-size:1.6rem}}
+.bench svg{max-height:200px}
+.logger .big{font-size:1.9rem}
+canvas.chart{height:220px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap" dir="rtl" lang="he">
+  <header class="mast">
+    <div>
+      <div class="eyebrow">חמד״ע · כימיה · מעבדה וירטואלית</div>
+      <h1>אנתלפיית המסה וסתירה – חוק הס</h1>
+    </div>
+    <div class="who">
+      <label class="fld" for="stName">שם התלמיד/ה<input type="text" id="stName" autocomplete="name"></label>
+      <label class="fld" for="stSchool">בית הספר<input type="text" id="stSchool"></label>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+
+<script>
+document.documentElement.setAttribute('dir','rtl');
+document.documentElement.setAttribute('lang','he');
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const F={
+  NaOHs:'<span class="f">NaOH<sub>(s)</sub></span>', NaOHaq:'<span class="f">NaOH<sub>(aq)</sub></span>', HClaq:'<span class="f">HCl<sub>(aq)</sub></span>',
+  NaOH:'<span class="f">NaOH</span>', dH:'<span class="f">ΔH</span>', dT:'<span class="f">ΔT</span>'
+};
+const BOTTLES={water:{label:'מים מזוקקים',html:'מים מזוקקים'},hcl50:{label:'HCl(aq) 0.50 M',html:F.HClaq+' <span class="f">0.50 M</span>'},hcl25:{label:'HCl(aq) 0.25 M',html:F.HClaq+' <span class="f">0.25 M</span>'},naoh50:{label:'NaOH(aq) 0.50 M',html:F.NaOHaq+' <span class="f">0.50 M</span>'}};
+const STEP_LABEL={measure:'מדידת נפח והעברה לכוס',setup:'מכסה וחיישן',start:'הפעלת מדידה',stabilize:'המתנה להתייצבות',weigh:'שקילת המוצק',addSolid:'הוספת המוצק וערבוב',measure2:'מדידת הבסיס במשורה',base:'הוספת הבסיס וערבוב',stir:'ערבוב',watch:'מעקב ועצירת המדידה',done:'רישום התוצאות'};
+const PARTS={
+  A:{tab:'חלק א׳',title:'חלק א׳ – אנתלפיית ההמסה של '+F.NaOH+' מוצק',
+     eq:'NaOH<sub>(s)</sub> → Na<sup>+</sup><sub>(aq)</sub> + OH<sup>−</sup><sub>(aq)</sub>',
+     need:{bottle:'water',vol:100}, kind:'solid', dHtrue:44.5,
+     steps:['weigh','measure','setup','start','stabilize','addSolid','watch','done'],
+     proto:['מדדו 100 מ״ל מים והעבירו לכוס התרמית. סגרו במכסה והכניסו את חיישן הטמפרטורה דרך הפתח המיועד.',
+            'הפעילו את מדידת הטמפרטורה. לאחר התייצבות הקריאה רשמו את הטמפרטורה ההתחלתית.',
+            'הוסיפו בזהירות 1.00 גרם '+F.NaOHs+' שנשקל מראש; סגרו שוב את המכסה וערבבו בעדינות במקל ערבוב מתאים.',
+            'עקבו אחר הטמפרטורה עד לקבלת ערך מרבי ורשמו אותו. עצרו את המדידה לאחר שהטמפרטורה מתחילה לרדת.'],
+     protoMap:[-1,0,0,1,1,2,3,3]},
+  B:{tab:'חלק ב׳',title:'חלק ב׳ – אנתלפיית הסתירה של '+F.NaOHaq+' עם '+F.HClaq,
+     eq:'OH<sup>−</sup><sub>(aq)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → 2H<sub>2</sub>O<sub>(l)</sub>',
+     need:{bottle:'hcl50',vol:50}, need2:{bottle:'naoh50',vol:50}, kind:'liquid', dHtrue:55.8,
+     steps:['measure','measure2','setup','start','stabilize','base','watch','done'],
+     proto:['מדדו 50 מ״ל '+F.HClaq+' בריכוז <span class="f">0.50 M</span> והעבירו לכוס תרמית נקייה. מדדו בנפרד 50 מ״ל '+F.NaOHaq+' בריכוז <span class="f">0.50 M</span>.',
+            'ודאו ששתי התמיסות באותה טמפרטורה התחלתית בקירוב. הפעילו את החיישן בתוך החומצה ורשמו את הטמפרטורה לאחר התייצבות.',
+            'הוסיפו את תמיסת הבסיס, סגרו במכסה וערבבו בעדינות במקל ערבוב מתאים. עקבו אחר הטמפרטורה עד לערך המרבי.',
+            'רשמו את הערך המרבי ועצרו את המדידה לאחר תחילת הירידה.'],
+     protoMap:[0,0,1,1,1,2,3,3]},
+  C:{tab:'חלק ג׳',title:'חלק ג׳ – אנתלפיית התגובה של '+F.NaOH+' מוצק עם חומצה',
+     eq:'NaOH<sub>(s)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → Na<sup>+</sup><sub>(aq)</sub> + 2H<sub>2</sub>O<sub>(l)</sub>',
+     need:{bottle:'hcl25',vol:100}, kind:'solid', dHtrue:100.3,
+     steps:['weigh','measure','setup','start','stabilize','addSolid','watch','done'],
+     proto:['מדדו 100 מ״ל '+F.HClaq+' בריכוז <span class="f">0.25 M</span> והעבירו לכוס תרמית נקייה. סגרו במכסה, הכניסו חיישן והפעילו מדידה.',
+            'לאחר התייצבות הטמפרטורה רשמו את הערך ההתחלתי. הוסיפו בזהירות 1.00 גרם '+F.NaOHs+' שנשקל מראש.',
+            'ערבבו בעדינות במקל ערבוב מתאים. רשמו את הטמפרטורה המרבית לאחר שהמוצק נמס.',
+            'עצרו את המדידה לאחר תחילת הירידה.'],
+     protoMap:[-1,0,0,0,1,1,2,3]}
+};
+const TABS=[['intro','מבוא'],['A','חלק א׳'],['B','חלק ב׳'],['C','חלק ג׳'],['calc','חישובים'],['hess','חוק הס'],['disc','דיון'],['submit','הגשה']];
+
+/* ---------- state ---------- */
+const KEY='hess-lab-v1';
+function freshPart(){
+  const room=22.5+Math.random()*2;
+  return {step:0,sel:null,vol:0,sel2:null,vol2:0,baseMeasured:false,lid:false,sensor:false,running:false,t:0,acc:0,
+    room, Tw:room-0.7+Math.random()*0.5, Ts:room+1.2, Tb:null, data:[], added:false,tAdd:null,mass:0,massUsed:null,stir:false,
+    Qtot:0,Qrel:0,tau:30,maxT:-1e9,tMax:0,truth:null,res:{Ti:'',Tmax:'',dT:'',m:''},resOk:false,msg:null,stopped:false};
+}
+let S={tab:'intro',name:'',school:'',speed:10,parts:{A:freshPart(),B:freshPart(),C:freshPart()},calc:{A:{},B:{},C:{}},calcOk:{A:false,B:false,C:false},
+  hess:{cancel:null,sum:'',c:'',diff:'',ok:false},disc:['','','',''],summary:''};
+try{const raw=localStorage.getItem(KEY); if(raw){const L=JSON.parse(raw); S=Object.assign(S,L);
+  for(const k of ['A','B','C']){const p=S.parts[k],len=PARTS[k].steps.length; if(!p||!(p.resOk||p.step===len-1)){S.parts[k]=freshPart();} else {p.step=len-1;p.running=false;p.stopped=true;p.msg=null;}}}}catch(e){}
+function save(){try{const c=JSON.parse(JSON.stringify(S));localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}}
+
+/* ---------- tabs ---------- */
+function partDone(k){return S.parts[k].resOk}
+function tabDone(id){
+  if(id==='intro')return !!(S.name.trim());
+  if(PARTS[id])return partDone(id);
+  if(id==='calc')return S.calcOk.A&&S.calcOk.B&&S.calcOk.C;
+  if(id==='hess')return S.hess.ok;
+  if(id==='disc')return QS.every((_,i)=>(S.disc[i]||'').trim().length>0);
+  return false;
+}
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(([id,l])=>`<button class="tab ${tabDone(id)?'done':''}" role="tab" aria-selected="${S.tab===id}" data-tab="${id}"><span class="dot"></span>${l}</button>`).join('');
+}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;S.tab=b.dataset.tab;save();render();window.scrollTo({top:0})});
+$('#stName').value=S.name;$('#stSchool').value=S.school;
+$('#stName').addEventListener('input',e=>{S.name=e.target.value;save();renderTabs()});
+$('#stSchool').addEventListener('input',e=>{S.school=e.target.value;save()});
+
+function render(){renderTabs();const v=$('#view');
+  if(S.tab==='intro')v.innerHTML=introHTML();
+  else if(PARTS[S.tab]&&!S.name.trim()){v.innerHTML=gateHTML();bindGate();}
+ else if(PARTS[S.tab]){v.innerHTML=partHTML(S.tab);bindPart(S.tab);}
+  else if(S.tab==='calc'){v.innerHTML=calcHTML();bindCalc();}
+  else if(S.tab==='hess'){v.innerHTML=hessHTML();bindHess();}
+  else if(S.tab==='disc'){v.innerHTML=discHTML();bindDisc();}
+  else if(S.tab==='submit'){v.innerHTML=submitHTML();bindSubmit();}
+}
+
+/* ---------- intro ---------- */
+function introHTML(){return `<div class="panel">
+ <div class="card"><h2>על הסימולציה</h2>
+ <p style="margin-top:8px">בסימולציה מודדים את החום שמשתחרר בשלושה תהליכים של ${F.NaOH}: המסה של המוצק במים, סתירה של תמיסת ${F.NaOH} בחומצה, ותגובה של המוצק ישירות עם החומצה. מהמדידות מחשבים את שינוי האנתלפיה לכל מול ובודקים אם הם מקיימים את חוק הס.</p>
+ <p style="margin-top:8px">בכל שלב מופיע בצד ימין מה צריך לעשות ועל מה ללחוץ. הטמפרטורה נמדדת בחיישן ומוצגת בגרף. התוצאות מחושבות לפי ערכים אמיתיים, עם רעש מדידה קטן ואיבוד חום לסביבה, כך שכל הרצה נותנת מספרים מעט שונים. הזמן בסימולציה רץ מהר פי 10, ואפשר להאיץ אותו לפי 30.</p></div>
+ <div class="card"><dl class="kv">
+  <dt>מטרה</dt><dd>למדוד שינויי טמפרטורה בשלושה תהליכים, לחשב שינוי אנתלפיה לכל מול ולבדוק את חוק הס.</dd>
+  <dt>ציוד</dt><dd>כוס תרמית עם מכסה, חיישן טמפרטורה, משורה, מאזניים ומקל ערבוב.</dd>
+  <dt>הנחות לחישוב</dt><dd>צפיפות התמיסות בקירוב 1.0 גרם למ״ל; מסת הסביבה הנמדדת בקירוב 100 גרם בכל חלק; החום שעובר לכוס ולאוויר זניח. הזניחו בחישוב את מסת המוצק שהוסף.</dd>
+ </dl></div>
+ <div class="card"><h3>סדר העבודה</h3>
+ <ol style="margin:8px 0 0;padding-inline-start:22px">
+  <li>רשמו שם ובית ספר בראש העמוד.</li>
+  <li>בצעו את חלקים א׳, ב׳ ו־ג׳. בסוף כל חלק קראו מהגרף את הטמפרטורה ההתחלתית והמרבית.</li>
+  <li>מלאו את טבלת החישובים, בדקו את חוק הס וענו על שאלות הדיון.</li>
+  <li>בלשונית "הגשה" מופיע סיכום של כל העבודה.</li>
+ </ol>
+ <div class="btns" style="margin-top:14px"><button class="b" onclick="S.tab='A';save();render()">להתחלת חלק א׳</button><button class="b alt" onclick="document.getElementById('allBox').hidden=false;this.hidden=true">↻ התחלת כל הניסוי מחדש</button></div>
+ <div class="confirm" id="allBox" hidden style="margin-top:10px"><p>למחוק את כל המדידות, החישובים והתשובות ולהתחיל מההתחלה? השם ובית הספר נשארים.</p><div class="btns"><button class="b" onclick="resetAll()">כן, להתחיל מחדש</button><button class="b alt" onclick="render()">ביטול</button></div></div></div>
+</div>`}
+
+function resetAll(){S.parts={A:freshPart(),B:freshPart(),C:freshPart()};S.calc={A:{},B:{},C:{}};S.calcOk={A:false,B:false,C:false};S.calcFb={};S.hess={cancel:null,sum:'',c:'',diff:'',ok:false};S.disc=['','','',''];hoverX=null;S.tab='A';save();render();window.scrollTo({top:0})}
+function gateHTML(){return `<div class="panel"><div class="card now" style="position:static;max-width:520px"><h2>לפני שמתחילים</h2>
+ <p class="say">רשמו את שמכם. השם יופיע בסיכום שתגישו בסוף.</p>
+ <label class="fld" for="gName">שם התלמיד/ה<input type="text" id="gName" autocomplete="name"></label>
+ <label class="fld" for="gSchool">בית הספר<input type="text" id="gSchool" value="${esc(S.school)}"></label>
+ <button class="b go" id="gGo" disabled>התחלת הניסוי</button></div></div>`}
+function bindGate(){const n=$('#gName'),g=$('#gGo');n.focus();n.oninput=()=>{g.disabled=!n.value.trim()};
+ n.onkeydown=e=>{if(e.key==='Enter'&&n.value.trim())g.click()};
+ g.onclick=()=>{S.name=n.value.trim();S.school=$('#gSchool').value.trim()||S.school;$('#stName').value=S.name;$('#stSchool').value=S.school;save();render()}}
+/* ---------- part view ---------- */
+function todo(items){return `<ol class="todo">${items.map(([d,t])=>`<li class="${d?'ok':''}">${t}</li>`).join('')}</ol>`}
+function partHTML(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];const pi=P.protoMap[p.step];const n=P.steps.length;
+ const stepNo=Math.min(n,p.step+1);
+ return `<div class="part">
+ <div class="phead"><h2>${P.title}</h2><div class="eq">${P.eq}</div></div>
+ <div class="work">
+  <aside class="now card" id="now" aria-live="polite">
+   <div class="stepline"><span>שלב ${stepNo} מתוך ${n}</span><b>${STEP_LABEL[sk]}</b></div>
+   <div class="bar" aria-hidden="true"><i style="width:${(p.resOk?n:p.step)/n*100}%"></i></div>
+   ${p.resOk?'':`<div class="quote"><span class="ql">הוראת הניסוי – מה עושים במעבדה</span>${pi<0?'שקלו מראש 1.00 גרם '+F.NaOHs+' על סירת שקילה. המוצק יתווסף לכוס רק אחרי שהטמפרטורה תתייצב.':P.proto[pi]}</div>`}
+   <div class="simbox"><span class="sl">בסימולציה – על מה ללחוץ</span><div class="action" id="action">${actionHTML(k)}</div></div>
+   <details class="more"><summary>כל ההוראות של ${P.tab}</summary>
+    <ol>${P.proto.map((t,i)=>`<li class="${i===pi&&!p.resOk?'cur':''}">${t}</li>`).join('')}</ol></details>
+   <button class="b alt" id="reset">↻ הפעלה מחדש של ${P.tab}</button>
+   <div class="confirm" id="resetBox" hidden><p>להתחיל את ${P.tab} מההתחלה? המדידות והתוצאות של החלק הזה יימחקו.</p><div class="btns"><button class="b" id="resetYes">כן, מההתחלה</button><button class="b alt" id="resetNo">ביטול</button></div></div>
+  </aside>
+  <div class="benchbox card">
+   <div class="bench"><div id="benchSvg">${benchSVG(k)}</div>
+    <div class="logger">
+     <div class="state" id="lgState"></div>
+     <div class="big" id="lgT">--.- °C</div>
+     <div class="row"><span>t</span><span id="lgt">0 s</span></div>
+     <div class="spdl">מהירות הזמן</div><div class="spd" title="כמה מהר עובר הזמן בסימולציה. ×10 = פי 10 מהמציאות, ×30 = פי 30"><button data-spd="10" aria-pressed="${S.speed===10}" aria-label="זמן מהיר פי 10">×10</button><button data-spd="30" aria-pressed="${S.speed===30}" aria-label="זמן מהיר פי 30">×30</button></div>
+    </div></div>
+  </div>
+  <div class="chartbox card"><canvas class="chart" id="chart" aria-label="גרף טמפרטורה כפונקציה של זמן"></canvas>
+   <p class="hint" id="hov">${p.stopped?'👆 העבירו את העכבר או האצבע על הגרף כדי לקרוא ערכים.':'הגרף מתעדכן בזמן המדידה.'}</p></div>
+ </div></div>`}
+
+function msgHTML(m){return m?`<div class="msg ${m[0]}">${m[1]}</div>`:''}
+function bottleChips(attr,sel){return `<div class="btns">${Object.entries(BOTTLES).map(([id,b])=>`<button class="chip bottle" data-${attr}="${id}" aria-pressed="${sel===id}">${b.html}</button>`).join('')}</div>`}
+function volTxt(v){return v>100?'מעל 100':String(v)}
+function volSlider(id,val,dv){return `<div class="slider"><input type="range" id="${id}" min="0" max="125" step="1" value="${val}" aria-label="נפח במשורה"><b class="vol"><span id="${id}v">${volTxt(val)}</span> מ״ל</b>
+  <span class="fine"><button class="chip" data-${dv}="-1" aria-label="פחות מיליליטר">−1</button><button class="chip" data-${dv}="1" aria-label="עוד מיליליטר">+1</button></span></div>`}
+function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h='';
+ if(sk==='measure'){
+  h=todo([[!!p.sel,'בחרו את התמיסה המתאימה להוראה'],[p.vol>0,'גררו את המחוון עד הנפח הנדרש (אפשר לדייק ב־‎−1/+1)'],[false,'לחצו על הכפתור הכחול']])
+   +bottleChips('bottle',p.sel)+volSlider('vol',p.vol,'dv')
+   +`<button class="b go" id="pour" ${p.sel&&p.vol>0?'':'disabled'}>העבירו לכוס התרמית</button>`;}
+ else if(sk==='setup'){h=`<p class="say">סגרו את הכוס התרמית במכסה והכניסו את החיישן דרך הפתח שבמכסה (בכל סדר). מקל הערבוב כבר נמצא בכוס.</p>
+  <div class="stack"><button class="b ${p.lid?'done':'go'}" id="lid" ${p.lid?'disabled':''}>${p.lid?'✓ הכוס סגורה':'סגירת הכוס במכסה'}</button>
+  <button class="b ${p.sensor?'done':'go'}" id="sensor" ${p.sensor?'disabled':''}>${p.sensor?'✓ החיישן בפנים':'הכנסת חיישן הטמפרטורה'}</button></div>`;}
+ else if(sk==='start'){h=`<p class="say">הכול מוכן. הפעילו את החיישן כדי להתחיל לרשום את הטמפרטורה.</p><button class="b go" id="startBtn">▶ הפעלת מדידה</button>`;}
+ else if(sk==='stabilize'){h=`<p class="say">החיישן היה באוויר החדר ולוקח לו כמה שניות להגיע לטמפרטורת התמיסה. חכו עד שהקו בגרף יתיישר.</p>
+  <div class="live wait" id="live">⏳ הקריאה עדיין משתנה – חכו</div><button class="b go" id="stableBtn" disabled>הקריאה התייצבה – המשך</button>`;}
+ else if(sk==='weigh'){const okm=Math.abs(p.mass-1)<=0.03;
+  h=`<p class="say">לחצו "הוספה בכף" עד שהמאזניים מראים כ־<b class="f">1.00 g</b>. עברתם? לחצו "הורדה מעט".</p>
+  <div class="live ${okm?'ok':'wait'}" id="massLive">על המאזניים: <b class="f">${p.mass.toFixed(2)} g</b> ${okm?'✓':''}</div>
+  <div class="btns"><button class="b alt" id="spoonAdd">＋ הוספה בכף</button><button class="b alt" id="spoonRem">− הורדה מעט</button></div>
+  <button class="b go" id="weighDone" ${okm?'':'disabled'}>סיום השקילה – המשך</button>`;}
+ else if(sk==='addSolid'){h=`<p class="say">הקריאה יציבה. עכשיו מוסיפים לכוס את המוצק ששקלתם: <b class="f">${p.mass.toFixed(2)} g</b> ${F.NaOHs}.</p><p class="hint">רשמו לעצמכם את הטמפרטורה ההתחלתית לפני שמוסיפים.</p><button class="b go" id="addSolid">הוסיפו את המוצק וערבבו</button>`;}
+ else if(sk==='base'||sk==='measure2'){
+  if(!p.baseMeasured){h=`<p class="say">עכשיו מודדים את הבסיס במשורה נפרדת.</p>`+todo([[!!p.sel2,'בחרו את תמיסת הבסיס המתאימה להוראה'],[p.vol2>0,'גררו את המחוון עד הנפח הנדרש'],[false,'לחצו על הכפתור הכחול']])
+   +bottleChips('bottle2',p.sel2)+volSlider('vol2',p.vol2,'dv2')
+   +`<button class="b go" id="measBase" ${p.sel2&&p.vol2>0?'':'disabled'}>מדדו את הבסיס</button>`;}
+  else {h=`<p class="say">השוו את הטמפרטורות של שתי התמיסות:</p>
+  <div class="cmp"><div><span>חומצה בכוס</span><b class="f" id="cmpA">${p.Ts.toFixed(1)} °C</b></div><div><span>בסיס במשורה</span><b class="f">${p.Tb.toFixed(1)} °C</b></div></div>
+  <p class="say">הן קרובות, אז אפשר להמשיך. רשמו לעצמכם את הטמפרטורה ההתחלתית של החומצה.</p>
+  <button class="b go" id="addBase">שפכו את הבסיס לכוס וערבבו</button>`;}}
+ else if(sk==='watch'){h=`<p class="say">עקבו אחר הגרף. כשהטמפרטורה מגיעה לשיא ומתחילה לרדת, אפשר לעצור.</p>
+  <div class="live wait" id="live">↑ הטמפרטורה עולה – המשיכו לעקוב</div><button class="b go" id="stopBtn" disabled>■ עצירת המדידה</button>`;}
+ else if(sk==='done'){h=resultsHTML(k);}
+ return msgHTML(p.msg)+h;
+}
+function resultsHTML(k){const p=S.parts[k],r=p.res,ok=p.resOk;const fb=p.fb||{};
+ const row=(f,l)=>`<label class="rrow" for="r_${f}"><span>${l}</span><input type="number" step="0.01" inputmode="decimal" id="r_${f}" value="${esc(r[f])}" ${ok?'disabled':''}><em class="${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</em></label>`;
+ if(ok)return `<div class="msg ok">✓ התוצאות של ${PARTS[k].tab} נרשמו.</div>
+  <div class="summ"><span>התחלתית <b class="f">${r.Ti} °C</b></span><span>מרבית <b class="f">${r.Tmax} °C</b></span><span><span class="f">ΔT</span> <b class="f">${r.dT} °C</b></span></div>
+  <button class="b go" id="nextTab">${k==='C'?'המשך לחישובים':'המשך ל'+PARTS[k==='A'?'B':'C'].tab} ←</button>`;
+ return `<p class="say">המדידה נעצרה. קראו מהגרף שני ערכים ורשמו אותם:</p>
+ ${todo([[false,'<b>טמפרטורה התחלתית</b>: הקו הישר לפני הקו המקווקו "הוספה"'],[false,'<b>טמפרטורה מרבית</b>: הנקודה הגבוהה ביותר בגרף']])}
+ <p class="hint">👆 העבירו את העכבר או האצבע על הגרף – הערך מופיע בתיבה.${PARTS[k].kind==='solid'?' המסה ששקלתם: <b class="f">'+p.massUsed.toFixed(2)+' g</b>.':''}</p>
+ <div class="rform">${row('Ti','טמפרטורה התחלתית (°C)')}${row('Tmax','טמפרטורה מרבית (°C)')}${row('dT','שינוי טמפרטורה <span class="f">ΔT</span> (°C)')}${row('m','מסת הסביבה (g)')}</div>
+ <button class="b go" id="checkRes">בדיקת התוצאות</button>`;
+}
+function updateLive(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];const L=$('#live');if(!L)return;
+ if(sk==='stabilize'){const st=Math.abs(p.Ts-p.Tw)<=0.06&&p.t>=8;L.className='live '+(st?'ok':'wait');L.textContent=st?'✓ הקריאה יציבה – אפשר להמשיך':'⏳ הקריאה עדיין משתנה – חכו';const b=$('#stableBtn');if(b)b.disabled=!st}
+ if(sk==='watch'){const passed=p.added&&p.Qrel/p.Qtot>0.95&&(p.t-p.tMax)>=12;const near=p.t-p.tMax>=3;
+  L.className='live '+(passed?'ok':'wait');L.textContent=passed?'↓ הטמפרטורה יורדת – אפשר לעצור':(near?'• הטמפרטורה סביב השיא – חכו עוד רגע':'↑ הטמפרטורה עולה – המשיכו לעקוב');const b=$('#stopBtn');if(b)b.disabled=!passed}
+}
+
+/* ---------- bench drawing ---------- */
+function pelHTML(k){const P=PARTS[k],p=S.parts[k];if(!(p.added&&P.kind==='solid'))return '';const cx=170,cy=80,cupH=120;const left=Math.max(0,1-p.Qrel/p.Qtot);if(left<0.02)return '';const nP=Math.ceil(left*Math.min(12,Math.round(p.massUsed*8)));let s='';for(let i=0;i<nP;i++){const r=1.5+2*left;s+=`<circle cx="${cx+22+(i%6)*9+(i>5?4:0)}" cy="${cy+cupH+4-Math.floor(i/6)*5}" r="${r.toFixed(1)}" fill="var(--paper)" stroke="var(--muted)"/>`}return s}
+function benchSVG(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];
+ const inCup=p.poured?(P.need.vol+(p.added&&P.kind==='liquid'?50:0)):0;
+ const cupH=120, lvl=Math.min(1,inCup/150);
+ const cylVol=sk==='measure'?p.vol:((sk==='base'||sk==='measure2')?p.vol2:0);
+ const showBal=P.kind==='solid'&&(sk==='weigh'||sk==='addSolid');
+ const showCyl=sk==='measure'||sk==='measure2'||(sk==='base');
+ const stir=p.stir&&p.running?'<animateTransform attributeName="transform" type="rotate" values="-8 210 70;8 210 70;-8 210 70" dur="0.8s" repeatCount="indefinite"/>':'';
+ let s=`<svg viewBox="0 0 360 230" style="direction:ltr" role="img" aria-label="שולחן העבודה"><rect x="0" y="212" width="360" height="4" fill="var(--line)"/>`;
+ // cup
+ const cx=170,cy=80,cw=90;
+ s+=`<path d="M${cx} ${cy} L${cx+cw} ${cy} L${cx+cw-10} ${cy+cupH+12} L${cx+10} ${cy+cupH+12} Z" fill="var(--cup)" stroke="var(--muted)" stroke-width="2"/>`;
+ if(lvl>0){const top=cy+cupH+12-lvl*(cupH-10);const inset=10*(1-(top-cy)/(cupH+12));
+  s+=`<path d="M${cx+4+inset} ${top} L${cx+cw-4-inset} ${top} L${cx+cw-13} ${cy+cupH+9} L${cx+13} ${cy+cupH+9} Z" fill="var(--liquid)" stroke="var(--liquid-line)" stroke-width="1"/>`;}
+ if(p.lid)s+=`<rect x="${cx-6}" y="${cy-10}" width="${cw+12}" height="10" rx="3" fill="var(--accent)"/>`;
+ if(p.sensor)s+=`<rect x="${cx+cw/2-30}" y="${cy-60}" width="6" height="${cupH+40}" rx="3" fill="var(--ink)"/><path d="M${cx+cw/2-27} ${cy-60} q0 -20 -40 -20" stroke="var(--ink)" stroke-width="2" fill="none"/>`;
+ s+=`<g id="pel">${pelHTML(k)}</g>`;
+ if(p.poured||p.stir)s+=`<g>${stir}<rect x="${cx+cw/2+16}" y="${cy-55}" width="5" height="${cupH+35}" rx="2" fill="var(--warn)"/></g>`;
+ s+=`<text x="${cx+cw/2}" y="${cy+cupH+30}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Assistant">כוס תרמית</text>`;
+ if(showCyl){const v=cylVol;const x=60,y=22,h=178,cap=125,u=(h-6)/cap;
+  s+=`<rect x="${x}" y="${y}" width="34" height="${h}" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/>`;
+  if(v>0)s+=`<rect x="${x+2}" y="${y+h-v*u-2}" width="30" height="${v*u}" fill="var(--liquid)"/>`;
+  for(let i=0;i<=10;i++){const yy=y+h-2-i*10*u;s+=`<line x1="${x}" x2="${x+(i%5?8:14)}" y1="${yy}" y2="${yy}" stroke="var(--muted)" stroke-width="1"/>`;if(i%5===0)s+=`<text x="${x-4}" y="${yy+4}" font-size="10" text-anchor="end" fill="var(--muted)" font-family="IBM Plex Mono">${i*10}</text>`}
+  s+=`<rect x="${x-8}" y="${y+h}" width="50" height="8" fill="var(--muted)"/><text x="${x+17}" y="${y-8}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Assistant">משורה 100 מ״ל</text>`;}
+ if(showBal){const x=10,y=150;
+  s+=`<rect x="${x}" y="${y+20}" width="120" height="42" rx="6" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/><rect x="${x+20}" y="${y+12}" width="80" height="8" fill="var(--muted)"/>
+  <rect x="${x+30}" y="${y+32}" width="60" height="20" rx="3" fill="var(--lcd)"/><text x="${x+60}" y="${y+47}" text-anchor="middle" font-size="13" fill="var(--lcd-ink)" font-family="IBM Plex Mono">${p.mass.toFixed(2)} g</text>`;
+  for(let i=0;i<Math.min(12,Math.round(p.mass*8));i++)s+=`<circle cx="${x+40+(i%6)*8}" cy="${y+6-Math.floor(i/6)*5}" r="3.2" fill="var(--paper)" stroke="var(--muted)"/>`;}
+ if(sk==='base'&&p.baseMeasured&&!p.added){s+=`<text x="76" y="30" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Assistant">בסיס: ${p.Tb.toFixed(1)} °C</text>`}
+ return s+'</svg>';
+}
+
+/* ---------- chart ---------- */
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888'}
+let hoverX=null;
+function drawChart(k){const cv=$('#chart');if(!cv)return;const p=S.parts[k];
+ const dpr=window.devicePixelRatio||1;const W=cv.clientWidth,H=cv.clientHeight;if(!W)return;
+ cv.width=W*dpr;cv.height=H*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);
+ const L=44,R=12,T=12,B=30;const d=p.data;
+ const tmax=Math.max(120,Math.ceil((p.t+15)/30)*30);
+ let lo=Infinity,hi=-Infinity;for(const [,v] of d){lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ if(!d.length){lo=p.room-1;hi=p.room+1}
+ lo=Math.floor(lo-0.3);hi=Math.ceil(hi+0.3);if(hi-lo<2)hi=lo+2;
+ const X=t=>L+(W-L-R)*t/tmax, Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ const mut=cssv('--muted'),line=cssv('--line'),acc=cssv('--accent'),ink=cssv('--ink');
+ c.font='11px "IBM Plex Mono", monospace';c.fillStyle=mut;c.strokeStyle=line;c.lineWidth=1;
+ const ystep=(hi-lo)>8?2:((hi-lo)>4?1:0.5);
+ c.textAlign='right';for(let v=lo;v<=hi+1e-9;v+=ystep){const y=Y(v);c.beginPath();c.moveTo(L,y);c.lineTo(W-R,y);c.stroke();c.fillText(v.toFixed(ystep<1?1:0),L-6,y+4)}
+ const xstep=tmax>300?60:30;c.textAlign='center';for(let t=0;t<=tmax;t+=xstep){const x=X(t);c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.fillText(t,x,H-B+14)}
+ c.fillText('t (s)',W-R-18,H-4);c.save();c.translate(10,T+(H-T-B)/2);c.rotate(-Math.PI/2);c.fillText('T (°C)',0,0);c.restore();
+ if(p.tAdd!=null){const x=X(p.tAdd);c.setLineDash([4,4]);c.strokeStyle=mut;c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.setLineDash([]);c.textAlign='center';c.fillStyle=mut;c.font='12px Assistant, sans-serif';c.fillText('הוספה',x,T+10)}
+ if(d.length){c.strokeStyle=acc;c.lineWidth=2;c.beginPath();d.forEach(([t,v],i)=>i?c.lineTo(X(t),Y(v)):c.moveTo(X(t),Y(v)));c.stroke();
+  const [lt,lv]=d[d.length-1];if(p.running){c.fillStyle=acc;c.beginPath();c.arc(X(lt),Y(lv),4,0,7);c.fill()}}
+ if(hoverX!=null&&p.stopped&&d.length){const t=(hoverX-L)/(W-L-R)*tmax;let best=d[0];for(const q of d)if(Math.abs(q[0]-t)<Math.abs(best[0]-t))best=q;
+  const x=X(best[0]),y=Y(best[1]);c.strokeStyle=ink;c.lineWidth=1;c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.fillStyle=ink;c.beginPath();c.arc(x,y,4,0,7);c.fill();
+  const lab=`t = ${best[0]} s   T = ${best[1].toFixed(2)} °C`;c.font='12px "IBM Plex Mono", monospace';const tw=c.measureText(lab).width+12;let bx=Math.min(Math.max(x-tw/2,L),W-R-tw);
+  c.fillStyle=cssv('--paper');c.strokeStyle=line;c.fillRect(bx,T+14,tw,20);c.strokeRect(bx,T+14,tw,20);c.fillStyle=ink;c.textAlign='left';c.fillText(lab,bx+6,T+28);
+  const h=$('#hov');if(h)h.innerHTML=`👆 נקודה נבחרת: <span class="f">t = ${best[0]} s, T = ${best[1].toFixed(2)} °C</span>`;}
+}
+
+/* ---------- simulation ---------- */
+let last=null;
+function noise(){return (Math.random()+Math.random()+Math.random()-1.5)*0.02}
+function stepSim(k,dt){const P=PARTS[k],p=S.parts[k];const h=0.1;const C=100*4.18+12;const kl=p.lid?0.0011:0.004;
+ p.acc+=dt;
+ while(p.acc>=h){p.acc-=h;p.t=+(p.t+h).toFixed(1);
+  let rate=0;if(p.added){rate=(p.Qtot-p.Qrel)/p.tau;p.Qrel+=rate*h}
+  p.Tw+=rate*h/C-kl*(p.Tw-p.room)*h;
+  p.Ts+=(p.Tw-p.Ts)*h/3;
+  if(Math.abs(p.t-Math.round(p.t))<1e-6){const r=+(p.Ts+noise()).toFixed(2);p.data.push([Math.round(p.t),r]);
+   if(r>p.maxT){p.maxT=r;p.tMax=Math.round(p.t)}}
+ }
+}
+function tick(ts){
+ const k=S.tab;if(PARTS[k]){const p=S.parts[k];
+  if(last!=null&&p.running){const dt=Math.min(0.1,(ts-last)/1000)*S.speed;stepSim(k,dt);if(p.t>900){p.running=false;p.stopped=true}}
+  updateLogger(k);updateLive(k);if(p.running)drawChart(k);
+  if(p.running&&p.added&&PARTS[k].kind==='solid'&&ts-(window._bt||0)>250){window._bt=ts;const g=$('#pel');if(g)g.innerHTML=pelHTML(k)}
+ }
+ last=ts;requestAnimationFrame(tick);
+}
+function updateLogger(k){const p=S.parts[k];const T=$('#lgT');if(!T)return;
+ const lastR=p.data.length?p.data[p.data.length-1][1]:null;
+ T.textContent=p.running||p.stopped?(lastR!=null?lastR.toFixed(2):p.Ts.toFixed(2))+' °C':'--.- °C';
+ $('#lgt').textContent=Math.round(p.t)+' s';
+ $('#lgState').textContent=p.running?'● מודד':(p.stopped?'המדידה נעצרה':'ממתין');
+ const ca=$('#cmpA');if(ca)ca.textContent=p.Ts.toFixed(1)+' °C';
+}
+requestAnimationFrame(tick);
+
+/* ---------- part actions ---------- */
+function setMsg(k,type,text){S.parts[k].msg=type?[type,text]:null}
+function next(k){const p=S.parts[k];p.step++;p.msg=null;save();refreshPart(k)}
+function rerender(k){const sc=scrollY;render();scrollTo(0,sc)}
+function refreshPart(k){render();const n=$('#now');if(n){const r=n.getBoundingClientRect();if(r.top<0||r.top>innerHeight*0.6)n.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}}
+function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
+ drawChart(k);updateLogger(k);
+ document.querySelectorAll('[data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;save();document.querySelectorAll('[data-spd]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+ $('#reset').onclick=()=>{$('#resetBox').hidden=false;$('#reset').hidden=true;$('#resetYes').focus()};
+ $('#resetNo').onclick=()=>{$('#resetBox').hidden=true;$('#reset').hidden=false};
+ $('#resetYes').onclick=()=>{S.parts[k]=freshPart();S.calcOk[k]=false;S.calc[k]={};if(S.calcFb)S.calcFb[k]={};S.hess.ok=false;S.hess.fb=null;hoverX=null;save();render();window.scrollTo({top:0})};
+ const cv=$('#chart');const hov=e=>{if(!p.stopped)return;const r=cv.getBoundingClientRect();hoverX=e.clientX-r.left;drawChart(k)};
+ cv.addEventListener('pointermove',hov);cv.addEventListener('pointerdown',hov);
+ const sk=P.steps[p.step];
+ const volBind=(id,vk,lab,dvk)=>{const r=$('#'+id);if(!r)return;const btn=A.querySelector('.b.go');const en=()=>{if(btn)btn.disabled=!((vk==='vol'?p.sel:p.sel2)&&p[vk]>0)};r.oninput=()=>{p[vk]=+r.value;$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()};
+  A.querySelectorAll(`[data-${dvk}]`).forEach(b=>b.onclick=()=>{p[vk]=Math.max(0,Math.min(125,p[vk]+ +b.getAttribute('data-'+dvk)));r.value=p[vk];$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()})};
+ if(sk==='measure'){A.querySelectorAll('[data-bottle]').forEach(b=>b.onclick=()=>{p.sel=b.dataset.bottle;p.msg=null;rerender(k)});
+  volBind('vol','vol','volv','dv');
+  $('#pour').onclick=()=>{const n=P.need;
+   if(!p.sel){setMsg(k,'warn','בחרו קודם את התמיסה שמודדים.');return render()}
+   if(p.sel!==n.bottle){setMsg(k,'bad','זו לא התמיסה הנדרשת בחלק הזה. קראו שוב את ההוראה.');return render()}
+   if(Math.abs(p.vol-n.vol)>1){setMsg(k,'bad',`בדקו את הנפח במשורה: ההוראה מבקשת ${n.vol} מ״ל. אפשר להוריד נוזל עם המחוון או עם −1.`);return render()}
+   p.poured=true;next(k)}}
+ if(sk==='setup'){$('#lid').onclick=()=>{p.lid=true;chk()};$('#sensor').onclick=()=>{p.sensor=true;chk()};
+  function chk(){if(p.lid&&p.sensor)next(k);else{save();rerender(k)}}}
+ if(sk==='addSolid'){$('#addSolid').onclick=()=>{startReaction(k);next(k)}}
+ if(sk==='start'){$('#startBtn').onclick=()=>{p.running=true;p.stopped=false;p.data=[];p.t=0;p.maxT=-1e9;next(k)}}
+ if(sk==='stabilize'){$('#stableBtn').onclick=()=>{if(Math.abs(p.Ts-p.Tw)>0.06||p.t<8){setMsg(k,'warn','הקריאה עדיין משתנה. חכו עוד מעט והסתכלו על הגרף.');render()}else next(k)}}
+ if(sk==='weigh'){
+  $('#spoonAdd').onclick=()=>{p.mass=+(p.mass+0.15+Math.random()*0.25).toFixed(2);p.msg=null;rerender(k)};
+  $('#spoonRem').onclick=()=>{p.mass=Math.max(0,+(p.mass-(0.03+Math.random()*0.1)).toFixed(2));rerender(k)};
+  $('#weighDone').onclick=()=>{if(Math.abs(p.mass-1)>0.03){setMsg(k,'bad',`על המאזניים ${p.mass.toFixed(2)} g. יש לשקול 1.00 גרם (בטווח 0.97–1.03).`);return render()}
+   next(k)}}
+ if(sk==='base'||sk==='measure2'){
+  if(!p.baseMeasured){A.querySelectorAll('[data-bottle2]').forEach(b=>b.onclick=()=>{p.sel2=b.dataset.bottle2;p.msg=null;rerender(k)});
+   volBind('vol2','vol2','vol2v','dv2');
+   $('#measBase').onclick=()=>{const n=P.need2;
+    if(!p.sel2){setMsg(k,'warn','בחרו קודם את התמיסה שמודדים.');return render()}
+    if(p.sel2!==n.bottle){setMsg(k,'bad','זו לא תמיסת הבסיס הנדרשת. קראו שוב את ההוראה.');return render()}
+    if(Math.abs(p.vol2-n.vol)>1){setMsg(k,'bad','בדקו את הנפח במשורה: ההוראה מבקשת 50 מ״ל. אפשר להוריד נוזל עם המחוון או עם −1.');return render()}
+    p.baseMeasured=true;p.Tb=p.room-0.5+Math.random()*0.4;p.msg=null;if(sk==='measure2')next(k);else{save();rerender(k)}}}
+  else $('#addBase').onclick=()=>{startReaction(k);next(k)}}
+ if(sk==='watch'){$('#stopBtn').onclick=()=>{
+   const passed=p.added&&p.Qrel/p.Qtot>0.95&&(p.t-p.tMax)>=12;
+   if(!passed){setMsg(k,'warn','הטמפרטורה עדיין עולה או שרק עכשיו הגיעה לשיא. עצרו רק אחרי שהיא מתחילה לרדת.');return render()}
+   p.running=false;p.stopped=true;
+   const pre=p.data.filter(([t])=>t>=p.tAdd-5&&t<=p.tAdd);p.truth={Ti:pre.reduce((a,b)=>a+b[1],0)/pre.length,Tmax:p.maxT};
+   next(k)}}
+ if(sk==='done'){
+  if(!p.resOk){['Ti','Tmax','dT','m'].forEach(f=>{const el=$('#r_'+f);el.oninput=()=>{p.res[f]=el.value;save()}});
+   $('#checkRes').onclick=()=>checkResults(k)}
+  else $('#nextTab').onclick=()=>{S.tab=k==='A'?'B':(k==='B'?'C':'calc');save();render();window.scrollTo({top:0})}}
+}
+function startReaction(k){const P=PARTS[k],p=S.parts[k];
+ p.added=true;p.tAdd=Math.round(p.t);
+ if(P.kind==='solid'){p.massUsed=p.mass;const n=p.mass/40;p.Qtot=n*P.dHtrue*1000;p.tau=6}
+ else{p.Tw=(p.Tw*50+p.Tb*50)/100;p.Qtot=0.025*P.dHtrue*1000;p.tau=2.5}
+ p.stir=true;
+}
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:null};
+function checkResults(k){const p=S.parts[k],r=p.res,t=p.truth;const fb={};
+ const Ti=num(r.Ti),Tm=num(r.Tmax),dT=num(r.dT),m=num(r.m);
+ fb.Ti=Ti==null?[0,'חסר ערך']:(Math.abs(Ti-t.Ti)<=0.15?[1,'✓']:[0,'קראו שוב את הקריאה היציבה לפני ההוספה']);
+ fb.Tmax=Tm==null?[0,'חסר ערך']:(Math.abs(Tm-t.Tmax)<=0.12?[1,'✓']:[0,'חפשו את הנקודה הגבוהה ביותר בגרף']);
+ fb.dT=dT==null?[0,'חסר ערך']:(Ti!=null&&Tm!=null&&Math.abs(dT-(Tm-Ti))<=0.021?[1,'✓']:(Ti!=null&&Tm!=null&&Math.abs(dT+(Tm-Ti))<=0.021?[0,'ΔT = סופית − התחלתית']:[0,'בדקו את החיסור']));
+ fb.m=m==null?[0,'חסר ערך']:(Math.abs(m-100)<0.5?[1,'✓']:[0,'ראו את "הנחות לחישוב" במבוא']);
+ p.fb=fb;p.resOk=Object.values(fb).every(x=>x[0]);
+ if(p.resOk){p.acc_dT=dT}
+ save();rerender(k);
+}
+
+/* ---------- calculations ---------- */
+const CF=[['qcal','שינוי אנרגיית הסביבה (cal)'],['qj','שינוי אנרגיית הסביבה (J)'],['qsys','שינוי אנרגיית המערכת (J)'],['n','n (mol)'],['dh','ΔH (kJ/mol)']];
+function expected(k){const p=S.parts[k];const dT=num(p.res.dT);const qcal=100*dT,qj=qcal*4.2,qsys=-qj;const n=k==='B'?0.025:p.massUsed/40;return {qcal,qj,qsys,n,dh:qsys/n/1000}}
+function calcHTML(){
+ const rows=['A','B','C'].map(k=>{const p=S.parts[k];const lbl={A:'א',B:'ב',C:'ג'}[k];
+  if(!p.resOk)return `<tr><th>${lbl}</th><td colspan="5" class="hint">השלימו קודם את ${PARTS[k].tab}</td></tr>`;
+  const c=S.calc[k],fb=(S.calcFb||{})[k]||{};const ok=S.calcOk[k];
+  return `<tr><th>${lbl}</th>${CF.map(([f])=>`<td><input type="number" step="any" inputmode="decimal" id="c_${k}_${f}" value="${esc(c[f]??'')}" ${ok?'disabled':''}><span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</span></td>`).join('')}</tr>`}).join('');
+ const info=['A','B','C'].map(k=>{const p=S.parts[k];if(!p.resOk)return '';const lbl={A:'א',B:'ב',C:'ג'}[k];
+  return `<li>חלק ${lbl}: <span class="f">ΔT = ${num(p.res.dT).toFixed(2)} °C</span>${k!=='B'?` · מסת ${F.NaOH} ששקלתם: <span class="f">${p.massUsed.toFixed(2)} g</span>`:` · <span class="f">50 mL × 0.50 M</span>`}</li>`}).join('');
+ return `<div class="panel">
+ <div class="card"><h2>דרך החישוב</h2>
+ <p style="margin-top:8px">קלוריה אחת (<span class="f">cal</span>) היא בקירוב האנרגיה הדרושה לחימום גרם אחד של מים במעלה צלזיוס אחת. בשאלות על אנרגיה יש לציין סימן מתאים.</p>
+ <ol style="margin:8px 0 0;padding-inline-start:22px;display:flex;flex-direction:column;gap:4px">
+  <li>שינוי האנרגיה של הסביבה בקלוריות: מספר הגרמים × ${F.dT}</li>
+  <li>המרה לג׳אולים: אנרגיה (<span class="f">J</span>) = אנרגיה (<span class="f">cal</span>) × 4.2</li>
+  <li>שינוי האנרגיה של המערכת: סימן הפוך לשינוי האנרגיה של הסביבה.</li>
+  <li>מספר המולים <span class="f">n</span> של ${F.NaOH} שהגיב. נתון: <span class="f">M(NaOH) = 40.0 g/mol</span></li>
+  <li>השינוי למול: שינוי האנרגיה של המערכת חלקי מספר המולים, ובהמרה ל־<span class="f">kJ/mol</span> (חלקו ב־1000).</li>
+ </ol>
+ <h3 style="margin-top:12px">הנתונים שלכם</h3><ul style="margin:6px 0 0;padding-inline-start:22px">${info||'<li class="hint">עדיין אין נתונים</li>'}</ul></div>
+ <div class="card"><h2>טבלת סיכום חישובים</h2>
+ <div class="tbl" style="margin-top:10px"><table><thead><tr><th>חלק</th>${CF.map(([,l])=>`<th>${l.replace('ΔH (kJ/mol)','<span class="f">ΔH (kJ/mol)</span>').replace('n (mol)','<span class="f">n (mol)</span>')}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+ <div class="btns" style="margin-top:12px"><button class="b" id="checkCalc">בדיקת החישובים</button>${tabDone('calc')?'<button class="b alt" id="toHess">לחוק הס</button>':''}</div>
+ ${tabDone('calc')?'<div class="msg ok" style="margin-top:10px">כל החישובים נכונים.</div>':''}</div></div>`}
+function bindCalc(){
+ ['A','B','C'].forEach(k=>CF.forEach(([f])=>{const el=$(`#c_${k}_${f}`);if(el)el.oninput=()=>{S.calc[k][f]=el.value;save()}}));
+ $('#checkCalc').onclick=()=>{S.calcFb=S.calcFb||{};
+  ['A','B','C'].forEach(k=>{if(!S.parts[k].resOk||S.calcOk[k])return;const e=expected(k),c=S.calc[k],fb={};
+   CF.forEach(([f])=>{const v=num(c[f]),x=e[f];const close=(a,b)=>Math.abs(a-b)<=Math.max(Math.abs(b)*0.02,f==='n'?0.0003:0.05);
+    if(v==null)fb[f]=[0,'חסר ערך'];
+    else if(close(v,x))fb[f]=[1,'✓'];
+    else if(close(-v,x))fb[f]=[0,'בדקו את הסימן'];
+    else if(close(v,x*1000)||close(v*1000,x))fb[f]=[0,'בדקו את היחידות'];
+    else if(close(v*4.2,x)||close(v,x*4.2))fb[f]=[0,'בדקו המרה cal↔J'];
+    else fb[f]=[0,'בדקו את החישוב']});
+   S.calcFb[k]=fb;S.calcOk[k]=Object.values(fb).every(x=>x[0])});
+  save();render()};
+ const th=$('#toHess');if(th)th.onclick=()=>{S.tab='hess';save();render()}
+}
+
+/* ---------- Hess ---------- */
+const SPEC=[['NaOH','NaOH<sub>(s)</sub>'],['Na','Na<sup>+</sup><sub>(aq)</sub>'],['OH','OH<sup>−</sup><sub>(aq)</sub>'],['H3O','H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub>'],['H2O','H<sub>2</sub>O<sub>(l)</sub>']];
+function dhv(k){return num(S.calc[k].dh)}
+function hessHTML(){const h=S.hess;const ready=tabDone('calc');
+ const cancelOk=h.cancel==='OH';
+ let s=`<div class="panel"><div class="card"><h2>חוק הס: השוואת המסלולים</h2>
+ <p style="margin-top:8px">חברו את משוואות התהליכים של חלקים א ו־ב:</p>
+ <div class="eqs">
+  <div class="eqr"><b>תהליך א</b><span class="f">NaOH<sub>(s)</sub> → Na<sup>+</sup><sub>(aq)</sub> + ${cancelOk?'<s>OH<sup>−</sup><sub>(aq)</sub></s>':'OH<sup>−</sup><sub>(aq)</sub>'}</span></div>
+  <div class="eqr"><b>תהליך ב</b><span class="f">${cancelOk?'<s>OH<sup>−</sup><sub>(aq)</sub></s>':'OH<sup>−</sup><sub>(aq)</sub>'} + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → 2H<sub>2</sub>O<sub>(l)</sub></span></div>
+  ${cancelOk?'<div class="eqr sum"><b>סכום א ו־ב</b><span class="f"><b>NaOH<sub>(s)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → Na<sup>+</sup><sub>(aq)</sub> + 2H<sub>2</sub>O<sub>(l)</sub></b></span></div>':''}
+ </div>
+ <p style="margin-top:10px;font-weight:700">איזה חלקיק מצטמצם משני אגפי הסכום?</p>
+ <div class="species" style="margin-top:6px">${SPEC.map(([id,l])=>`<button class="chip" data-sp="${id}" aria-pressed="${h.cancel===id}"><span class="f">${l}</span></button>`).join('')}</div>
+ ${h.cancel?(cancelOk?'<div class="msg ok" style="margin-top:8px">נכון. היון '+'<span class="f">OH<sup>−</sup><sub>(aq)</sub></span>'+' נוצר בתהליך א ומגיב בתהליך ב, ולכן הסכום של א ו־ב הוא בדיוק תהליך ג.</div>':'<div class="msg bad" style="margin-top:8px">החלקיק הזה לא מופיע בשני האגפים. חפשו חלקיק שהוא תוצר באחת המשוואות ומגיב בשנייה.</div>'):''}
+ </div>`;
+ if(!ready)return s+`<div class="card"><p class="hint">כדי להשוות ערכים, השלימו קודם את טבלת החישובים.</p></div></div>`;
+ const fb=h.fb||{};
+ const inp=(f)=>`<input type="number" step="any" inputmode="decimal" id="h_${f}" value="${esc(h[f])}" ${h.ok?'disabled':''} style="width:8em;direction:ltr;text-align:center"> <span class="f">kJ/mol</span> <span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}" style="display:inline">${fb[f]?fb[f][1]:''}</span>`;
+ s+=`<div class="card"><h3>מה הקשר בין תהליך ג לבין סכום התהליכים א ו־ב?</h3>
+ <p style="margin-top:8px">הערכים שחישבתם בלשונית "חישובים":</p>
+ <div class="dhs">${['A','B','C'].map(k=>`<div><span>ΔH של תהליך ${{A:'א',B:'ב',C:'ג'}[k]}</span><b class="f">${dhv(k).toFixed(2)} kJ/mol</b></div>`).join('')}</div>
+ <p style="margin-top:10px">לפי חוק הס, ΔH של תהליך ג צריך להיות שווה בקירוב לסכום ΔH של תהליכים א ו־ב. השלימו:</p>
+ <div class="reqs" style="margin-top:10px">
+  <div>סכום ΔH של תהליכים א ו־ב = ${inp('sum')}</div>
+  <div>ההפרש בין ΔH של תהליך ג לסכום = ${inp('diff')}</div></div>
+ <div class="btns" style="margin-top:12px"><button class="b" id="checkHess">בדיקה</button></div>
+ ${h.ok?`<div class="msg ok" style="margin-top:10px">${hessVerdict()}</div>`:''}
+ ${h.ok?`<h3 style="margin-top:16px">תרשים אנתלפיה לפי התוצאות שלכם</h3><div style="overflow-x:auto">${enthalpySVG()}</div><button class="b go" style="margin-top:14px" onclick="S.tab='disc';save();render();window.scrollTo({top:0})">המשך לשאלות הדיון ←</button>`:''}
+ </div></div>`;
+ return s}
+const LIT={A:-44.5,B:-55.8,C:-100.3};
+function litHTML(){const n={A:'א – המסה',B:'ב – סתירה',C:'ג – מוצק עם חומצה'};
+ return `<h3 style="margin-top:16px">השוואה לערכים מהספרות</h3>
+ <div class="tbl" style="margin-top:8px"><table><thead><tr><th>תהליך</th><th>התוצאה שלכם <span class="f">(kJ/mol)</span></th><th>ערך ספרותי <span class="f">(kJ/mol)</span></th><th>סטייה</th></tr></thead><tbody>
+ ${['A','B','C'].map(k=>{const v=dhv(k),l=LIT[k];return `<tr><td>${n[k]}</td><td class="f">${v.toFixed(1)}</td><td class="f">${l.toFixed(1)}</td><td class="f">${(Math.abs(v-l)/Math.abs(l)*100).toFixed(1)}%</td></tr>`}).join('')}
+ </tbody></table></div>
+ <p class="hint" style="margin-top:6px">הערכים הספרותיים מתייחסים לתמיסות מהולות מאוד ב־25 °C. הערך של תהליך ג הוא סכום של א ו־ב, לפי חוק הס. מה יכול להסביר את הסטייה של התוצאות שלכם? חזרו לזה בשאלות הדיון.</p>`}
+function hessVerdict(){const a=dhv('A'),b=dhv('B'),c=dhv('C');const sum=a+b;const pct=Math.abs(c-sum)/Math.abs(c)*100;
+ return `הסכום של שני השלבים (<span class="f">${sum.toFixed(1)}</span>) שונה מהמדידה הישירה (<span class="f">${c.toFixed(1)}</span>) ב־${pct.toFixed(1)}%. ${pct<8?'זו התאמה טובה בגבולות הדיוק של הניסוי.':'זה הפרש גדול יחסית. חשבו בשאלות הדיון מה יכול לגרום לו.'}`}
+function enthalpySVG(){const a=dhv('A'),b=dhv('B'),c=dhv('C');const W=520,H=300,top=30,bot=260;
+ const lo=Math.min(0,a,a+b,c),hi=0;const Y=v=>top+(bot-top)*(hi-v)/(hi-lo||1);
+ const ink='var(--ink)',mut='var(--muted)',acc='var(--accent)';
+ const lvl=(x1,x2,v,lab)=>`<line x1="${x1}" x2="${x2}" y1="${Y(v)}" y2="${Y(v)}" stroke="${ink}" stroke-width="3"/><text x="${x2}" y="${Y(v)-7}" text-anchor="end" font-size="12" fill="${ink}">${lab}</text>`;
+ const arr=(x,v1,v2,lab,col)=>`<line x1="${x}" x2="${x}" y1="${Y(v1)}" y2="${Y(v2)-6}" stroke="${col}" stroke-width="2.5"/><path d="M${x-6} ${Y(v2)-8} L${x} ${Y(v2)} L${x+6} ${Y(v2)-8}" fill="${col}"/><text x="${x+8}" y="${(Y(v1)+Y(v2))/2+4}" font-size="12" fill="${col}" style="font-family:'IBM Plex Mono',monospace">${lab}</text>`;
+ return `<svg viewBox="0 0 ${W} ${H}" direction="ltr" style="direction:ltr;unicode-bidi:isolate;font-family:Assistant,sans-serif;width:100%;min-width:420px;max-width:${W}px" role="img" aria-label="תרשים אנתלפיה">
+ <line x1="20" x2="20" y1="${top-10}" y2="${bot+10}" stroke="${mut}"/><text x="26" y="${top-12}" font-size="12" fill="${mut}" font-family="Assistant">H ↑</text>
+ ${lvl(40,240,0,'NaOH(s) + H₃O⁺(aq)')}${lvl(300,510,0,'NaOH(s) + H₃O⁺(aq)')}
+ ${lvl(40,160,a,'Na⁺ + OH⁻ + H₃O⁺')}${lvl(120,240,a+b,'Na⁺(aq) + 2H₂O(l)')}${lvl(300,510,c,'Na⁺(aq) + 2H₂O(l)')}
+ ${arr(52,0,a,a.toFixed(1)+' (א)',acc)}${arr(132,a,a+b,b.toFixed(1)+' (ב)',acc)}${arr(312,0,c,c.toFixed(1)+' (ג)','var(--warn)')}
+ <text x="140" y="${H-10}" text-anchor="middle" font-size="13" fill="${mut}" font-family="Assistant">מסלול בשני שלבים</text><text x="400" y="${H-10}" text-anchor="middle" font-size="13" fill="${mut}" font-family="Assistant">מסלול ישיר</text></svg>`}
+function bindHess(){document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{S.hess.cancel=b.dataset.sp;save();render()});
+ ['sum','c','diff'].forEach(f=>{const el=$('#h_'+f);if(el)el.oninput=()=>{S.hess[f]=el.value;save()}});
+ const cb=$('#checkHess');if(cb)cb.onclick=()=>{const a=dhv('A'),b=dhv('B'),c=dhv('C');const h=S.hess,fb={};
+  const close=(v,x)=>v!=null&&Math.abs(v-x)<=Math.max(Math.abs(x)*0.02,0.3);
+  const sv=num(h.sum),cv=num(h.c),dv=num(h.diff);
+  fb.sum=close(sv,a+b)?[1,'✓']:[0,'חברו את שני הערכים מטבלת החישובים, כולל הסימן'];
+  h.c=String(c);
+  fb.diff=(dv!=null&&Math.abs(Math.abs(dv)-Math.abs(c-(a+b)))<=0.3)?[1,'✓']:[0,'חסרו את הסכום מהתוצאה הישירה'];
+  h.fb=fb;h.ok=Object.values(fb).every(x=>x[0])&&h.cancel==='OH';
+  if(Object.values(fb).every(x=>x[0])&&h.cancel!=='OH')h.fb.diff=[1,'✓ – ענו גם על שאלת הצמצום למעלה'];
+  save();render()}}
+
+/* ---------- discussion ---------- */
+const QS=['מדוע חשוב שהתגובות בשלושת החלקים יתייחסו לאותו מספר מולים של '+F.NaOH+'?',
+ 'אם הכוס התרמית אינה מבודדת לחלוטין, כיצד עלול הדבר להשפיע על שינוי הטמפרטורה שנמדד?',
+ 'האם התוצאות מאששות את חוק הס בגבולות הדיוק של הניסוי? נמקו באמצעות הערכים שמדדתם.',
+ 'ציינו שני גורמים נוספים לכך ש־<span class="f">ΔH(ג)</span> הנמדד עשוי להיות שונה מן הסכום <span class="f">ΔH(א) + ΔH(ב)</span>.',
+ 'הערכים הספרותיים (בתמיסות מהולות מאוד, ב־25 °C) הם: המסה <span class="f">−44.5</span>, סתירה <span class="f">−55.8</span>, ותגובת המוצק עם החומצה <span class="f">−100.3</span> (כולם ב־<span class="f">kJ/mol</span>). השוו לתוצאות שקיבלתם. האם התוצאות שלכם גבוהות או נמוכות מהערכים הספרותיים? הציעו הסבר לסטייה, והתייחסו להנחות שעשיתם בחישוב.'];
+function myDH(){return tabDone('calc')?`<div class="dhs" style="margin-top:4px">${['A','B','C'].map(k=>`<div><span>התוצאה שלכם – תהליך ${{A:'א',B:'ב',C:'ג'}[k]}</span><b class="f">${dhv(k).toFixed(1)} kJ/mol</b></div>`).join('')}</div>`:''}
+function discHTML(){return `<div class="panel"><div class="card"><h2>דיון וסיכום</h2>
+ <div style="display:flex;flex-direction:column;gap:16px;margin-top:10px">${QS.map((q,i)=>`<label for="q${i}" style="display:flex;flex-direction:column;gap:6px"><span><b>${i+1}.</b> ${q}</span>${i===4?myDH():''}<textarea id="q${i}">${esc(S.disc[i]||'')}</textarea></label>`).join('')}</div>
+ <p style="margin-top:14px"><b>לסיכום:</b> חוק הס קובע ששינוי האנתלפיה הכולל תלוי במצב ההתחלתי ובמצב הסופי, ולא במסלול שבו התהליך התרחש.</p>
+ <div class="btns" style="margin-top:12px"><button class="b" id="toSubmit">להגשה</button></div></div></div>`}
+function bindDisc(){QS.forEach((_,i)=>{const t=$('#q'+i);t.oninput=()=>{S.disc[i]=t.value;save();renderTabs()}});$('#toSubmit').onclick=()=>{S.tab='submit';save();render()}}
+
+/* ---------- submit ---------- */
+function reportText(){const L=[];const lbl={A:'א',B:'ב',C:'ג'};
+ L.push('ניסוי וירטואלי – אנתלפיית המסה וסתירה, חוק הס');L.push('שם: '+(S.name||'—')+' | בית ספר: '+(S.school||'—'));L.push('');
+ L.push('תוצאות מדידה:');
+ for(const k of ['A','B','C']){const p=S.parts[k];if(!p.resOk){L.push(`חלק ${lbl[k]}: לא הושלם`);continue}
+  L.push(`חלק ${lbl[k]}: T התחלתית ${p.res.Ti} °C, T מרבית ${p.res.Tmax} °C, ΔT ${p.res.dT} °C, מסת סביבה ${p.res.m} g`+(k!=='B'?`, מסת NaOH ${p.massUsed.toFixed(2)} g`:''))}
+ L.push('');L.push('חישובים:');
+ for(const k of ['A','B','C']){const c=S.calc[k];L.push(`חלק ${lbl[k]}: סביבה ${c.qcal??'—'} cal = ${c.qj??'—'} J; מערכת ${c.qsys??'—'} J; n = ${c.n??'—'} mol; ΔH = ${c.dh??'—'} kJ/mol`+(S.calcOk[k]?' ✓':''))}
+ L.push('');L.push('חוק הס:');L.push(`ΔH(א)+ΔH(ב) = ${S.hess.sum||'—'} ; ΔH(ג) = ${S.hess.c||'—'} ; הפרש = ${S.hess.diff||'—'} kJ/mol`+(S.hess.ok?' ✓':''));
+ L.push('');L.push('שאלות לדיון:');
+ const qt=['מדוע חשוב שהתגובות יתייחסו לאותו מספר מולים של NaOH?','השפעת בידוד לא מלא של הכוס על שינוי הטמפרטורה','האם התוצאות מאששות את חוק הס?','שני גורמים נוספים להבדל בין ΔH(ג) לסכום','השוואה לערכים הספרותיים (−44.5, −55.8, −100.3 kJ/mol) והסבר לסטייה'];
+ qt.forEach((q,i)=>{L.push(`${i+1}. ${q}`);L.push((S.disc[i]||'').trim()||'—')});
+ return L.join('\n')}
+function submitHTML(){const items=[['פרטי תלמיד',tabDone('intro')],['חלק א׳',partDone('A')],['חלק ב׳',partDone('B')],['חלק ג׳',partDone('C')],['חישובים',tabDone('calc')],['חוק הס',tabDone('hess')],['שאלות דיון',tabDone('disc')]];
+ const tabsOf={'פרטי תלמיד':'intro','חלק א׳':'A','חלק ב׳':'B','חלק ג׳':'C','חישובים':'calc','חוק הס':'hess','שאלות דיון':'disc'};
+ const missing=items.filter(x=>!x[1]);
+ return `<div class="panel"><div class="card"><h2>הגשת העבודה</h2>
+ <p style="margin-top:6px">הסימולציה מרכזת את כל המדידות, החישובים והתשובות שלכם בטקסט אחד. כדי להגיש, מעתיקים אותו ומדביקים במקום שבו אתם מגישים עבודות.</p>
+ <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:12px">${items.map(([l,d])=>d?`<div class="check on"><span class="mk">✓</span>${l}</div>`:`<button class="check linkish" data-go="${tabsOf[l]}"><span class="mk"></span>${l} – להשלמה</button>`).join('')}</div>
+ ${missing.length?`<div class="msg warn" style="margin-top:10px">עדיין חסר: ${missing.map(x=>x[0]).join(', ')}. לחצו על פריט כדי לעבור אליו. אפשר להגיש גם עבודה חלקית.</div>`:'<div class="msg ok" style="margin-top:10px">כל החלקים הושלמו.</div>'}
+ <ol class="subst">
+  <li><b>לחצו על "העתקת הסיכום".</b><button class="b go" id="copyRep" style="margin-top:8px">העתקת הסיכום</button><div id="copyMsg"></div></li>
+  <li><b>פתחו את המקום שבו מגישים</b>: הודעת מייל, משימה במערכת הלמידה או מסמך.</li>
+  <li><b>הדביקו</b>: במחשב <span class="f">Ctrl+V</span>, בטלפון לחיצה ארוכה ואז "הדבקה". ואז שלחו.</li>
+ </ol>
+ <details class="more" style="margin-top:12px"><summary>הצגת הסיכום שיועתק</summary><textarea id="rep" readonly style="min-height:260px;margin-top:8px;font-family:var(--body)">${esc(reportText())}</textarea></details>
+ </div></div>`}
+function bindSubmit(){document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.go;save();render();window.scrollTo({top:0})});
+ $('#copyRep').onclick=()=>{const t=$('#rep');const done=ok=>{if(!ok)t.closest('details').open=true;$('#copyMsg').innerHTML=ok?'<div class="msg ok" style="margin-top:8px">✓ הסיכום הועתק. עכשיו עברו לשלב 2.</div>':'<div class="msg warn" style="margin-top:8px">ההעתקה האוטומטית לא עבדה כאן. הטקסט סומן למטה – העתיקו אותו בעצמכם (Ctrl+C, או לחיצה ארוכה ואז "העתקה").</div>'};
+ try{navigator.clipboard.writeText(t.value).then(()=>done(true),()=>{t.focus();t.select();done(false)})}catch(e){t.focus();t.select();done(false)}}}
+
+window.addEventListener('resize',()=>{if(PARTS[S.tab])drawChart(S.tab)});
+render();
+</script>
+
+</body>
+</html>

@@ -234,7 +234,8 @@ const PARTS={
 const TABS=[['intro','מבוא'],['A','חלק א׳'],['B','חלק ב׳'],['C','חלק ג׳'],['calc','חישובים'],['hess','חוק הס'],['disc','דיון'],['submit','הגשה']];
 
 /* ---------- state ---------- */
-const KEY='hess-lab-v1';
+const KEY='hess-lab-v2';
+const massOk=m=>Math.round(Math.abs(m-1)*100)<=3;
 function freshPart(){
   const room=22.5+Math.random()*2;
   return {step:0,sel:null,vol:0,sel2:null,vol2:0,baseMeasured:false,lid:false,sensor:false,running:false,t:0,acc:0,
@@ -244,7 +245,7 @@ function freshPart(){
 let S={tab:'intro',name:'',school:'',speed:10,parts:{A:freshPart(),B:freshPart(),C:freshPart()},calc:{A:{},B:{},C:{}},calcOk:{A:false,B:false,C:false},
   hess:{cancel:null,sum:'',c:'',diff:'',ok:false},disc:['','','',''],summary:''};
 try{const raw=localStorage.getItem(KEY); if(raw){const L=JSON.parse(raw); S=Object.assign(S,L);
-  for(const k of ['A','B','C']){const p=S.parts[k],len=PARTS[k].steps.length; if(!p||!(p.resOk||p.step===len-1)){S.parts[k]=freshPart();} else {p.step=len-1;p.running=false;p.stopped=true;p.msg=null;}}}}catch(e){}
+  for(const k of ['A','B','C']){const p=S.parts[k],len=PARTS[k].steps.length; if(!p||typeof p.step!=='number'||p.step>len-1){S.parts[k]=freshPart();} else {p.msg=null;p.acc=0;if(p.resOk){p.step=len-1;p.running=false;p.stopped=true;}}}}}catch(e){}
 function save(){try{const c=JSON.parse(JSON.stringify(S));localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}}
 
 /* ---------- tabs ---------- */
@@ -351,7 +352,7 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
  else if(sk==='start'){h=`<p class="say">הכול מוכן. הפעילו את החיישן כדי להתחיל לרשום את הטמפרטורה.</p><button class="b go" id="startBtn">▶ הפעלת מדידה</button>`;}
  else if(sk==='stabilize'){h=`<p class="say">החיישן היה באוויר החדר ולוקח לו כמה שניות להגיע לטמפרטורת התמיסה. חכו עד שהקו בגרף יתיישר.</p>
   <div class="live wait" id="live">⏳ הקריאה עדיין משתנה – חכו</div><button class="b go" id="stableBtn" disabled>הקריאה התייצבה – המשך</button>`;}
- else if(sk==='weigh'){const okm=Math.abs(p.mass-1)<=0.03;
+ else if(sk==='weigh'){const okm=massOk(p.mass);
   h=`<p class="say">לחצו "הוספה בכף" עד שהמאזניים מראים כ־<b class="f">1.00 g</b>. עברתם? לחצו "הורדה מעט".</p>
   <div class="live ${okm?'ok':'wait'}" id="massLive">על המאזניים: <b class="f">${p.mass.toFixed(2)} g</b> ${okm?'✓':''}</div>
   <div class="btns"><button class="b alt" id="spoonAdd">＋ הוספה בכף</button><button class="b alt" id="spoonRem">− הורדה מעט</button></div>
@@ -451,7 +452,7 @@ function drawChart(k){const cv=$('#chart');if(!cv)return;const p=S.parts[k];
 /* ---------- simulation ---------- */
 let last=null;
 function noise(){return (Math.random()+Math.random()+Math.random()-1.5)*0.02}
-function stepSim(k,dt){const P=PARTS[k],p=S.parts[k];const h=0.1;const C=100*4.18+12;const kl=p.lid?0.0011:0.004;
+function stepSim(k,dt){const P=PARTS[k],p=S.parts[k];const h=0.1;const mliq=p.vol+(p.added&&P.kind==='liquid'?p.vol2:0);const C=mliq*4.18+12;const kl=p.lid?0.0011:0.004;
  p.acc+=dt;
  while(p.acc>=h){p.acc-=h;p.t=+(p.t+h).toFixed(1);
   let rate=0;if(p.added){rate=(p.Qtot-p.Qrel)/p.tau;p.Qrel+=rate*h}
@@ -465,6 +466,7 @@ function tick(ts){
  const k=S.tab;if(PARTS[k]){const p=S.parts[k];
   if(last!=null&&p.running){const dt=Math.min(0.1,(ts-last)/1000)*S.speed;stepSim(k,dt);if(p.t>900){p.running=false;p.stopped=true}}
   updateLogger(k);updateLive(k);if(p.running)drawChart(k);
+  if(p.running&&ts-(window._sv||0)>2000){window._sv=ts;save()}
   if(p.running&&p.added&&PARTS[k].kind==='solid'&&ts-(window._bt||0)>250){window._bt=ts;const g=$('#pel');if(g)g.innerHTML=pelHTML(k)}
  }
  last=ts;requestAnimationFrame(tick);
@@ -509,7 +511,7 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
  if(sk==='weigh'){
   $('#spoonAdd').onclick=()=>{p.mass=+(p.mass+0.15+Math.random()*0.25).toFixed(2);p.msg=null;rerender(k)};
   $('#spoonRem').onclick=()=>{p.mass=Math.max(0,+(p.mass-(0.03+Math.random()*0.1)).toFixed(2));rerender(k)};
-  $('#weighDone').onclick=()=>{if(Math.abs(p.mass-1)>0.03){setMsg(k,'bad',`על המאזניים ${p.mass.toFixed(2)} g. יש לשקול 1.00 גרם (בטווח 0.97–1.03).`);return render()}
+  $('#weighDone').onclick=()=>{if(!massOk(p.mass)){setMsg(k,'bad',`על המאזניים ${p.mass.toFixed(2)} g. יש לשקול 1.00 גרם (בטווח 0.97–1.03).`);return render()}
    next(k)}}
  if(sk==='base'||sk==='measure2'){
   if(!p.baseMeasured){A.querySelectorAll('[data-bottle2]').forEach(b=>b.onclick=()=>{p.sel2=b.dataset.bottle2;p.msg=null;rerender(k)});
@@ -533,8 +535,12 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
 }
 function startReaction(k){const P=PARTS[k],p=S.parts[k];
  p.added=true;p.tAdd=Math.round(p.t);
- if(P.kind==='solid'){p.massUsed=p.mass;const n=p.mass/40;p.Qtot=n*P.dHtrue*1000;p.tau=6}
- else{p.Tw=(p.Tw*50+p.Tb*50)/100;p.Qtot=0.025*P.dHtrue*1000;p.tau=2.5}
+ const DH_SOL=44.5e3,DH_NEU=55.8e3;
+ if(P.kind==='solid'){p.massUsed=p.mass;const nN=p.mass/40;
+  if(k==='A')p.Qtot=nN*DH_SOL;
+  else{const nA=0.25*p.vol/1000;p.Qtot=nN*DH_SOL+Math.min(nN,nA)*DH_NEU}
+  p.tau=6}
+ else{const nA=0.50*p.vol/1000,nB=0.50*p.vol2/1000;p.Tw=(p.Tw*p.vol+p.Tb*p.vol2)/(p.vol+p.vol2);p.Qtot=Math.min(nA,nB)*DH_NEU;p.tau=2.5}
  p.stir=true;
 }
 const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:null};
@@ -697,6 +703,7 @@ function bindSubmit(){document.querySelectorAll('[data-go]').forEach(b=>b.onclic
  $('#copyRep').onclick=()=>{const t=$('#rep');const done=ok=>{if(!ok)t.closest('details').open=true;$('#copyMsg').innerHTML=ok?'<div class="msg ok" style="margin-top:8px">✓ הסיכום הועתק. עכשיו עברו לשלב 2.</div>':'<div class="msg warn" style="margin-top:8px">ההעתקה האוטומטית לא עבדה כאן. הטקסט סומן למטה – העתיקו אותו בעצמכם (Ctrl+C, או לחיצה ארוכה ואז "העתקה").</div>'};
  try{navigator.clipboard.writeText(t.value).then(()=>done(true),()=>{t.focus();t.select();done(false)})}catch(e){t.focus();t.select();done(false)}}}
 
+window.addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 window.addEventListener('resize',()=>{if(PARTS[S.tab])drawChart(S.tab)});
 render();
 </script>

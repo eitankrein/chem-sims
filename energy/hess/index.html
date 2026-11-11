@@ -171,6 +171,52 @@ button.link{background:none;border:0;color:var(--muted);text-decoration:underlin
 .bench svg{max-height:200px}
 .logger .big{font-size:1.9rem}
 canvas.chart{height:220px}
+/* --- phone measurement dock, chart-first order --- */
+#chartbox{scroll-margin-top:70px}
+.dock{display:none}
+@media (max-width:820px){
+ .work.chartfirst{grid-template-areas:"bench" "chart" "now"}
+ .dock{display:flex;position:fixed;inset:auto 0 0 0;z-index:8;gap:10px;align-items:center;justify-content:space-between;background:var(--paper);border-top:2px solid var(--accent);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+ .dkinfo{display:flex;flex-direction:column;min-width:0;font-size:.88rem;line-height:1.3}
+ .dkinfo b{font-family:var(--mono);font-size:1.15rem}
+ .dock .b{flex:0 0 auto;max-width:55%}
+ .part:has(.dock){padding-bottom:96px}
+}
+/* --- compact header after the intro --- */
+.whotxt{display:none;font-size:.9rem;color:var(--muted)}
+.mast.compact{align-items:center;padding-bottom:8px}
+.mast.compact .who,.mast.compact .eyebrow{display:none}
+.mast.compact .whotxt{display:block}
+.mast.compact h1{font-size:1.15rem}
+/* --- bench --- */
+.bench svg{max-height:250px}
+@media (max-width:560px){.bench svg{max-height:190px}}
+/* --- equations: label beside equation, equations aligned --- */
+.eqs{direction:ltr;overflow-x:auto}
+.eqr{grid-template-columns:6.5em minmax(0,1fr);gap:14px}
+.eqr>b{direction:rtl;text-align:right}
+.eqr .nb{display:inline-block;white-space:nowrap}
+.eqr .nb.dh{margin-inline-start:14px}
+@media (max-width:560px){
+ .eqr{grid-template-columns:minmax(0,1fr);gap:2px}
+ .eqr>b{text-align:left;direction:rtl}
+ .eqr .f{font-size:.8rem}
+ .eqr .nb.dh{margin-inline-start:0;display:block}
+}
+/* --- calculation table stacks on phones --- */
+@media (max-width:640px){
+ table.calc thead{display:none}
+ table.calc,table.calc tbody,table.calc tr{display:block}
+ table.calc tr{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;overflow:hidden}
+ table.calc th{display:block;text-align:start;border:0}
+ table.calc th::before{content:"חלק "}
+ table.calc td{display:grid;grid-template-columns:minmax(0,1fr) 8em;align-items:center;gap:4px 10px;border:0;border-top:1px solid var(--line);text-align:start}
+ table.calc td::before{content:attr(data-label);font-size:.9rem;unicode-bidi:plaintext}
+ table.calc td input{width:100%}
+ table.calc td .fb{grid-column:1/-1}
+ table.calc td[colspan]{display:block}
+ table.calc td[colspan]::before{content:none}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -182,6 +228,7 @@ canvas.chart{height:220px}
       <div class="eyebrow">חמד״ע · כימיה · מעבדה וירטואלית</div>
       <h1>אנתלפיית המסה וסתירה – חוק הס</h1>
     </div>
+    <div class="whotxt" id="whoTxt"></div>
     <div class="who">
       <label class="fld" for="stName">שם התלמיד/ה<input type="text" id="stName" autocomplete="name"></label>
       <label class="fld" for="stSchool">בית הספר<input type="text" id="stSchool"></label>
@@ -234,7 +281,7 @@ const PARTS={
 const TABS=[['intro','מבוא'],['A','חלק א׳'],['B','חלק ב׳'],['C','חלק ג׳'],['calc','חישובים'],['hess','חוק הס'],['disc','דיון'],['submit','הגשה']];
 
 /* ---------- state ---------- */
-const KEY='hess-lab-v2';
+const KEY='hess-lab-v3';
 const massOk=m=>Math.round(Math.abs(m-1)*100)<=3;
 function freshPart(){
   const room=22.5+Math.random()*2;
@@ -243,7 +290,7 @@ function freshPart(){
     Qtot:0,Qrel:0,tau:30,maxT:-1e9,tMax:0,truth:null,res:{Ti:'',Tmax:'',dT:'',m:''},resOk:false,msg:null,stopped:false};
 }
 let S={tab:'intro',name:'',school:'',speed:10,parts:{A:freshPart(),B:freshPart(),C:freshPart()},calc:{A:{},B:{},C:{}},calcOk:{A:false,B:false,C:false},
-  hess:{cancel:null,sum:'',c:'',diff:'',ok:false},disc:['','','',''],summary:''};
+  hess:{cancel:[],cancelOk:false,fbCancel:null,sum:'',c:'',diff:'',ok:false,fb:null},disc:['','','',''],summary:''};
 try{const raw=localStorage.getItem(KEY); if(raw){const L=JSON.parse(raw); S=Object.assign(S,L);
   for(const k of ['A','B','C']){const p=S.parts[k],len=PARTS[k].steps.length; if(!p||typeof p.step!=='number'||p.step>len-1){S.parts[k]=freshPart();} else {p.msg=null;p.acc=0;if(p.resOk){p.step=len-1;p.running=false;p.stopped=true;}}}}}catch(e){}
 function save(){try{const c=JSON.parse(JSON.stringify(S));localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}}
@@ -297,7 +344,7 @@ function introHTML(){return `<div class="panel">
  <div class="confirm" id="allBox" hidden style="margin-top:10px"><p>למחוק את כל המדידות, החישובים והתשובות ולהתחיל מההתחלה? השם ובית הספר נשארים.</p><div class="btns"><button class="b" onclick="resetAll()">כן, להתחיל מחדש</button><button class="b alt" onclick="render()">ביטול</button></div></div></div>
 </div>`}
 
-function resetAll(){S.parts={A:freshPart(),B:freshPart(),C:freshPart()};S.calc={A:{},B:{},C:{}};S.calcOk={A:false,B:false,C:false};S.calcFb={};S.hess={cancel:null,sum:'',c:'',diff:'',ok:false};S.disc=['','','',''];hoverX=null;S.tab='A';save();render();window.scrollTo({top:0})}
+function resetAll(){S.parts={A:freshPart(),B:freshPart(),C:freshPart()};S.calc={A:{},B:{},C:{}};S.calcOk={A:false,B:false,C:false};S.calcFb={};S.hess={cancel:[],cancelOk:false,fbCancel:null,sum:'',c:'',diff:'',ok:false,fb:null};S.disc=['','','',''];hoverX=null;S.tab='A';save();render();window.scrollTo({top:0})}
 function gateHTML(){return `<div class="panel"><div class="card now" style="position:static;max-width:520px"><h2>לפני שמתחילים</h2>
  <p class="say">רשמו את שמכם. השם יופיע בסיכום שתגישו בסוף.</p>
  <label class="fld" for="gName">שם התלמיד/ה<input type="text" id="gName" autocomplete="name"></label>
@@ -310,9 +357,10 @@ function bindGate(){const n=$('#gName'),g=$('#gGo');n.focus();n.oninput=()=>{g.d
 function todo(items){return `<ol class="todo">${items.map(([d,t])=>`<li class="${d?'ok':''}">${t}</li>`).join('')}</ol>`}
 function partHTML(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];const pi=P.protoMap[p.step];const n=P.steps.length;
  const stepNo=Math.min(n,p.step+1);
+ const run=sk==='stabilize'||sk==='watch';const chartFirst=run||(sk==='done'&&!p.resOk);
  return `<div class="part">
  <div class="phead"><h2>${P.title}</h2><div class="eq">${P.eq}</div></div>
- <div class="work">
+ <div class="work ${chartFirst?'chartfirst':''}">
   <aside class="now card" id="now" aria-live="polite">
    <div class="stepline"><span>שלב ${stepNo} מתוך ${n}</span><b>${STEP_LABEL[sk]}</b></div>
    <div class="bar" aria-hidden="true"><i style="width:${(p.resOk?n:p.step)/n*100}%"></i></div>
@@ -332,10 +380,17 @@ function partHTML(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];cons
      <div class="spdl">מהירות הזמן</div><div class="spd" title="כמה מהר עובר הזמן בסימולציה. ×10 = פי 10 מהמציאות, ×30 = פי 30"><button data-spd="10" aria-pressed="${S.speed===10}" aria-label="זמן מהיר פי 10">×10</button><button data-spd="30" aria-pressed="${S.speed===30}" aria-label="זמן מהיר פי 30">×30</button></div>
     </div></div>
   </div>
-  <div class="chartbox card"><canvas class="chart" id="chart" aria-label="גרף טמפרטורה כפונקציה של זמן"></canvas>
-   <p class="hint" id="hov">${p.stopped?'👆 העבירו את העכבר או האצבע על הגרף כדי לקרוא ערכים.':'הגרף מתעדכן בזמן המדידה.'}</p></div>
- </div></div>`}
+  <div class="chartbox card" id="chartbox"><canvas class="chart" id="chart" aria-label="גרף טמפרטורה כפונקציה של זמן"></canvas>
+   <p class="hint" id="hov">${p.stopped?'בחרו נקודה בגרף בעכבר או באצבע כדי לקרוא ערכים.':'הגרף מתעדכן בזמן המדידה.'}</p></div>
+ </div>
+ ${run?`<div class="dock" id="dock"><div class="dkinfo"><b class="f" id="dkT">--.- °C</b><span id="dkL"></span></div><button class="b" id="dkBtn" disabled>${sk==='watch'?'■ עצירה':'המשך'}</button></div>`:''}
+ </div>`}
 
+const PRED=[['up','תעלה'],['same','לא תשתנה'],['down','תרד']];
+function predChips(k){const p=S.parts[k];return `<p class="say"><b>לפני שמוסיפים – מה לדעתכם יקרה?</b> הטמפרטורה של התמיסה:</p>
+ <div class="btns">${PRED.map(([id,l])=>`<button class="chip" data-pred="${id}" aria-pressed="${p.pred===id}">${l}</button>`).join('')}</div>`}
+function predHTML(k){const p=S.parts[k];if(!p.pred||!p.truth)return '';const L=Object.fromEntries(PRED);const actual=p.Qtot>0?'up':'down';
+ return `<div class="msg ${p.pred===actual?'ok':'warn'}">ניבאתם שהטמפרטורה ${L[p.pred]}. בפועל היא ${actual==='up'?'עלתה':'ירדה'}.${p.pred===actual?'':' חשבו מה יכול להסביר זאת.'}</div>`}
 function msgHTML(m){return m?`<div class="msg ${m[0]}">${m[1]}</div>`:''}
 function bottleChips(attr,sel){return `<div class="btns">${Object.entries(BOTTLES).map(([id,b])=>`<button class="chip bottle" data-${attr}="${id}" aria-pressed="${sel===id}">${b.html}</button>`).join('')}</div>`}
 function volTxt(v){return v>100?'מעל 100':String(v)}
@@ -351,13 +406,13 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
   <button class="b ${p.sensor?'done':'go'}" id="sensor" ${p.sensor?'disabled':''}>${p.sensor?'✓ החיישן בפנים':'הכנסת חיישן הטמפרטורה'}</button></div>`;}
  else if(sk==='start'){h=`<p class="say">הכול מוכן. הפעילו את החיישן כדי להתחיל לרשום את הטמפרטורה.</p><button class="b go" id="startBtn">▶ הפעלת מדידה</button>`;}
  else if(sk==='stabilize'){h=`<p class="say">החיישן היה באוויר החדר ולוקח לו כמה שניות להגיע לטמפרטורת התמיסה. חכו עד שהקו בגרף יתיישר.</p>
-  <div class="live wait" id="live">⏳ הקריאה עדיין משתנה – חכו</div><button class="b go" id="stableBtn" disabled>הקריאה התייצבה – המשך</button>`;}
+  <div class="live wait" id="live">הקריאה עדיין משתנה – חכו</div><button class="b go" id="stableBtn" disabled>הקריאה התייצבה – המשך</button>`;}
  else if(sk==='weigh'){const okm=massOk(p.mass);
   h=`<p class="say">לחצו "הוספה בכף" עד שהמאזניים מראים כ־<b class="f">1.00 g</b>. עברתם? לחצו "הורדה מעט".</p>
   <div class="live ${okm?'ok':'wait'}" id="massLive">על המאזניים: <b class="f">${p.mass.toFixed(2)} g</b> ${okm?'✓':''}</div>
   <div class="btns"><button class="b alt" id="spoonAdd">＋ הוספה בכף</button><button class="b alt" id="spoonRem">− הורדה מעט</button></div>
   <button class="b go" id="weighDone" ${okm?'':'disabled'}>סיום השקילה – המשך</button>`;}
- else if(sk==='addSolid'){h=`<p class="say">הקריאה יציבה. עכשיו מוסיפים לכוס את המוצק ששקלתם: <b class="f">${p.mass.toFixed(2)} g</b> ${F.NaOHs}.</p><p class="hint">רשמו לעצמכם את הטמפרטורה ההתחלתית לפני שמוסיפים.</p><button class="b go" id="addSolid">הוסיפו את המוצק וערבבו</button>`;}
+ else if(sk==='addSolid'){h=`<p class="say">הקריאה יציבה. עכשיו מוסיפים לכוס את המוצק ששקלתם: <b class="f">${p.mass.toFixed(2)} g</b> ${F.NaOHs}.</p><p class="hint">רשמו לעצמכם את הטמפרטורה ההתחלתית לפני שמוסיפים.</p>${predChips(k)}<button class="b go" id="addSolid" ${p.pred?'':'disabled'}>הוסיפו את המוצק וערבבו</button>`;}
  else if(sk==='base'||sk==='measure2'){
   if(!p.baseMeasured){h=`<p class="say">עכשיו מודדים את הבסיס במשורה נפרדת.</p>`+todo([[!!p.sel2,'בחרו את תמיסת הבסיס המתאימה להוראה'],[p.vol2>0,'גררו את המחוון עד הנפח הנדרש'],[false,'לחצו על הכפתור הכחול']])
    +bottleChips('bottle2',p.sel2)+volSlider('vol2',p.vol2,'dv2')
@@ -365,7 +420,7 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
   else {h=`<p class="say">השוו את הטמפרטורות של שתי התמיסות:</p>
   <div class="cmp"><div><span>חומצה בכוס</span><b class="f" id="cmpA">${p.Ts.toFixed(1)} °C</b></div><div><span>בסיס במשורה</span><b class="f">${p.Tb.toFixed(1)} °C</b></div></div>
   <p class="say">הן קרובות, אז אפשר להמשיך. רשמו לעצמכם את הטמפרטורה ההתחלתית של החומצה.</p>
-  <button class="b go" id="addBase">שפכו את הבסיס לכוס וערבבו</button>`;}}
+  ${predChips(k)}<button class="b go" id="addBase" ${p.pred?'':'disabled'}>שפכו את הבסיס לכוס וערבבו</button>`;}}
  else if(sk==='watch'){h=`<p class="say">עקבו אחר הגרף. כשהטמפרטורה מגיעה לשיא ומתחילה לרדת, אפשר לעצור.</p>
   <div class="live wait" id="live">↑ הטמפרטורה עולה – המשיכו לעקוב</div><button class="b go" id="stopBtn" disabled>■ עצירת המדידה</button>`;}
  else if(sk==='done'){h=resultsHTML(k);}
@@ -375,21 +430,31 @@ function resultsHTML(k){const p=S.parts[k],r=p.res,ok=p.resOk;const fb=p.fb||{};
  const row=(f,l)=>`<label class="rrow" for="r_${f}"><span>${l}</span><input type="number" step="0.01" inputmode="decimal" id="r_${f}" value="${esc(r[f])}" ${ok?'disabled':''}><em class="${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</em></label>`;
  if(ok)return `<div class="msg ok">✓ התוצאות של ${PARTS[k].tab} נרשמו.</div>
   <div class="summ"><span>התחלתית <b class="f">${r.Ti} °C</b></span><span>מרבית <b class="f">${r.Tmax} °C</b></span><span><span class="f">ΔT</span> <b class="f">${r.dT} °C</b></span></div>
+  ${predHTML(k)}
   <button class="b go" id="nextTab">${k==='C'?'המשך לחישובים':'המשך ל'+PARTS[k==='A'?'B':'C'].tab} ←</button>`;
- return `<p class="say">המדידה נעצרה. קראו מהגרף שני ערכים ורשמו אותם:</p>
+ return `${predHTML(k)}<p class="say">המדידה נעצרה. קראו מהגרף שני ערכים ורשמו אותם:</p>
  ${todo([[false,'<b>טמפרטורה התחלתית</b>: הקו הישר לפני הקו המקווקו "הוספה"'],[false,'<b>טמפרטורה מרבית</b>: הנקודה הגבוהה ביותר בגרף']])}
- <p class="hint">👆 העבירו את העכבר או האצבע על הגרף – הערך מופיע בתיבה.${PARTS[k].kind==='solid'?' המסה ששקלתם: <b class="f">'+p.massUsed.toFixed(2)+' g</b>.':''}</p>
- <div class="rform">${row('Ti','טמפרטורה התחלתית (°C)')}${row('Tmax','טמפרטורה מרבית (°C)')}${row('dT','שינוי טמפרטורה <span class="f">ΔT</span> (°C)')}${row('m','מסת הסביבה (g)')}</div>
+ <p class="hint">בחרו נקודה בגרף בעכבר או באצבע. מתחת לגרף יופיעו כפתורים שרושמים את הערך בשדה המתאים. את <span class="f">ΔT</span> חשבו בעצמכם.${PARTS[k].kind==='solid'?' המסה ששקלתם: <b class="f">'+p.massUsed.toFixed(2)+' g</b>.':''}</p>
+ <div class="rform">${row('Ti','טמפרטורה התחלתית <span class="f">(°C)</span>')}${row('Tmax','טמפרטורה מרבית <span class="f">(°C)</span>')}${row('dT','שינוי טמפרטורה <span class="f">ΔT (°C)</span>')}${row('m','מסת הסביבה <span class="f">(g)</span>')}</div>
  <button class="b go" id="checkRes">בדיקת התוצאות</button>`;
 }
 function updateLive(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];const L=$('#live');if(!L)return;
- if(sk==='stabilize'){const st=Math.abs(p.Ts-p.Tw)<=0.06&&p.t>=8;L.className='live '+(st?'ok':'wait');L.textContent=st?'✓ הקריאה יציבה – אפשר להמשיך':'⏳ הקריאה עדיין משתנה – חכו';const b=$('#stableBtn');if(b)b.disabled=!st}
+ if(sk==='stabilize'){const st=Math.abs(p.Ts-p.Tw)<=0.06&&p.t>=8;L.className='live '+(st?'ok':'wait');L.textContent=st?'✓ הקריאה יציבה – אפשר להמשיך':'הקריאה עדיין משתנה – חכו';const b=$('#stableBtn');if(b)b.disabled=!st}
  if(sk==='watch'){const passed=p.added&&p.Qrel/p.Qtot>0.95&&(p.t-p.tMax)>=12;const near=p.t-p.tMax>=3;
   L.className='live '+(passed?'ok':'wait');L.textContent=passed?'↓ הטמפרטורה יורדת – אפשר לעצור':(near?'• הטמפרטורה סביב השיא – חכו עוד רגע':'↑ הטמפרטורה עולה – המשיכו לעקוב');const b=$('#stopBtn');if(b)b.disabled=!passed}
+ const dl=$('#dkL');if(dl){dl.textContent=L.textContent;const src=$('#stableBtn')||$('#stopBtn'),db=$('#dkBtn');if(src&&db)db.disabled=src.disabled}
 }
 
 /* ---------- bench drawing ---------- */
 function pelHTML(k){const P=PARTS[k],p=S.parts[k];if(!(p.added&&P.kind==='solid'))return '';const cx=170,cy=80,cupH=120;const left=Math.max(0,1-p.Qrel/p.Qtot);if(left<0.02)return '';const nP=Math.ceil(left*Math.min(12,Math.round(p.massUsed*8)));let s='';for(let i=0;i<nP;i++){const r=1.5+2*left;s+=`<circle cx="${cx+22+(i%6)*9+(i>5?4:0)}" cy="${cy+cupH+4-Math.floor(i/6)*5}" r="${r.toFixed(1)}" fill="var(--paper)" stroke="var(--muted)"/>`}return s}
+function flowHTML(k){const P=PARTS[k],p=S.parts[k];if(!p.added||!p.Qtot)return '';const left=1-p.Qrel/p.Qtot;if(left<0.04)return '';
+ const out=p.Qtot>0,op=Math.max(0.3,Math.min(1,left*1.6)).toFixed(2);
+ const bx=215,by=P.kind==='solid'?198:180;
+ const arrow=(x1,y1,x2,y2)=>{if(!out){[x1,y1,x2,y2]=[x2,y2,x1,y1]}const a=Math.atan2(y2-y1,x2-x1),h=6,w=0.5;
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--warn)" stroke-width="2.6"/><path d="M${x2} ${y2} L${(x2-h*Math.cos(a-w)).toFixed(1)} ${(y2-h*Math.sin(a-w)).toFixed(1)} L${(x2-h*Math.cos(a+w)).toFixed(1)} ${(y2-h*Math.sin(a+w)).toFixed(1)} Z" fill="var(--warn)"/>`};
+ const g=P.kind==='solid'?arrow(bx,by-8,bx,by-30)+arrow(bx-10,by-6,bx-28,by-22)+arrow(bx+10,by-6,bx+28,by-22)
+  :arrow(bx,by-8,bx,by-26)+arrow(bx,by+8,bx,by+22)+arrow(bx-10,by,bx-30,by)+arrow(bx+10,by,bx+30,by);
+ return `<g opacity="${op}">${g}<text x="${P.kind==='solid'?272:272}" y="${P.kind==='solid'?166:160}" font-size="11" fill="var(--warn)" font-family="Assistant">מעבר אנרגיה</text></g>`}
 function benchSVG(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];
  const inCup=p.poured?(P.need.vol+(p.added&&P.kind==='liquid'?50:0)):0;
  const cupH=120, lvl=Math.min(1,inCup/150);
@@ -405,7 +470,7 @@ function benchSVG(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];
   s+=`<path d="M${cx+4+inset} ${top} L${cx+cw-4-inset} ${top} L${cx+cw-13} ${cy+cupH+9} L${cx+13} ${cy+cupH+9} Z" fill="var(--liquid)" stroke="var(--liquid-line)" stroke-width="1"/>`;}
  if(p.lid)s+=`<rect x="${cx-6}" y="${cy-10}" width="${cw+12}" height="10" rx="3" fill="var(--accent)"/>`;
  if(p.sensor)s+=`<rect x="${cx+cw/2-30}" y="${cy-60}" width="6" height="${cupH+40}" rx="3" fill="var(--ink)"/><path d="M${cx+cw/2-27} ${cy-60} q0 -20 -40 -20" stroke="var(--ink)" stroke-width="2" fill="none"/>`;
- s+=`<g id="pel">${pelHTML(k)}</g>`;
+ s+=`<g id="pel">${pelHTML(k)}</g><g id="flow">${flowHTML(k)}</g>`;
  if(p.poured||p.stir)s+=`<g>${stir}<rect x="${cx+cw/2+16}" y="${cy-55}" width="5" height="${cupH+35}" rx="2" fill="var(--warn)"/></g>`;
  s+=`<text x="${cx+cw/2}" y="${cy+cupH+30}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Assistant">כוס תרמית</text>`;
  if(showCyl){const v=cylVol;const x=60,y=22,h=178,cap=125,u=(h-6)/cap;
@@ -424,6 +489,8 @@ function benchSVG(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];
 /* ---------- chart ---------- */
 function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888'}
 let hoverX=null;
+function fillBtns(k){const P=PARTS[k],p=S.parts[k];if(P.steps[p.step]!=='done'||p.resOk)return '';
+ return `<span class="btns" style="margin-top:6px"><button class="chip" data-fill="Ti">רשמו כטמפרטורה התחלתית</button><button class="chip" data-fill="Tmax">רשמו כטמפרטורה מרבית</button></span>`}
 function drawChart(k){const cv=$('#chart');if(!cv)return;const p=S.parts[k];
  const dpr=window.devicePixelRatio||1;const W=cv.clientWidth,H=cv.clientHeight;if(!W)return;
  cv.width=W*dpr;cv.height=H*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);
@@ -446,7 +513,7 @@ function drawChart(k){const cv=$('#chart');if(!cv)return;const p=S.parts[k];
   const x=X(best[0]),y=Y(best[1]);c.strokeStyle=ink;c.lineWidth=1;c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.fillStyle=ink;c.beginPath();c.arc(x,y,4,0,7);c.fill();
   const lab=`t = ${best[0]} s   T = ${best[1].toFixed(2)} °C`;c.font='12px "IBM Plex Mono", monospace';const tw=c.measureText(lab).width+12;let bx=Math.min(Math.max(x-tw/2,L),W-R-tw);
   c.fillStyle=cssv('--paper');c.strokeStyle=line;c.fillRect(bx,T+14,tw,20);c.strokeRect(bx,T+14,tw,20);c.fillStyle=ink;c.textAlign='left';c.fillText(lab,bx+6,T+28);
-  const h=$('#hov');if(h)h.innerHTML=`👆 נקודה נבחרת: <span class="f">t = ${best[0]} s, T = ${best[1].toFixed(2)} °C</span>`;}
+  window._sel=best;const h=$('#hov');if(h)h.innerHTML=`נקודה נבחרת: <span class="f">t = ${best[0]} s, T = ${best[1].toFixed(2)} °C</span>`+fillBtns(k);}
 }
 
 /* ---------- simulation ---------- */
@@ -467,7 +534,7 @@ function tick(ts){
   if(last!=null&&p.running){const dt=Math.min(0.1,(ts-last)/1000)*S.speed;stepSim(k,dt);if(p.t>900){p.running=false;p.stopped=true}}
   updateLogger(k);updateLive(k);if(p.running)drawChart(k);
   if(p.running&&ts-(window._sv||0)>2000){window._sv=ts;save()}
-  if(p.running&&p.added&&PARTS[k].kind==='solid'&&ts-(window._bt||0)>250){window._bt=ts;const g=$('#pel');if(g)g.innerHTML=pelHTML(k)}
+  if(p.running&&p.added&&ts-(window._bt||0)>250){window._bt=ts;const g=$('#pel');if(g)g.innerHTML=pelHTML(k);const fl=$('#flow');if(fl)fl.innerHTML=flowHTML(k)}
  }
  last=ts;requestAnimationFrame(tick);
 }
@@ -476,6 +543,7 @@ function updateLogger(k){const p=S.parts[k];const T=$('#lgT');if(!T)return;
  T.textContent=p.running||p.stopped?(lastR!=null?lastR.toFixed(2):p.Ts.toFixed(2))+' °C':'--.- °C';
  $('#lgt').textContent=Math.round(p.t)+' s';
  $('#lgState').textContent=p.running?'● מודד':(p.stopped?'המדידה נעצרה':'ממתין');
+ const dkT=$('#dkT');if(dkT)dkT.textContent=T.textContent;
  const ca=$('#cmpA');if(ca)ca.textContent=p.Ts.toFixed(1)+' °C';
 }
 requestAnimationFrame(tick);
@@ -484,7 +552,9 @@ requestAnimationFrame(tick);
 function setMsg(k,type,text){S.parts[k].msg=type?[type,text]:null}
 function next(k){const p=S.parts[k];p.step++;p.msg=null;save();refreshPart(k)}
 function rerender(k){const sc=scrollY;render();scrollTo(0,sc)}
-function refreshPart(k){render();const n=$('#now');if(n){const r=n.getBoundingClientRect();if(r.top<0||r.top>innerHeight*0.6)n.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}}
+function refreshPart(k){render();const beh=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+ if(matchMedia('(max-width:820px)').matches&&$('.work.chartfirst')){$('#chartbox').scrollIntoView({behavior:beh,block:'start'});return}
+ const n=$('#now');if(n){const r=n.getBoundingClientRect();if(r.top<0||r.top>innerHeight*0.6)n.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}}
 function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
  drawChart(k);updateLogger(k);
  document.querySelectorAll('[data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;save();document.querySelectorAll('[data-spd]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
@@ -494,6 +564,10 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
  const cv=$('#chart');const hov=e=>{if(!p.stopped)return;const r=cv.getBoundingClientRect();hoverX=e.clientX-r.left;drawChart(k)};
  cv.addEventListener('pointermove',hov);cv.addEventListener('pointerdown',hov);
  const sk=P.steps[p.step];
+ const dk=$('#dkBtn');if(dk)dk.onclick=()=>{const b2=$(sk==='watch'?'#stopBtn':'#stableBtn');if(b2)b2.click()};
+ $('#hov').onclick=e=>{const b2=e.target.closest('[data-fill]');if(!b2||!window._sel)return;const f=b2.dataset.fill,v=window._sel[1].toFixed(2);
+  p.res[f]=v;save();const el=$('#r_'+f);if(el)el.value=v;b2.textContent='✓ נרשם';b2.setAttribute('aria-pressed','true')};
+ A.querySelectorAll('[data-pred]').forEach(b=>b.onclick=()=>{p.pred=b.dataset.pred;save();A.querySelectorAll('[data-pred]').forEach(x=>x.setAttribute('aria-pressed',x===b));const g=$('#addSolid')||$('#addBase');if(g)g.disabled=false});
  const volBind=(id,vk,lab,dvk)=>{const r=$('#'+id);if(!r)return;const btn=A.querySelector('.b.go');const en=()=>{if(btn)btn.disabled=!((vk==='vol'?p.sel:p.sel2)&&p[vk]>0)};r.oninput=()=>{p[vk]=+r.value;$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()};
   A.querySelectorAll(`[data-${dvk}]`).forEach(b=>b.onclick=()=>{p[vk]=Math.max(0,Math.min(125,p[vk]+ +b.getAttribute('data-'+dvk)));r.value=p[vk];$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()})};
  if(sk==='measure'){A.querySelectorAll('[data-bottle]').forEach(b=>b.onclick=()=>{p.sel=b.dataset.bottle;p.msg=null;rerender(k)});
@@ -505,7 +579,7 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
    p.poured=true;next(k)}}
  if(sk==='setup'){$('#lid').onclick=()=>{p.lid=true;chk()};$('#sensor').onclick=()=>{p.sensor=true;chk()};
   function chk(){if(p.lid&&p.sensor)next(k);else{save();rerender(k)}}}
- if(sk==='addSolid'){$('#addSolid').onclick=()=>{startReaction(k);next(k)}}
+ if(sk==='addSolid'){$('#addSolid').onclick=()=>{if(!p.pred)return;startReaction(k);next(k)}}
  if(sk==='start'){$('#startBtn').onclick=()=>{p.running=true;p.stopped=false;p.data=[];p.t=0;p.maxT=-1e9;next(k)}}
  if(sk==='stabilize'){$('#stableBtn').onclick=()=>{if(Math.abs(p.Ts-p.Tw)>0.06||p.t<8){setMsg(k,'warn','הקריאה עדיין משתנה. חכו עוד מעט והסתכלו על הגרף.');render()}else next(k)}}
  if(sk==='weigh'){
@@ -521,7 +595,7 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
     if(p.sel2!==n.bottle){setMsg(k,'bad','זו לא תמיסת הבסיס הנדרשת. קראו שוב את ההוראה.');return render()}
     if(Math.abs(p.vol2-n.vol)>1){setMsg(k,'bad','בדקו את הנפח במשורה: ההוראה מבקשת 50 מ״ל. אפשר להוריד נוזל עם המחוון או עם −1.');return render()}
     p.baseMeasured=true;p.Tb=p.room-0.5+Math.random()*0.4;p.msg=null;if(sk==='measure2')next(k);else{save();rerender(k)}}}
-  else $('#addBase').onclick=()=>{startReaction(k);next(k)}}
+  else $('#addBase').onclick=()=>{if(!p.pred)return;startReaction(k);next(k)}}
  if(sk==='watch'){$('#stopBtn').onclick=()=>{
    const passed=p.added&&p.Qrel/p.Qtot>0.95&&(p.t-p.tMax)>=12;
    if(!passed){setMsg(k,'warn','הטמפרטורה עדיין עולה או שרק עכשיו הגיעה לשיא. עצרו רק אחרי שהיא מתחילה לרדת.');return render()}
@@ -562,7 +636,7 @@ function calcHTML(){
  const rows=['A','B','C'].map(k=>{const p=S.parts[k];const lbl={A:'א',B:'ב',C:'ג'}[k];
   if(!p.resOk)return `<tr><th>${lbl}</th><td colspan="5" class="hint">השלימו קודם את ${PARTS[k].tab}</td></tr>`;
   const c=S.calc[k],fb=(S.calcFb||{})[k]||{};const ok=S.calcOk[k];
-  return `<tr><th>${lbl}</th>${CF.map(([f])=>`<td><input type="number" step="any" inputmode="decimal" id="c_${k}_${f}" value="${esc(c[f]??'')}" ${ok?'disabled':''}><span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</span></td>`).join('')}</tr>`}).join('');
+  return `<tr><th>${lbl}</th>${CF.map(([f,l])=>`<td data-label="${l}"><input type="number" step="any" inputmode="decimal" id="c_${k}_${f}" value="${esc(c[f]??'')}" ${ok?'disabled':''}><span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</span></td>`).join('')}</tr>`}).join('');
  const info=['A','B','C'].map(k=>{const p=S.parts[k];if(!p.resOk)return '';const lbl={A:'א',B:'ב',C:'ג'}[k];
   return `<li>חלק ${lbl}: <span class="f">ΔT = ${num(p.res.dT).toFixed(2)} °C</span>${k!=='B'?` · מסת ${F.NaOH} ששקלתם: <span class="f">${p.massUsed.toFixed(2)} g</span>`:` · <span class="f">50 mL × 0.50 M</span>`}</li>`}).join('');
  return `<div class="panel">
@@ -577,12 +651,12 @@ function calcHTML(){
  </ol>
  <h3 style="margin-top:12px">הנתונים שלכם</h3><ul style="margin:6px 0 0;padding-inline-start:22px">${info||'<li class="hint">עדיין אין נתונים</li>'}</ul></div>
  <div class="card"><h2>טבלת סיכום חישובים</h2>
- <div class="tbl" style="margin-top:10px"><table><thead><tr><th>חלק</th>${CF.map(([,l])=>`<th>${l.replace('ΔH (kJ/mol)','<span class="f">ΔH (kJ/mol)</span>').replace('n (mol)','<span class="f">n (mol)</span>')}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
- <div class="btns" style="margin-top:12px"><button class="b" id="checkCalc">בדיקת החישובים</button>${tabDone('calc')?'<button class="b alt" id="toHess">לחוק הס</button>':''}</div>
+ <div class="tbl" style="margin-top:10px"><table class="calc"><thead><tr><th>חלק</th>${CF.map(([,l])=>`<th>${l.replace('ΔH (kJ/mol)','<span class="f">ΔH (kJ/mol)</span>').replace('n (mol)','<span class="f">n (mol)</span>').replace('(cal)','<span class="f">(cal)</span>').replace('(J)','<span class="f">(J)</span>')}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+ <div class="btns" style="margin-top:12px">${tabDone('calc')?'<button class="b go" id="toHess">המשך לחוק הס ←</button>':'<button class="b" id="checkCalc">בדיקת החישובים</button>'}</div>
  ${tabDone('calc')?'<div class="msg ok" style="margin-top:10px">כל החישובים נכונים.</div>':''}</div></div>`}
 function bindCalc(){
  ['A','B','C'].forEach(k=>CF.forEach(([f])=>{const el=$(`#c_${k}_${f}`);if(el)el.oninput=()=>{S.calc[k][f]=el.value;save()}}));
- $('#checkCalc').onclick=()=>{S.calcFb=S.calcFb||{};
+ const ck=$('#checkCalc');if(ck)ck.onclick=()=>{S.calcFb=S.calcFb||{};
   ['A','B','C'].forEach(k=>{if(!S.parts[k].resOk||S.calcOk[k])return;const e=expected(k),c=S.calc[k],fb={};
    CF.forEach(([f])=>{const v=num(c[f]),x=e[f];const close=(a,b)=>Math.abs(a-b)<=Math.max(Math.abs(b)*0.02,f==='n'?0.0003:0.05);
     if(v==null)fb[f]=[0,'חסר ערך'];
@@ -593,38 +667,39 @@ function bindCalc(){
     else fb[f]=[0,'בדקו את החישוב']});
    S.calcFb[k]=fb;S.calcOk[k]=Object.values(fb).every(x=>x[0])});
   save();render()};
- const th=$('#toHess');if(th)th.onclick=()=>{S.tab='hess';save();render()}
+ const th=$('#toHess');if(th)th.onclick=()=>{S.tab='hess';save();render();window.scrollTo({top:0})}
 }
 
 /* ---------- Hess ---------- */
 const SPEC=[['NaOH','NaOH<sub>(s)</sub>'],['Na','Na<sup>+</sup><sub>(aq)</sub>'],['OH','OH<sup>−</sup><sub>(aq)</sub>'],['H3O','H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub>'],['H2O','H<sub>2</sub>O<sub>(l)</sub>']];
 function dhv(k){return num(S.calc[k].dh)}
-function hessHTML(){const h=S.hess;const ready=tabDone('calc');
- const cancelOk=h.cancel==='OH';
+function knownDH(k){const nm={A:'ΔH<sub>א</sub>',B:'ΔH<sub>ב</sub>',C:'ΔH<sub>ג</sub>'}[k];return tabDone('calc')?`${nm}&lrm; = ${dhv(k).toFixed(1)} kJ/mol`:`${nm}&lrm; = ?`}
+function hessHTML(){const h=S.hess;h.cancel=Array.isArray(h.cancel)?h.cancel:[];const ready=tabDone('calc');const ok=h.cancelOk;
+ const oh=ok?'<s>OH<sup>−</sup><sub>(aq)</sub></s>':'OH<sup>−</sup><sub>(aq)</sub>';
  let s=`<div class="panel"><div class="card"><h2>חוק הס: השוואת המסלולים</h2>
  <p style="margin-top:8px">חברו את משוואות התהליכים של חלקים א ו־ב:</p>
- <div class="eqs">
-  <div class="eqr"><b>תהליך א</b><span class="f">NaOH<sub>(s)</sub> → Na<sup>+</sup><sub>(aq)</sub> + ${cancelOk?'<s>OH<sup>−</sup><sub>(aq)</sub></s>':'OH<sup>−</sup><sub>(aq)</sub>'}</span></div>
-  <div class="eqr"><b>תהליך ב</b><span class="f">${cancelOk?'<s>OH<sup>−</sup><sub>(aq)</sub></s>':'OH<sup>−</sup><sub>(aq)</sub>'} + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → 2H<sub>2</sub>O<sub>(l)</sub></span></div>
-  ${cancelOk?'<div class="eqr sum"><b>סכום א ו־ב</b><span class="f"><b>NaOH<sub>(s)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → Na<sup>+</sup><sub>(aq)</sub> + 2H<sub>2</sub>O<sub>(l)</sub></b></span></div>':''}
+ <div class="eqs" style="margin-top:10px">
+  <div class="eqr"><b>תהליך א</b><span class="f"><span class="nb">NaOH<sub>(s)</sub> → Na<sup>+</sup><sub>(aq)</sub> + ${oh}</span> <span class="nb dh">${knownDH('A')}</span></span></div>
+  <div class="eqr"><b>תהליך ב</b><span class="f"><span class="nb">${oh} + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → 2H<sub>2</sub>O<sub>(l)</sub></span> <span class="nb dh">${knownDH('B')}</span></span></div>
+  ${ok?`<div class="eqr sum"><b>סכום א ו־ב</b><span class="f"><span class="nb"><b>NaOH<sub>(s)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → Na<sup>+</sup><sub>(aq)</sub> + 2H<sub>2</sub>O<sub>(l)</sub></b></span> <span class="nb dh">ΔH = ?</span></span></div>`:''}
+  <div class="eqr"><b>תהליך ג</b><span class="f"><span class="nb">NaOH<sub>(s)</sub> + H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub> → Na<sup>+</sup><sub>(aq)</sub> + 2H<sub>2</sub>O<sub>(l)</sub></span> <span class="nb dh">${knownDH('C')}</span></span></div>
  </div>
- <p style="margin-top:10px;font-weight:700">איזה חלקיק מצטמצם משני אגפי הסכום?</p>
- <div class="species" style="margin-top:6px">${SPEC.map(([id,l])=>`<button class="chip" data-sp="${id}" aria-pressed="${h.cancel===id}"><span class="f">${l}</span></button>`).join('')}</div>
- ${h.cancel?(cancelOk?'<div class="msg ok" style="margin-top:8px">נכון. היון '+'<span class="f">OH<sup>−</sup><sub>(aq)</sub></span>'+' נוצר בתהליך א ומגיב בתהליך ב, ולכן הסכום של א ו־ב הוא בדיוק תהליך ג.</div>':'<div class="msg bad" style="margin-top:8px">החלקיק הזה לא מופיע בשני האגפים. חפשו חלקיק שהוא תוצר באחת המשוואות ומגיב בשנייה.</div>'):''}
+ ${ready?'':'<p class="hint" style="margin-top:6px">הערכים יופיעו כאן אחרי שתשלימו את טבלת החישובים.</p>'}
+ <p style="margin-top:12px;font-weight:700">אילו חלקיקים מופיעים בשני אגפי הסכום ומצטמצמים? סמנו את כולם.</p>
+ <div class="species" style="margin-top:6px">${SPEC.map(([id,l])=>`<button class="chip" data-sp="${id}" aria-pressed="${h.cancel.includes(id)}" ${ok?'disabled':''}><span class="f">${l}</span></button>`).join('')}</div>
+ ${ok?'<div class="msg ok" style="margin-top:8px">נכון. היון <span class="f">OH<sup>−</sup><sub>(aq)</sub></span> נוצר בתהליך א ומגיב בתהליך ב, ולכן הוא מצטמצם. הסכום של א ו־ב הוא תהליך ג.</div>':`<div class="btns" style="margin-top:10px"><button class="b" id="checkCancel">בדיקה</button></div>${h.fbCancel?`<div class="msg bad" style="margin-top:8px">${h.fbCancel}</div>`:''}`}
  </div>`;
+ if(!ok)return s+'</div>';
  if(!ready)return s+`<div class="card"><p class="hint">כדי להשוות ערכים, השלימו קודם את טבלת החישובים.</p></div></div>`;
  const fb=h.fb||{};
- const inp=(f)=>`<input type="number" step="any" inputmode="decimal" id="h_${f}" value="${esc(h[f])}" ${h.ok?'disabled':''} style="width:8em;direction:ltr;text-align:center"> <span class="f">kJ/mol</span> <span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}" style="display:inline">${fb[f]?fb[f][1]:''}</span>`;
+ const inp=(f)=>`<input type="number" step="any" inputmode="decimal" id="h_${f}" value="${esc(h[f]||'')}" ${h.ok?'disabled':''} style="width:8em;direction:ltr;text-align:center"> <span class="f">kJ/mol</span> <span class="fb ${fb[f]&&fb[f][0]?'good':'badc'}" style="display:inline">${fb[f]?fb[f][1]:''}</span>`;
  s+=`<div class="card"><h3>מה הקשר בין תהליך ג לבין סכום התהליכים א ו־ב?</h3>
- <p style="margin-top:8px">הערכים שחישבתם בלשונית "חישובים":</p>
- <div class="dhs">${['A','B','C'].map(k=>`<div><span>ΔH של תהליך ${{A:'א',B:'ב',C:'ג'}[k]}</span><b class="f">${dhv(k).toFixed(2)} kJ/mol</b></div>`).join('')}</div>
- <p style="margin-top:10px">לפי חוק הס, ΔH של תהליך ג צריך להיות שווה בקירוב לסכום ΔH של תהליכים א ו־ב. השלימו:</p>
+ <p style="margin-top:8px">לפי חוק הס, <span class="f">ΔH</span> של תהליך ג צריך להיות שווה בקירוב לסכום <span class="f">ΔH</span> של תהליכים א ו־ב. השתמשו בערכים שבמשוואות למעלה והשלימו:</p>
  <div class="reqs" style="margin-top:10px">
-  <div>סכום ΔH של תהליכים א ו־ב = ${inp('sum')}</div>
-  <div>ההפרש בין ΔH של תהליך ג לסכום = ${inp('diff')}</div></div>
- <div class="btns" style="margin-top:12px"><button class="b" id="checkHess">בדיקה</button></div>
- ${h.ok?`<div class="msg ok" style="margin-top:10px">${hessVerdict()}</div>`:''}
- ${h.ok?`<h3 style="margin-top:16px">תרשים אנתלפיה לפי התוצאות שלכם</h3><div style="overflow-x:auto">${enthalpySVG()}</div><button class="b go" style="margin-top:14px" onclick="S.tab='disc';save();render();window.scrollTo({top:0})">המשך לשאלות הדיון ←</button>`:''}
+  <div>סכום <span class="f">ΔH</span> של תהליכים א ו־ב = ${inp('sum')}</div>
+  <div>ההפרש בין <span class="f">ΔH</span> של תהליך ג לסכום = ${inp('diff')}</div></div>
+ ${h.ok?'':'<div class="btns" style="margin-top:12px"><button class="b" id="checkHess">בדיקה</button></div>'}
+ ${h.ok?`<div class="msg ok" style="margin-top:10px">${hessVerdict()}</div><h3 style="margin-top:16px" id="diag">תרשים אנתלפיה לפי התוצאות שלכם</h3><div style="overflow-x:auto;direction:ltr">${enthalpySVG()}</div><button class="b go" id="toDisc" style="margin-top:14px">המשך לשאלות הדיון ←</button>`:''}
  </div></div>`;
  return s}
 const LIT={A:-44.5,B:-55.8,C:-100.3};
@@ -634,8 +709,7 @@ function litHTML(){const n={A:'א – המסה',B:'ב – סתירה',C:'ג – 
  ${['A','B','C'].map(k=>{const v=dhv(k),l=LIT[k];return `<tr><td>${n[k]}</td><td class="f">${v.toFixed(1)}</td><td class="f">${l.toFixed(1)}</td><td class="f">${(Math.abs(v-l)/Math.abs(l)*100).toFixed(1)}%</td></tr>`}).join('')}
  </tbody></table></div>
  <p class="hint" style="margin-top:6px">הערכים הספרותיים מתייחסים לתמיסות מהולות מאוד ב־25 °C. הערך של תהליך ג הוא סכום של א ו־ב, לפי חוק הס. מה יכול להסביר את הסטייה של התוצאות שלכם? חזרו לזה בשאלות הדיון.</p>`}
-function hessVerdict(){const a=dhv('A'),b=dhv('B'),c=dhv('C');const sum=a+b;const pct=Math.abs(c-sum)/Math.abs(c)*100;
- return `הסכום של שני השלבים (<span class="f">${sum.toFixed(1)}</span>) שונה מהמדידה הישירה (<span class="f">${c.toFixed(1)}</span>) ב־${pct.toFixed(1)}%. ${pct<8?'זו התאמה טובה בגבולות הדיוק של הניסוי.':'זה הפרש גדול יחסית. חשבו בשאלות הדיון מה יכול לגרום לו.'}`}
+function hessVerdict(){return 'נכון. שני המסלולים מתחילים באותו מצב ומסתיימים באותו מצב, ולכן לפי חוק הס שינוי האנתלפיה שלהם שווה. ההפרש שחישבתם נובע מאי־דיוק במדידה. חשבו על מקורותיו בשאלות הדיון.'}
 function enthalpySVG(){const a=dhv('A'),b=dhv('B'),c=dhv('C');const W=520,H=300,top=30,bot=260;
  const lo=Math.min(0,a,a+b,c),hi=0;const Y=v=>top+(bot-top)*(hi-v)/(hi-lo||1);
  const ink='var(--ink)',mut='var(--muted)',acc='var(--accent)';
@@ -647,17 +721,23 @@ function enthalpySVG(){const a=dhv('A'),b=dhv('B'),c=dhv('C');const W=520,H=300,
  ${lvl(40,160,a,'Na⁺ + OH⁻ + H₃O⁺')}${lvl(120,240,a+b,'Na⁺(aq) + 2H₂O(l)')}${lvl(300,510,c,'Na⁺(aq) + 2H₂O(l)')}
  ${arr(52,0,a,a.toFixed(1)+' (א)',acc)}${arr(132,a,a+b,b.toFixed(1)+' (ב)',acc)}${arr(312,0,c,c.toFixed(1)+' (ג)','var(--warn)')}
  <text x="140" y="${H-10}" text-anchor="middle" font-size="13" fill="${mut}" font-family="Assistant">מסלול בשני שלבים</text><text x="400" y="${H-10}" text-anchor="middle" font-size="13" fill="${mut}" font-family="Assistant">מסלול ישיר</text></svg>`}
-function bindHess(){document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{S.hess.cancel=b.dataset.sp;save();render()});
- ['sum','c','diff'].forEach(f=>{const el=$('#h_'+f);if(el)el.oninput=()=>{S.hess[f]=el.value;save()}});
- const cb=$('#checkHess');if(cb)cb.onclick=()=>{const a=dhv('A'),b=dhv('B'),c=dhv('C');const h=S.hess,fb={};
+function bindHess(){const h=S.hess;
+ document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{const id=b.dataset.sp,i=h.cancel.indexOf(id);if(i<0)h.cancel.push(id);else h.cancel.splice(i,1);h.fbCancel=null;save();rerenderHess()});
+ const cc=$('#checkCancel');if(cc)cc.onclick=()=>{const c=h.cancel;
+  if(!c.length)h.fbCancel='סמנו לפחות חלקיק אחד.';
+  else if(c.some(x=>x!=='OH'))h.fbCancel='חלקיק מצטמצם רק אם הוא מופיע בשני האגפים: תוצר בתהליך אחד ומגיב בשני. בדקו שוב כל חלקיק שסימנתם.';
+  else{h.fbCancel=null;h.cancelOk=true}
+  save();rerenderHess()};
+ ['sum','diff'].forEach(f=>{const el=$('#h_'+f);if(el)el.oninput=()=>{h[f]=el.value;save()}});
+ const cb=$('#checkHess');if(cb)cb.onclick=()=>{const a=dhv('A'),b=dhv('B'),c=dhv('C');const fb={};
   const close=(v,x)=>v!=null&&Math.abs(v-x)<=Math.max(Math.abs(x)*0.02,0.3);
-  const sv=num(h.sum),cv=num(h.c),dv=num(h.diff);
-  fb.sum=close(sv,a+b)?[1,'✓']:[0,'חברו את שני הערכים מטבלת החישובים, כולל הסימן'];
-  h.c=String(c);
-  fb.diff=(dv!=null&&Math.abs(Math.abs(dv)-Math.abs(c-(a+b)))<=0.3)?[1,'✓']:[0,'חסרו את הסכום מהתוצאה הישירה'];
-  h.fb=fb;h.ok=Object.values(fb).every(x=>x[0])&&h.cancel==='OH';
-  if(Object.values(fb).every(x=>x[0])&&h.cancel!=='OH')h.fb.diff=[1,'✓ – ענו גם על שאלת הצמצום למעלה'];
-  save();render()}}
+  const sv=num(h.sum),dv=num(h.diff);
+  fb.sum=sv==null?[0,'חסר ערך']:(close(sv,a+b)?[1,'✓']:(close(-sv,a+b)?[0,'בדקו את הסימן']:[0,'חברו את ΔH של תהליך א ואת ΔH של תהליך ב, כולל הסימן']));
+  fb.diff=dv==null?[0,'חסר ערך']:((Math.abs(Math.abs(dv)-Math.abs(c-(a+b)))<=0.3)?[1,'✓']:[0,'חסרו את הסכום מ־ΔH של תהליך ג']);
+  h.c=String(c);h.fb=fb;h.ok=fb.sum[0]===1&&fb.diff[0]===1&&h.cancelOk;
+  save();rerenderHess();const d=document.getElementById('diag');if(d&&h.ok)d.scrollIntoView({behavior:'smooth',block:'center'})};
+ const td=$('#toDisc');if(td)td.onclick=()=>{S.tab='disc';save();render();window.scrollTo({top:0})}}
+function rerenderHess(){const sc=scrollY;render();scrollTo(0,sc)}
 
 /* ---------- discussion ---------- */
 const QS=['מדוע חשוב שהתגובות בשלושת החלקים יתייחסו לאותו מספר מולים של '+F.NaOH+'?',
@@ -677,10 +757,10 @@ function reportText(){const L=[];const lbl={A:'א',B:'ב',C:'ג'};
  L.push('ניסוי וירטואלי – אנתלפיית המסה וסתירה, חוק הס');L.push('שם: '+(S.name||'—')+' | בית ספר: '+(S.school||'—'));L.push('');
  L.push('תוצאות מדידה:');
  for(const k of ['A','B','C']){const p=S.parts[k];if(!p.resOk){L.push(`חלק ${lbl[k]}: לא הושלם`);continue}
-  L.push(`חלק ${lbl[k]}: T התחלתית ${p.res.Ti} °C, T מרבית ${p.res.Tmax} °C, ΔT ${p.res.dT} °C, מסת סביבה ${p.res.m} g`+(k!=='B'?`, מסת NaOH ${p.massUsed.toFixed(2)} g`:''))}
+  L.push(`חלק ${lbl[k]}: T התחלתית ${p.res.Ti} °C, T מרבית ${p.res.Tmax} °C, ΔT ${p.res.dT} °C, מסת סביבה ${p.res.m} g`+(k!=='B'?`, מסת NaOH ${p.massUsed.toFixed(2)} g`:'')+(p.pred?`; ניבוי לפני ההוספה: הטמפרטורה ${Object.fromEntries(PRED)[p.pred]} (בפועל: ${p.Qtot>0?'עלתה':'ירדה'})`:''))}
  L.push('');L.push('חישובים:');
  for(const k of ['A','B','C']){const c=S.calc[k];L.push(`חלק ${lbl[k]}: סביבה ${c.qcal??'—'} cal = ${c.qj??'—'} J; מערכת ${c.qsys??'—'} J; n = ${c.n??'—'} mol; ΔH = ${c.dh??'—'} kJ/mol`+(S.calcOk[k]?' ✓':''))}
- L.push('');L.push('חוק הס:');L.push(`ΔH(א)+ΔH(ב) = ${S.hess.sum||'—'} ; ΔH(ג) = ${S.hess.c||'—'} ; הפרש = ${S.hess.diff||'—'} kJ/mol`+(S.hess.ok?' ✓':''));
+ L.push('');L.push('חוק הס:');L.push('חלקיקים שמצטמצמים: '+((S.hess.cancel||[]).map(id=>(SPEC.find(x=>x[0]===id)||[,''])[1].replace(/<[^>]+>/g,'')).join(', ')||'—')+(S.hess.cancelOk?' ✓':''));L.push(`ΔH(א)+ΔH(ב) = ${S.hess.sum||'—'} ; ΔH(ג) = ${S.hess.c||'—'} ; הפרש = ${S.hess.diff||'—'} kJ/mol`+(S.hess.ok?' ✓':''));
  L.push('');L.push('שאלות לדיון:');
  const qt=['מדוע חשוב שהתגובות יתייחסו לאותו מספר מולים של NaOH?','השפעת בידוד לא מלא של הכוס על שינוי הטמפרטורה','האם התוצאות מאששות את חוק הס?','שני גורמים נוספים להבדל בין ΔH(ג) לסכום','השוואה לערכים הספרותיים (−44.5, −55.8, −100.3 kJ/mol) והסבר לסטייה'];
  qt.forEach((q,i)=>{L.push(`${i+1}. ${q}`);L.push((S.disc[i]||'').trim()||'—')});
@@ -703,6 +783,8 @@ function bindSubmit(){document.querySelectorAll('[data-go]').forEach(b=>b.onclic
  $('#copyRep').onclick=()=>{const t=$('#rep');const done=ok=>{if(!ok)t.closest('details').open=true;$('#copyMsg').innerHTML=ok?'<div class="msg ok" style="margin-top:8px">✓ הסיכום הועתק. עכשיו עברו לשלב 2.</div>':'<div class="msg warn" style="margin-top:8px">ההעתקה האוטומטית לא עבדה כאן. הטקסט סומן למטה – העתיקו אותו בעצמכם (Ctrl+C, או לחיצה ארוכה ואז "העתקה").</div>'};
  try{navigator.clipboard.writeText(t.value).then(()=>done(true),()=>{t.focus();t.select();done(false)})}catch(e){t.focus();t.select();done(false)}}}
 
+const _render=render;
+render=function(){_render();$('.mast').classList.toggle('compact',S.tab!=='intro');const nm=S.name.trim(),sc=(S.school||'').trim();$('#whoTxt').textContent=nm?nm+(sc?' · '+sc:''):''};
 window.addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 window.addEventListener('resize',()=>{if(PARTS[S.tab])drawChart(S.tab)});
 render();

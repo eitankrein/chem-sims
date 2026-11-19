@@ -227,6 +227,13 @@ canvas.chart{height:220px}
  .eqr .nb.dh{margin-inline-start:0;display:block}
 }
 table.calc .auto{background:var(--accent-soft)}
+/* --- teacher report --- */
+.rp{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--paper)}
+.rp h1{font-size:1.15rem}.rp h2{font-size:1rem;color:var(--accent);margin-top:12px}
+.rp p{unicode-bidi:plaintext;margin:2px 0}.rp .rp-meta{font-weight:700}.rp .rp-q{font-weight:700;margin-top:8px}.rp .rp-a{margin-inline-start:14px;white-space:pre-wrap}
+@media print{body.printing-report *{visibility:hidden!important}body.printing-report #report,body.printing-report #report *{visibility:visible!important}
+ body.printing-report #report{position:absolute;inset:0 auto auto 0;width:100%;border:0;padding:0}
+ body.printing-report .tabs,body.printing-report .dock{display:none!important}}
 </style>
 
 
@@ -919,6 +926,41 @@ render=function(){_render();if(S.tab==='intro')bindIntro();
 window.addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 window.addEventListener('resize',()=>{if(PARTS[S.tab])drawChart(S.tab)});
 window.__lab={S:()=>S,stepSim,render,PARTS,expected,hydVal};
+/* ---------- teacher report (optional) ---------- */
+function _repDate(){try{return new Date().toLocaleDateString('he-IL')}catch(e){return ''}}
+function _repLines(){const L=reportText().split('\n');L.splice(2,0,'תאריך: '+_repDate());return L}
+function _repIso(t){return t.replace(/[A-Za-z0-9Δ±−+=×·(\[—][^\u0590-\u05FF,;|]*[A-Za-z0-9Δ)\]°—]/g,m=>{let lead='',tail='';const c=(x,ch)=>x.split(ch).length-1;
+ while(m.endsWith(')')&&c(m,')')>c(m,'(')){tail=')'+tail;m=m.slice(0,-1)}while(m.startsWith('(')&&c(m,'(')>c(m,')')){lead+='(';m=m.slice(1)}
+ return lead+(m?'<bdi dir="ltr">'+m+'</bdi>':'')+tail})}
+function reportBodyHTML(){const L=_repLines();let h='',ans=false;const E=t=>_repIso(esc(t));
+ L.forEach((l,i)=>{const t=l.trim();if(!t){ans=false;return}
+  if(i===0){h+=`<h1>${E(t)}</h1>`;return}
+  if(i<=2){h+=`<p class="rp-meta">${E(t)}</p>`;return}
+  if(/:$/.test(t)&&t.length<40){h+=`<h2>${E(t.slice(0,-1))}</h2>`;ans=false;return}
+  if(/^\d+\.\s/.test(t)){h+=`<p class="rp-q">${E(t)}</p>`;ans=true;return}
+  h+=`<p class="${ans?'rp-a':''}">${E(t)}</p>`});
+ return h}
+function reportFileHTML(){return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(document.title)} – ${esc(S.name||'')}</title>
+<style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;line-height:1.55;color:#18282d}h1{font-size:1.4rem;border-bottom:2px solid #19576c;padding-bottom:6px}h2{font-size:1.1rem;color:#19576c;margin:18px 0 6px}p{margin:4px 0;unicode-bidi:plaintext}.rp-meta{font-weight:700}.rp-q{font-weight:700;margin-top:10px}.rp-a{margin-inline-start:16px;white-space:pre-wrap}</style></head><body>${reportBodyHTML()}</body></html>`}
+function reportCardHTML(){return `<div class="card" id="repCard"><h2>דוח למורה (רשות)</h2>
+ <p style="margin-top:6px">אם המורה ביקש דוח, אפשר לשלוח אותו מכאן בווטסאפ, או לשמור אותו כקובץ ולהעלות לפטל. אם לא ביקשו – אפשר לדלג.</p>
+ <div class="btns" style="margin-top:12px"><button class="b" id="repWa">שליחה בווטסאפ</button><button class="b alt" id="repFile">הורדת הדוח כקובץ (להעלאה לפטל)</button><button class="b alt" id="repPdf">שמירה כ־PDF או הדפסה</button></div>
+ <div id="repMsg"></div>
+ <details class="more" style="margin-top:12px"><summary>הצגת הדוח</summary><div id="report" class="rp">${reportBodyHTML()}</div></details></div>`}
+const _submitHTML0=submitHTML;
+submitHTML=function(){const h=_submitHTML0();const i=h.lastIndexOf('</div>');return h.slice(0,i)+reportCardHTML()+h.slice(i)};
+const _bindSubmit0=bindSubmit;
+bindSubmit=function(){_bindSubmit0();
+ const msg=(ok,t)=>{$('#repMsg').innerHTML=`<div class="msg ${ok?'ok':'warn'}" style="margin-top:8px">${t}</div>`};
+ $('#repWa').onclick=()=>{const t=_repLines().join('\n');
+  if(navigator.share&&matchMedia('(pointer:coarse)').matches){navigator.share({title:document.title,text:t}).then(()=>msg(true,'✓ הדוח נשלח.'),()=>{});return}
+  const w=window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');if(!w)msg(false,'החלון לא נפתח. אפשר להשתמש בכפתור "העתקת הסיכום" ולהדביק בווטסאפ.')};
+ $('#repFile').onclick=()=>{try{const d=new Date(),pad=n=>String(n).padStart(2,'0');const name=KEY.replace(/-v\d+$/,'')+'-report-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.html';
+  const url=URL.createObjectURL(new Blob([reportFileHTML()],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  msg(true,'✓ הקובץ נשמר בתיקיית ההורדות. אפשר להעלות אותו לפטל.')}catch(e){msg(false,'ההורדה לא עבדה כאן. נסו "שמירה כ־PDF או הדפסה".')}};
+ $('#repPdf').onclick=()=>{const d=$('#report').closest('details');d.open=true;document.body.classList.add('printing-report');setTimeout(()=>{try{window.print()}catch(e){}document.body.classList.remove('printing-report')},50)};
+};
+
 render();
 
 </script>

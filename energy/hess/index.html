@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -220,6 +220,14 @@ canvas.chart{height:220px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">RTYED43HRRCR-535375568-6648364</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">edc73be4-dc1b-4635-892c-b3d17f4970c2</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://hemda.sharepoint.com/sites/MyDoc/_layouts/15/DocIdRedir.aspx?ID=RTYED43HRRCR-535375568-6648364, RTYED43HRRCR-535375568-6648364</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
 <div class="wrap" dir="rtl" lang="he">
@@ -248,7 +256,7 @@ const F={
   NaOH:'<span class="f">NaOH</span>', dH:'<span class="f">ΔH</span>', dT:'<span class="f">ΔT</span>'
 };
 const BOTTLES={water:{label:'מים מזוקקים',html:'מים מזוקקים'},hcl50:{label:'HCl(aq) 0.50 M',html:F.HClaq+' <span class="f">0.50 M</span>'},hcl25:{label:'HCl(aq) 0.25 M',html:F.HClaq+' <span class="f">0.25 M</span>'},naoh50:{label:'NaOH(aq) 0.50 M',html:F.NaOHaq+' <span class="f">0.50 M</span>'}};
-const STEP_LABEL={measure:'מדידת נפח והעברה לכוס',setup:'מכסה וחיישן',start:'הפעלת מדידה',stabilize:'המתנה להתייצבות',weigh:'שקילת המוצק',addSolid:'הוספת המוצק וערבוב',measure2:'מדידת הבסיס במשורה',base:'הוספת הבסיס וערבוב',stir:'ערבוב',watch:'מעקב ועצירת המדידה',done:'רישום התוצאות'};
+const STEP_LABEL={measure:'מדידת נפח והעברה לכוס',setup:'מכסה וחיישן',start:'הפעלת מדידה',stabilize:'המתנה להתייצבות',weigh:'שקילת המוצק',addSolid:'הוספת המוצק ובחישה',measure2:'מדידת הבסיס במשורה',base:'הוספת הבסיס ובחישה',stir:'בחישה',watch:'מעקב ועצירת המדידה',done:'רישום התוצאות'};
 const PARTS={
   A:{tab:'חלק א׳',title:'חלק א׳ – אנתלפיית ההמסה של '+F.NaOH+' מוצק',
      eq:'NaOH<sub>(s)</sub> → Na<sup>+</sup><sub>(aq)</sub> + OH<sup>−</sup><sub>(aq)</sub>',
@@ -256,7 +264,7 @@ const PARTS={
      steps:['weigh','measure','setup','start','stabilize','addSolid','watch','done'],
      proto:['מדדו 100 מ״ל מים והעבירו לכוס התרמית. סגרו במכסה והכניסו את חיישן הטמפרטורה דרך הפתח המיועד.',
             'הפעילו את מדידת הטמפרטורה. לאחר התייצבות הקריאה רשמו את הטמפרטורה ההתחלתית.',
-            'הוסיפו בזהירות 1.00 גרם '+F.NaOHs+' שנשקל מראש; סגרו שוב את המכסה וערבבו בעדינות במקל ערבוב מתאים.',
+            'הוסיפו בזהירות 1.00 גרם '+F.NaOHs+' שנשקל מראש; סגרו שוב את המכסה ובחשו בעדינות במקל בחישה מתאים.',
             'עקבו אחר הטמפרטורה עד לקבלת ערך מרבי ורשמו אותו. עצרו את המדידה לאחר שהטמפרטורה מתחילה לרדת.'],
      protoMap:[-1,0,0,1,1,2,3,3]},
   B:{tab:'חלק ב׳',title:'חלק ב׳ – אנתלפיית הסתירה של '+F.NaOHaq+' עם '+F.HClaq,
@@ -265,7 +273,7 @@ const PARTS={
      steps:['measure','measure2','setup','start','stabilize','base','watch','done'],
      proto:['מדדו 50 מ״ל '+F.HClaq+' בריכוז <span class="f">0.50 M</span> והעבירו לכוס תרמית נקייה. מדדו בנפרד 50 מ״ל '+F.NaOHaq+' בריכוז <span class="f">0.50 M</span>.',
             'ודאו ששתי התמיסות באותה טמפרטורה התחלתית בקירוב. הפעילו את החיישן בתוך החומצה ורשמו את הטמפרטורה לאחר התייצבות.',
-            'הוסיפו את תמיסת הבסיס, סגרו במכסה וערבבו בעדינות במקל ערבוב מתאים. עקבו אחר הטמפרטורה עד לערך המרבי.',
+            'הוסיפו את תמיסת הבסיס, סגרו במכסה ובחשו בעדינות במקל בחישה מתאים. עקבו אחר הטמפרטורה עד לערך המרבי.',
             'רשמו את הערך המרבי ועצרו את המדידה לאחר תחילת הירידה.'],
      protoMap:[0,0,1,1,1,2,3,3]},
   C:{tab:'חלק ג׳',title:'חלק ג׳ – אנתלפיית התגובה של '+F.NaOH+' מוצק עם חומצה',
@@ -274,7 +282,7 @@ const PARTS={
      steps:['weigh','measure','setup','start','stabilize','addSolid','watch','done'],
      proto:['מדדו 100 מ״ל '+F.HClaq+' בריכוז <span class="f">0.25 M</span> והעבירו לכוס תרמית נקייה. סגרו במכסה, הכניסו חיישן והפעילו מדידה.',
             'לאחר התייצבות הטמפרטורה רשמו את הערך ההתחלתי. הוסיפו בזהירות 1.00 גרם '+F.NaOHs+' שנשקל מראש.',
-            'ערבבו בעדינות במקל ערבוב מתאים. רשמו את הטמפרטורה המרבית לאחר שהמוצק נמס.',
+            'בחשו בעדינות במקל בחישה מתאים. רשמו את הטמפרטורה המרבית לאחר שהמוצק נמס.',
             'עצרו את המדידה לאחר תחילת הירידה.'],
      protoMap:[-1,0,0,0,1,1,2,3]}
 };
@@ -330,7 +338,7 @@ function introHTML(){return `<div class="panel">
  <p style="margin-top:8px">בכל שלב מופיע בצד ימין מה צריך לעשות ועל מה ללחוץ. הטמפרטורה נמדדת בחיישן ומוצגת בגרף. התוצאות מחושבות לפי ערכים אמיתיים, עם רעש מדידה קטן ואיבוד חום לסביבה, כך שכל הרצה נותנת מספרים מעט שונים. הזמן בסימולציה רץ מהר פי 10, ואפשר להאיץ אותו לפי 30.</p></div>
  <div class="card"><dl class="kv">
   <dt>מטרה</dt><dd>למדוד שינויי טמפרטורה בשלושה תהליכים, לחשב שינוי אנתלפיה לכל מול ולבדוק את חוק הס.</dd>
-  <dt>ציוד</dt><dd>כוס תרמית עם מכסה, חיישן טמפרטורה, משורה, מאזניים ומקל ערבוב.</dd>
+  <dt>ציוד</dt><dd>כוס תרמית עם מכסה, חיישן טמפרטורה, משורה, מאזניים ומקל בחישה.</dd>
   <dt>הנחות לחישוב</dt><dd>צפיפות התמיסות בקירוב 1.0 גרם למ״ל; מסת הסביבה הנמדדת בקירוב 100 גרם בכל חלק; החום שעובר לכוס ולאוויר זניח. הזניחו בחישוב את מסת המוצק שהוסף.</dd>
  </dl></div>
  <div class="card"><h3>סדר העבודה</h3>
@@ -386,11 +394,6 @@ function partHTML(k){const P=PARTS[k],p=S.parts[k];const sk=P.steps[p.step];cons
  ${run?`<div class="dock" id="dock"><div class="dkinfo"><b class="f" id="dkT">--.- °C</b><span id="dkL"></span></div><button class="b" id="dkBtn" disabled>${sk==='watch'?'■ עצירה':'המשך'}</button></div>`:''}
  </div>`}
 
-const PRED=[['up','תעלה'],['same','לא תשתנה'],['down','תרד']];
-function predChips(k){const p=S.parts[k];return `<p class="say"><b>לפני שמוסיפים – מה לדעתכם יקרה?</b> הטמפרטורה של התמיסה:</p>
- <div class="btns">${PRED.map(([id,l])=>`<button class="chip" data-pred="${id}" aria-pressed="${p.pred===id}">${l}</button>`).join('')}</div>`}
-function predHTML(k){const p=S.parts[k];if(!p.pred||!p.truth)return '';const L=Object.fromEntries(PRED);const actual=p.Qtot>0?'up':'down';
- return `<div class="msg ${p.pred===actual?'ok':'warn'}">ניבאתם שהטמפרטורה ${L[p.pred]}. בפועל היא ${actual==='up'?'עלתה':'ירדה'}.${p.pred===actual?'':' חשבו מה יכול להסביר זאת.'}</div>`}
 function msgHTML(m){return m?`<div class="msg ${m[0]}">${m[1]}</div>`:''}
 function bottleChips(attr,sel){return `<div class="btns">${Object.entries(BOTTLES).map(([id,b])=>`<button class="chip bottle" data-${attr}="${id}" aria-pressed="${sel===id}">${b.html}</button>`).join('')}</div>`}
 function volTxt(v){return v>100?'מעל 100':String(v)}
@@ -401,7 +404,7 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
   h=todo([[!!p.sel,'בחרו את התמיסה המתאימה להוראה'],[p.vol>0,'גררו את המחוון עד הנפח הנדרש (אפשר לדייק ב־‎−1/+1)'],[false,'לחצו על הכפתור הכחול']])
    +bottleChips('bottle',p.sel)+volSlider('vol',p.vol,'dv')
    +`<button class="b go" id="pour" ${p.sel&&p.vol>0?'':'disabled'}>העבירו לכוס התרמית</button>`;}
- else if(sk==='setup'){h=`<p class="say">סגרו את הכוס התרמית במכסה והכניסו את החיישן דרך הפתח שבמכסה (בכל סדר). מקל הערבוב כבר נמצא בכוס.</p>
+ else if(sk==='setup'){h=`<p class="say">סגרו את הכוס התרמית במכסה והכניסו את החיישן דרך הפתח שבמכסה (בכל סדר). מקל הבחישה כבר נמצא בכוס.</p>
   <div class="stack"><button class="b ${p.lid?'done':'go'}" id="lid" ${p.lid?'disabled':''}>${p.lid?'✓ הכוס סגורה':'סגירת הכוס במכסה'}</button>
   <button class="b ${p.sensor?'done':'go'}" id="sensor" ${p.sensor?'disabled':''}>${p.sensor?'✓ החיישן בפנים':'הכנסת חיישן הטמפרטורה'}</button></div>`;}
  else if(sk==='start'){h=`<p class="say">הכול מוכן. הפעילו את החיישן כדי להתחיל לרשום את הטמפרטורה.</p><button class="b go" id="startBtn">▶ הפעלת מדידה</button>`;}
@@ -412,7 +415,7 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
   <div class="live ${okm?'ok':'wait'}" id="massLive">על המאזניים: <b class="f">${p.mass.toFixed(2)} g</b> ${okm?'✓':''}</div>
   <div class="btns"><button class="b alt" id="spoonAdd">＋ הוספה בכף</button><button class="b alt" id="spoonRem">− הורדה מעט</button></div>
   <button class="b go" id="weighDone" ${okm?'':'disabled'}>סיום השקילה – המשך</button>`;}
- else if(sk==='addSolid'){h=`<p class="say">הקריאה יציבה. עכשיו מוסיפים לכוס את המוצק ששקלתם: <b class="f">${p.mass.toFixed(2)} g</b> ${F.NaOHs}.</p><p class="hint">רשמו לעצמכם את הטמפרטורה ההתחלתית לפני שמוסיפים.</p>${predChips(k)}<button class="b go" id="addSolid" ${p.pred?'':'disabled'}>הוסיפו את המוצק וערבבו</button>`;}
+ else if(sk==='addSolid'){h=`<p class="say">הקריאה יציבה. עכשיו מוסיפים לכוס את המוצק ששקלתם: <b class="f">${p.mass.toFixed(2)} g</b> ${F.NaOHs}.</p><p class="hint">רשמו לעצמכם את הטמפרטורה ההתחלתית לפני שמוסיפים.</p><button class="b go" id="addSolid">הוסיפו את המוצק ובחשו</button>`;}
  else if(sk==='base'||sk==='measure2'){
   if(!p.baseMeasured){h=`<p class="say">עכשיו מודדים את הבסיס במשורה נפרדת.</p>`+todo([[!!p.sel2,'בחרו את תמיסת הבסיס המתאימה להוראה'],[p.vol2>0,'גררו את המחוון עד הנפח הנדרש'],[false,'לחצו על הכפתור הכחול']])
    +bottleChips('bottle2',p.sel2)+volSlider('vol2',p.vol2,'dv2')
@@ -420,7 +423,7 @@ function actionHTML(k){const P=PARTS[k],p=S.parts[k],sk=P.steps[p.step];let h=''
   else {h=`<p class="say">השוו את הטמפרטורות של שתי התמיסות:</p>
   <div class="cmp"><div><span>חומצה בכוס</span><b class="f" id="cmpA">${p.Ts.toFixed(1)} °C</b></div><div><span>בסיס במשורה</span><b class="f">${p.Tb.toFixed(1)} °C</b></div></div>
   <p class="say">הן קרובות, אז אפשר להמשיך. רשמו לעצמכם את הטמפרטורה ההתחלתית של החומצה.</p>
-  ${predChips(k)}<button class="b go" id="addBase" ${p.pred?'':'disabled'}>שפכו את הבסיס לכוס וערבבו</button>`;}}
+  <button class="b go" id="addBase">שפכו את הבסיס לכוס ובחשו</button>`;}}
  else if(sk==='watch'){h=`<p class="say">עקבו אחר הגרף. כשהטמפרטורה מגיעה לשיא ומתחילה לרדת, אפשר לעצור.</p>
   <div class="live wait" id="live">↑ הטמפרטורה עולה – המשיכו לעקוב</div><button class="b go" id="stopBtn" disabled>■ עצירת המדידה</button>`;}
  else if(sk==='done'){h=resultsHTML(k);}
@@ -430,9 +433,8 @@ function resultsHTML(k){const p=S.parts[k],r=p.res,ok=p.resOk;const fb=p.fb||{};
  const row=(f,l)=>`<label class="rrow" for="r_${f}"><span>${l}</span><input type="number" step="0.01" inputmode="decimal" id="r_${f}" value="${esc(r[f])}" ${ok?'disabled':''}><em class="${fb[f]&&fb[f][0]?'good':'badc'}">${fb[f]?fb[f][1]:''}</em></label>`;
  if(ok)return `<div class="msg ok">✓ התוצאות של ${PARTS[k].tab} נרשמו.</div>
   <div class="summ"><span>התחלתית <b class="f">${r.Ti} °C</b></span><span>מרבית <b class="f">${r.Tmax} °C</b></span><span><span class="f">ΔT</span> <b class="f">${r.dT} °C</b></span></div>
-  ${predHTML(k)}
   <button class="b go" id="nextTab">${k==='C'?'המשך לחישובים':'המשך ל'+PARTS[k==='A'?'B':'C'].tab} ←</button>`;
- return `${predHTML(k)}<p class="say">המדידה נעצרה. קראו מהגרף שני ערכים ורשמו אותם:</p>
+ return `<p class="say">המדידה נעצרה. קראו מהגרף שני ערכים ורשמו אותם:</p>
  ${todo([[false,'<b>טמפרטורה התחלתית</b>: הקו הישר לפני הקו המקווקו "הוספה"'],[false,'<b>טמפרטורה מרבית</b>: הנקודה הגבוהה ביותר בגרף']])}
  <p class="hint">בחרו נקודה בגרף בעכבר או באצבע. מתחת לגרף יופיעו כפתורים שרושמים את הערך בשדה המתאים. את <span class="f">ΔT</span> חשבו בעצמכם.${PARTS[k].kind==='solid'?' המסה ששקלתם: <b class="f">'+p.massUsed.toFixed(2)+' g</b>.':''}</p>
  <div class="rform">${row('Ti','טמפרטורה התחלתית <span class="f">(°C)</span>')}${row('Tmax','טמפרטורה מרבית <span class="f">(°C)</span>')}${row('dT','שינוי טמפרטורה <span class="f">ΔT (°C)</span>')}${row('m','מסת הסביבה <span class="f">(g)</span>')}</div>
@@ -567,7 +569,6 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
  const dk=$('#dkBtn');if(dk)dk.onclick=()=>{const b2=$(sk==='watch'?'#stopBtn':'#stableBtn');if(b2)b2.click()};
  $('#hov').onclick=e=>{const b2=e.target.closest('[data-fill]');if(!b2||!window._sel)return;const f=b2.dataset.fill,v=window._sel[1].toFixed(2);
   p.res[f]=v;save();const el=$('#r_'+f);if(el)el.value=v;b2.textContent='✓ נרשם';b2.setAttribute('aria-pressed','true')};
- A.querySelectorAll('[data-pred]').forEach(b=>b.onclick=()=>{p.pred=b.dataset.pred;save();A.querySelectorAll('[data-pred]').forEach(x=>x.setAttribute('aria-pressed',x===b));const g=$('#addSolid')||$('#addBase');if(g)g.disabled=false});
  const volBind=(id,vk,lab,dvk)=>{const r=$('#'+id);if(!r)return;const btn=A.querySelector('.b.go');const en=()=>{if(btn)btn.disabled=!((vk==='vol'?p.sel:p.sel2)&&p[vk]>0)};r.oninput=()=>{p[vk]=+r.value;$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()};
   A.querySelectorAll(`[data-${dvk}]`).forEach(b=>b.onclick=()=>{p[vk]=Math.max(0,Math.min(125,p[vk]+ +b.getAttribute('data-'+dvk)));r.value=p[vk];$('#'+lab).textContent=volTxt(p[vk]);$('#benchSvg').innerHTML=benchSVG(k);en()})};
  if(sk==='measure'){A.querySelectorAll('[data-bottle]').forEach(b=>b.onclick=()=>{p.sel=b.dataset.bottle;p.msg=null;rerender(k)});
@@ -579,7 +580,7 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
    p.poured=true;next(k)}}
  if(sk==='setup'){$('#lid').onclick=()=>{p.lid=true;chk()};$('#sensor').onclick=()=>{p.sensor=true;chk()};
   function chk(){if(p.lid&&p.sensor)next(k);else{save();rerender(k)}}}
- if(sk==='addSolid'){$('#addSolid').onclick=()=>{if(!p.pred)return;startReaction(k);next(k)}}
+ if(sk==='addSolid'){$('#addSolid').onclick=()=>{startReaction(k);next(k)}}
  if(sk==='start'){$('#startBtn').onclick=()=>{p.running=true;p.stopped=false;p.data=[];p.t=0;p.maxT=-1e9;next(k)}}
  if(sk==='stabilize'){$('#stableBtn').onclick=()=>{if(Math.abs(p.Ts-p.Tw)>0.06||p.t<8){setMsg(k,'warn','הקריאה עדיין משתנה. חכו עוד מעט והסתכלו על הגרף.');render()}else next(k)}}
  if(sk==='weigh'){
@@ -595,7 +596,7 @@ function bindPart(k){const P=PARTS[k],p=S.parts[k];const A=$('#action');
     if(p.sel2!==n.bottle){setMsg(k,'bad','זו לא תמיסת הבסיס הנדרשת. קראו שוב את ההוראה.');return render()}
     if(Math.abs(p.vol2-n.vol)>1){setMsg(k,'bad','בדקו את הנפח במשורה: ההוראה מבקשת 50 מ״ל. אפשר להוריד נוזל עם המחוון או עם −1.');return render()}
     p.baseMeasured=true;p.Tb=p.room-0.5+Math.random()*0.4;p.msg=null;if(sk==='measure2')next(k);else{save();rerender(k)}}}
-  else $('#addBase').onclick=()=>{if(!p.pred)return;startReaction(k);next(k)}}
+  else $('#addBase').onclick=()=>{startReaction(k);next(k)}}
  if(sk==='watch'){$('#stopBtn').onclick=()=>{
    const passed=p.added&&p.Qrel/p.Qtot>0.95&&(p.t-p.tMax)>=12;
    if(!passed){setMsg(k,'warn','הטמפרטורה עדיין עולה או שרק עכשיו הגיעה לשיא. עצרו רק אחרי שהיא מתחילה לרדת.');return render()}
@@ -757,7 +758,7 @@ function reportText(){const L=[];const lbl={A:'א',B:'ב',C:'ג'};
  L.push('ניסוי וירטואלי – אנתלפיית המסה וסתירה, חוק הס');L.push('שם: '+(S.name||'—')+' | בית ספר: '+(S.school||'—'));L.push('');
  L.push('תוצאות מדידה:');
  for(const k of ['A','B','C']){const p=S.parts[k];if(!p.resOk){L.push(`חלק ${lbl[k]}: לא הושלם`);continue}
-  L.push(`חלק ${lbl[k]}: T התחלתית ${p.res.Ti} °C, T מרבית ${p.res.Tmax} °C, ΔT ${p.res.dT} °C, מסת סביבה ${p.res.m} g`+(k!=='B'?`, מסת NaOH ${p.massUsed.toFixed(2)} g`:'')+(p.pred?`; ניבוי לפני ההוספה: הטמפרטורה ${Object.fromEntries(PRED)[p.pred]} (בפועל: ${p.Qtot>0?'עלתה':'ירדה'})`:''))}
+  L.push(`חלק ${lbl[k]}: T התחלתית ${p.res.Ti} °C, T מרבית ${p.res.Tmax} °C, ΔT ${p.res.dT} °C, מסת סביבה ${p.res.m} g`+(k!=='B'?`, מסת NaOH ${p.massUsed.toFixed(2)} g`:''))}
  L.push('');L.push('חישובים:');
  for(const k of ['A','B','C']){const c=S.calc[k];L.push(`חלק ${lbl[k]}: סביבה ${c.qcal??'—'} cal = ${c.qj??'—'} J; מערכת ${c.qsys??'—'} J; n = ${c.n??'—'} mol; ΔH = ${c.dh??'—'} kJ/mol`+(S.calcOk[k]?' ✓':''))}
  L.push('');L.push('חוק הס:');L.push('חלקיקים שמצטמצמים: '+((S.hess.cancel||[]).map(id=>(SPEC.find(x=>x[0]===id)||[,''])[1].replace(/<[^>]+>/g,'')).join(', ')||'—')+(S.hess.cancelOk?' ✓':''));L.push(`ΔH(א)+ΔH(ב) = ${S.hess.sum||'—'} ; ΔH(ג) = ${S.hess.c||'—'} ; הפרש = ${S.hess.diff||'—'} kJ/mol`+(S.hess.ok?' ✓':''));
@@ -787,6 +788,48 @@ const _render=render;
 render=function(){_render();$('.mast').classList.toggle('compact',S.tab!=='intro');const nm=S.name.trim(),sc=(S.school||'').trim();$('#whoTxt').textContent=nm?nm+(sc?' · '+sc:''):''};
 window.addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 window.addEventListener('resize',()=>{if(PARTS[S.tab])drawChart(S.tab)});
+/* ---------- teacher report (optional) ---------- */
+function _repDate(){try{return new Date().toLocaleDateString('he-IL')}catch(e){return ''}}
+function _repLines(){const L=reportText().split('\n');L.splice(2,0,'תאריך: '+_repDate());return L}
+function _repIso(t){return t.replace(/[A-Za-z0-9Δ±−+=×·(\[—][^\u0590-\u05FF,;|]*[A-Za-z0-9Δ)\]°—]/g,m=>{let lead='',tail='';const c=(x,ch)=>x.split(ch).length-1;
+ while(m.endsWith(')')&&c(m,')')>c(m,'(')){tail=')'+tail;m=m.slice(0,-1)}while(m.startsWith('(')&&c(m,'(')>c(m,')')){lead+='(';m=m.slice(1)}
+ return lead+(m?'<bdi dir="ltr">'+m+'</bdi>':'')+tail})}
+function reportBodyHTML(){const L=_repLines();let h='',ans=false;const E=t=>_repIso(esc(t));
+ L.forEach((l,i)=>{const t=l.trim();if(!t){ans=false;return}
+  if(i===0){h+=`<h1>${E(t)}</h1>`;return}
+  if(i<=2){h+=`<p class="rp-meta">${E(t)}</p>`;return}
+  if(/:$/.test(t)&&t.length<40){h+=`<h2>${E(t.slice(0,-1))}</h2>`;ans=false;return}
+  if(/^\d+\.\s/.test(t)){h+=`<p class="rp-q">${E(t)}</p>`;ans=true;return}
+  h+=`<p class="${ans?'rp-a':''}">${E(t)}</p>`});
+ return h}
+function reportFileHTML(){return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(document.title)} – ${esc(S.name||'')}</title>
+<style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;line-height:1.55;color:#18282d}h1{font-size:1.4rem;border-bottom:2px solid #19576c;padding-bottom:6px}h2{font-size:1.1rem;color:#19576c;margin:18px 0 6px}p{margin:4px 0;unicode-bidi:plaintext}.rp-meta{font-weight:700}.rp-q{font-weight:700;margin-top:10px}.rp-a{margin-inline-start:16px;white-space:pre-wrap}/* --- teacher report --- */
+.rp{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--paper)}
+.rp h1{font-size:1.15rem}.rp h2{font-size:1rem;color:var(--accent);margin-top:12px}
+.rp p{unicode-bidi:plaintext;margin:2px 0}.rp .rp-meta{font-weight:700}.rp .rp-q{font-weight:700;margin-top:8px}.rp .rp-a{margin-inline-start:14px;white-space:pre-wrap}
+@media print{body.printing-report *{visibility:hidden!important}body.printing-report #report,body.printing-report #report *{visibility:visible!important}
+ body.printing-report #report{position:absolute;inset:0 auto auto 0;width:100%;border:0;padding:0}
+ body.printing-report .tabs,body.printing-report .dock{display:none!important}}
+</style></head><body>${reportBodyHTML()}</body></html>`}
+function reportCardHTML(){return `<div class="card" id="repCard"><h2>דוח למורה (רשות)</h2>
+ <p style="margin-top:6px">אם המורה ביקש דוח, אפשר לשלוח אותו מכאן בווטסאפ, או לשמור אותו כקובץ ולהעלות לפטל. אם לא ביקשו – אפשר לדלג.</p>
+ <div class="btns" style="margin-top:12px"><button class="b" id="repWa">שליחה בווטסאפ</button><button class="b alt" id="repFile">הורדת הדוח כקובץ (להעלאה לפטל)</button><button class="b alt" id="repPdf">שמירה כ־PDF או הדפסה</button></div>
+ <div id="repMsg"></div>
+ <details class="more" style="margin-top:12px"><summary>הצגת הדוח</summary><div id="report" class="rp">${reportBodyHTML()}</div></details></div>`}
+const _submitHTML0=submitHTML;
+submitHTML=function(){const h=_submitHTML0();const i=h.lastIndexOf('</div>');return h.slice(0,i)+reportCardHTML()+h.slice(i)};
+const _bindSubmit0=bindSubmit;
+bindSubmit=function(){_bindSubmit0();
+ const msg=(ok,t)=>{$('#repMsg').innerHTML=`<div class="msg ${ok?'ok':'warn'}" style="margin-top:8px">${t}</div>`};
+ $('#repWa').onclick=()=>{const t=_repLines().join('\n');
+  if(navigator.share&&matchMedia('(pointer:coarse)').matches){navigator.share({title:document.title,text:t}).then(()=>msg(true,'✓ הדוח נשלח.'),()=>{});return}
+  const w=window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');if(!w)msg(false,'החלון לא נפתח. אפשר להשתמש בכפתור "העתקת הסיכום" ולהדביק בווטסאפ.')};
+ $('#repFile').onclick=()=>{try{const d=new Date(),pad=n=>String(n).padStart(2,'0');const name=KEY.replace(/-v\d+$/,'')+'-report-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.html';
+  const url=URL.createObjectURL(new Blob([reportFileHTML()],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  msg(true,'✓ הקובץ נשמר בתיקיית ההורדות. אפשר להעלות אותו לפטל.')}catch(e){msg(false,'ההורדה לא עבדה כאן. נסו "שמירה כ־PDF או הדפסה".')}};
+ $('#repPdf').onclick=()=>{const d=$('#report').closest('details');d.open=true;document.body.classList.add('printing-report');setTimeout(()=>{try{window.print()}catch(e){}document.body.classList.remove('printing-report')},50)};
+};
+
 render();
 </script>
 

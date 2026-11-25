@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>אידוי נוזלים – מעבדת חקר לכיתה י״א</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Rubik:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6f6;--card:#fff;--ink:#18282d;--muted:#5b6d72;--line:#d3dde0;--acc:#19576c;--acc-soft:#e1eef1;--acc-ink:#fff;
+--ok:#1f7a45;--ok-bg:#e3f4ea;--warn:#8a5a00;--warn-bg:#fdf1d8;--err:#a8322d;--err-bg:#fbe6e4;
+--lcd:#0f1d1f;--lcd-ink:#8ff0c8;--glass:#7f97a0;--liquid:rgba(225,240,245,.35);--meniscus:#6d8790;--pat:#9aa9ae;--vap:#c2672b;--grid:#e6edef;
+--s1:#19576c;--s2:#c2672b;--s3:#7a4fa8;--s4:#2f8a4c;--s5:#6b7b80;
+--fh:"Rubik","Assistant",Arial,sans-serif;--fb:"Assistant",Arial,sans-serif;--fm:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#10181a;--card:#172225;--ink:#e3ecee;--muted:#9db0b5;--line:#2c3c40;--acc:#5fb3cc;--acc-soft:#1d3238;--acc-ink:#0c1618;
+--ok:#7fd3a0;--ok-bg:#16332a;--warn:#f0c46a;--warn-bg:#3a2f15;--err:#f19b93;--err-bg:#3d1d1b;
+--lcd:#0a1214;--glass:#8fa9b2;--liquid:rgba(160,200,215,.12);--meniscus:#9fb6bd;--pat:#4e6168;--vap:#f0955a;--grid:#24353a;
+--s1:#5fb3cc;--s2:#f0955a;--s3:#b997e6;--s4:#6fcf8f;--s5:#9aa9ae}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--fb)}
+h1,h2,h3{font-family:var(--fh);font-weight:700;line-height:1.25;margin:0 0 .5em}
+h1{font-size:1.7rem}h2{font-size:1.2rem}h3{font-size:1rem;font-weight:500;margin:.8em 0 .3em}
+p{margin:.35em 0 .7em}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.wrap{max-width:1280px;margin:auto;padding:16px}
+header .eyebrow{color:var(--acc);font-weight:700;font-size:.88rem;margin-bottom:4px}
+header p{color:var(--muted);margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+.card.cur{border:2px solid var(--acc)}
+.btn{font:700 1rem var(--fb);border-radius:8px;padding:10px 16px;cursor:pointer;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink)}
+.btn.sec{background:transparent;color:var(--acc)}.btn.full{width:100%}.btn.sm{font-size:.88rem;padding:6px 12px}
+.btn:disabled{opacity:.4;cursor:not-allowed;animation:none!important}
+.btn:focus-visible,.chip:focus-visible,.slot:focus-visible{outline:3px solid #e0a040;outline-offset:2px}
+.btn.pulse:not(:disabled){animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc) 45%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+@media (prefers-reduced-motion:reduce){.btn.pulse{animation:none}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chip{font:600 .9rem var(--fb);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+.chip:disabled{opacity:.5;cursor:not-allowed}
+.glabel{font-weight:700;font-size:.9rem;margin-top:8px}
+.status{display:inline-block;font-weight:600;font-size:.9rem;border-radius:8px;padding:4px 10px;margin:4px 0}
+.st-ok{background:var(--ok-bg);color:var(--ok)}.st-warn{background:var(--warn-bg);color:var(--warn)}.st-info{background:var(--acc-soft);color:var(--acc)}
+.muted{color:var(--muted)}.small{font-size:.88rem}
+.confirm{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 10px;margin-top:8px}
+/* tabs */
+nav.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;margin:6px 0 12px;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tab{flex:0 0 auto;font:600 .95rem var(--fb);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+.tab[aria-selected="true"]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tab .d{width:8px;height:8px;border-radius:50%;border:1.5px solid currentColor;opacity:.7}.tab .d.done{background:var(--ok);border-color:var(--ok);opacity:1}
+.tab:focus-visible{outline:3px solid #e0a040;outline-offset:2px}
+@media (max-width:600px){nav.tabs{flex-wrap:wrap;overflow:visible}.tab{padding:6px 11px;font-size:.88rem}}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}@media (max-width:960px){.cols{grid-template-columns:1fr}}
+.narrow{max-width:900px;margin-inline:auto}
+body.locked nav.tabs,body.locked section{display:none!important}
+#t-intro .form2{grid-template-columns:1fr}#pcv{max-width:620px;margin-inline:auto}
+.hint{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0}.hint b{display:block}
+.report{background:#fff;color:#111;border:1px solid var(--line);border-radius:8px;padding:18px;max-height:520px;overflow:auto;font:400 15px/1.5 Arial,sans-serif}
+.report table{border-collapse:collapse;width:100%;margin:6px 0}.report th,.report td{border:1px solid #888;padding:4px 6px;text-align:center;color:#111;background:#fff;white-space:normal;font-size:.9rem}
+.report th{background:#eee}.report h1{font-size:1.3rem}.report h2{font-size:1.05rem;margin-top:1em}.report img{max-width:100%}
+label.f{display:block;font-weight:700;margin:10px 0 4px}
+/* layout */
+.lab{display:grid;grid-template-columns:340px minmax(0,1fr);grid-template-areas:"plan bench" "plan res";gap:12px;align-items:start}
+.a-plan{grid-area:plan;position:sticky;top:62px}.a-bench{grid-area:bench}.a-res{grid-area:res}
+@media (max-width:960px){.lab{grid-template-columns:minmax(0,1fr);grid-template-areas:"bench" "plan" "res"}.a-plan{position:static}}
+/* slots */
+.slots{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.slot{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:right;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;cursor:pointer;font:400 .92rem var(--fb)}
+.slot[aria-pressed="true"]{border:2px solid var(--acc);padding:7px 9px}
+.slot .dot{width:12px;height:12px;border-radius:50%}
+.slot b{font-weight:700}.badge{font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.b-pend{background:var(--bg);color:var(--muted)}.b-run{background:var(--warn-bg);color:var(--warn)}.b-done{background:var(--ok-bg);color:var(--ok)}
+.editor{border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+.info{font-size:.86rem;color:var(--muted);background:var(--bg);border-radius:8px;padding:6px 10px;margin:2px 0 6px}
+/* bench */
+.bench svg{width:100%;height:auto;display:block;direction:ltr;max-height:330px}
+.instr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.instr.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lcd{background:var(--lcd);color:var(--lcd-ink);border-radius:8px;padding:8px 10px;direction:ltr;text-align:center}
+.lcd small{display:block;font:600 .78rem var(--fb);color:#a9c7c0;direction:rtl}
+.lcd strong{font:500 1.45rem var(--fm);font-variant-numeric:tabular-nums}
+.speed{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:4px;direction:rtl;align-items:center}
+.lcd .chip{background:#1b2b2e;color:#cfe;border-color:#33494d;padding:2px 9px;font-size:.82rem}.lcd .chip[aria-pressed="true"]{background:#2b5a52;color:#fff;border-color:#8ff0c8}
+.zoom{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:10px;align-items:center;margin-top:10px}
+.zoom canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block;direction:ltr}
+@media (max-width:560px){.zoom{grid-template-columns:1fr}.instr{grid-template-columns:1fr 1fr}.instr .lcd:first-child{grid-column:1/-1}}
+/* results */
+.chartbox{position:relative}.chartbox canvas{width:100%;height:320px;display:block;touch-action:none;direction:ltr}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.88rem;margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:5px;vertical-align:middle}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;font-size:.9rem;white-space:nowrap}
+th{background:var(--acc-soft);font-weight:700;white-space:normal;min-width:60px}
+td.num{font-family:var(--fm);direction:ltr}
+.stack{margin:8px 0}.stack label{display:block;font-weight:700;margin-bottom:4px}.stack select{min-width:220px}
+.form2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;margin:6px 0}
+select,input[type=text]{font:400 1rem var(--fb);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+input[type=text]{width:100%}input[type=range]{width:100%;accent-color:var(--acc)}select{min-width:200px;max-width:100%}
+#rqCard .form2{grid-template-columns:1fr}#rqCard select{width:100%}
+.rqsum{background:var(--acc-soft);border-radius:8px;padding:10px 12px;margin:6px 0}
+textarea{font:400 1rem var(--fb);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-height:70px;resize:vertical}
+.fb{font-size:.92rem;border-radius:8px;padding:6px 10px;margin:6px 0}
+.fb.st-warn,.need{font-size:1rem;font-weight:600;border:2px solid var(--warn);background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 12px;margin:8px 0}
+.need ul{margin:4px 0 0;padding-inline-start:20px}.need b{display:block}
+.btn.blocked{opacity:.55;cursor:not-allowed;animation:none}
+@keyframes flashw{0%,100%{box-shadow:none}30%,70%{box-shadow:0 0 0 4px var(--warn)}}.flash{animation:flashw 1.2s ease 1}
+@media (max-width:560px){.form2{grid-template-columns:1fr}select{min-width:0;width:100%}}
+.svg-glass{stroke:var(--glass);fill:none;stroke-width:2.5}
+.svg-bal{fill:var(--acc-soft);stroke:var(--glass);stroke-width:2}
+.svg-txt{fill:var(--muted);font:600 13px var(--fb)}
+.plancols{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
+.instr.one{grid-template-columns:minmax(0,320px);justify-content:center}
+.systab td,.systab th{white-space:normal;vertical-align:middle}.systab th.ivh{background:var(--acc);color:var(--acc-ink)}
+.systab select{min-width:0;width:100%;font-size:.9rem;padding:5px 6px}
+.systab tr.krow td{background:var(--warn-bg)}.systab tr.krow td:first-child{color:var(--warn);font-weight:700;font-size:.85rem}
+.systab tr.ctlrow td{background:var(--bg)}
+.systab .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:5px;vertical-align:middle}
+.systab td:first-child{min-width:92px}
+.systab th select{font-size:.85rem;padding:3px 4px;margin-top:4px;background:var(--card)}
+.xbtn{border:0;background:transparent;color:var(--muted);font:700 1rem var(--fb);cursor:pointer;padding:0 4px}
+.checks{list-style:none;padding:0;margin:6px 0}.checks li{margin:2px 0;font-size:.92rem}
+.repbox{background:var(--acc-soft);border-radius:8px;padding:10px 12px;margin:6px 0;font-size:.92rem}
+.meanin{width:80px;font-family:var(--fm);direction:ltr;text-align:center;padding:3px 5px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.meanin.ok{border-color:var(--ok);background:var(--ok-bg)}.meanin.bad{border-color:var(--warn);background:var(--warn-bg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">חמד״ע · כימיה · מעבדה וירטואלית</div>
+  <h1>אידוי נוזלים – מעבדת חקר לכיתה י״א</h1>
+  <p>כיתה י״א · תכננו ניסוי של עד ארבע מערכות, הריצו אותן במקביל והשוו את התוצאות.</p>
+  <div><button class="btn sec sm" id="gReset">↻ איפוס הסימולציה</button>
+  <div class="confirm" id="gResetC" hidden>כל העבודה תימחק: שאלת החקר, המערכות, התוצאות, המסקנות והרמזים. להמשיך?
+  <div class="row" style="margin-top:6px"><button class="btn sm" id="gResetY">כן, לאפס הכול</button><button class="btn sec sm" id="gResetN">ביטול</button></div></div></div>
+</header>
+
+<div class="card cur narrow" id="resume" hidden></div>
+<nav class="tabs" role="tablist" id="tabs"></nav>
+
+<section id="t-intro" hidden class="narrow">
+  <div class="card">
+    <h2>מה קורה לנוזל בכלי פתוח?</h2>
+    <p>נוזל שנמצא בכלי פתוח נעלם בהדרגה, גם בטמפרטורה נמוכה בהרבה מטמפרטורת הרתיחה שלו. כך מתייבשת כביסה, כך נעלם ריח של בושם מהבקבוק, וכך מרגישים קרירות כשמורחים אלכוהול על העור.</p>
+    <p>התהליך נקרא <b>אידוי</b>: חלקיקים עוברים מהנוזל לאוויר ונהיים גז. לדוגמה, אידוי של אתאנול: <span class="ltr" style="font-family:var(--fm)">C<sub>2</sub>H<sub>6</sub>O(l) → C<sub>2</sub>H<sub>6</sub>O(g)</span></p>
+    <p class="small muted">באידוי, חלקיקים עוזבים רק מפני הנוזל, בכל טמפרטורה. ברתיחה נוצרות בועות גז בכל הנוזל, והיא מתרחשת רק בטמפרטורת הרתיחה.</p>
+    <p class="small">כך נראה ניסוי אידוי במעבדת חמד״ע: <a href="https://youtu.be/6NEGIVAskn4" target="_blank" rel="noopener">סרטון הניסוי ביוטיוב</a> (כדקה וחצי).</p>
+      </div>
+  <div class="card"><details id="pDet" open><summary>מבט ברמת החלקיקים (לא חובה)</summary>
+    <p class="small">המולקולות בנוזל נעות כל הזמן, ולא כולן באותה מהירות. רק מולקולה שנמצאת ליד פני הנוזל, ויש לה מספיק אנרגיה, יכולה לעזוב אותו. הצבע מראה את המהירות: <span style="color:#3b7dd8;font-weight:700">איטית</span> → <span style="color:#d9822b;font-weight:700">מהירה</span>.</p>
+    <canvas id="pcv" width="560" height="320" style="width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block;direction:ltr" aria-label="המחשה של מולקולות בנוזל ובאוויר"></canvas>
+    <div class="form2" style="margin-top:8px"><label for="pT">טמפרטורת הסביבה: <b id="pTv"></b></label><input type="range" id="pT" min="5" max="45" step="5">
+      <label for="pI" id="pIl">חוזק האינטראקציות בין המולקולות: <b id="pIv"></b></label><input type="range" id="pI" min="1" max="3" step="1"></div>
+    <div class="row small"><span class="status st-info" id="pCnt"></span><span class="status st-info" id="pTl"></span><button class="btn sec sm" id="pReset">↻ מילוי מחדש</button></div>
+    <p class="small muted">המחשה בלבד: מספר המולקולות והמהירויות אינם בקנה מידה אמיתי.</p>
+    <div id="pQ" class="small"></div>
+  </details></div>
+  <div class="card" id="preCard"></div>
+  <div class="card">
+    <h2>איך עובדים בסימולציה של מעבדת החקר במסכים הבאים</h2>
+    <ol class="small"><li><b>שאלה ותכנון</b> – בחרו משתנים, נסחו שאלת חקר והשערה, ומלאו את טבלת המערכות.</li>
+    <li><b>ניסוי</b> – הריצו את כל המערכות במקביל.</li><li><b>תוצאות ומסקנות</b> – הוסיפו חזרות, בנו גרף תוצאות וענו על שאלת החקר.</li>
+    <li><b>הגשה</b> – אם המורה ביקש.</li></ol>
+    <p class="small muted">אפשר לחזור לכל לשונית ולתקן, ולאפס את הכול בכפתור שבראש העמוד.</p>
+    <button class="btn full pulse" data-go="plan">המשך לשאלה ותכנון</button>
+  </div>
+</section>
+
+<section id="t-plan" hidden>
+  <div class="cols plancols"><div><div class="card" id="rqCard"></div><div class="card" id="hintCard"></div></div><div class="card" id="plan"></div></div>
+</section>
+
+<section id="t-exp" hidden>
+  <div class="lab">
+    <div class="a-plan"><div class="card cur" id="runCard"></div></div>
+    <div class="a-bench card bench">
+      <svg id="bench" viewBox="0 108 560 198" aria-label="הכלים של כל המערכות על המאזניים"></svg>
+      <div class="instr one" id="instr">
+        <div class="lcd"><small>טיימר</small><strong id="lcdTime">00:00</strong>
+          <div class="speed" role="group" aria-label="מהירות הזמן"><span style="font-size:.78rem;color:#a9c7c0">מהירות הזמן</span><span id="speedChips"></span></div></div>
+
+      </div>
+      <details class="zoom" open><summary class="small" style="cursor:pointer;font-weight:700">מבט מקרוב על פני הנוזל (המחשה)</summary>
+        <p class="small muted" style="margin:0" id="zoomCap">מבט מקרוב על פני הנוזל (המחשה, לא בקנה מידה).</p>
+        <canvas id="zoom" width="500" height="300" aria-label="המחשה של מולקולות העוזבות את פני הנוזל"></canvas>
+      </details>
+    </div>
+    <div class="a-res card">
+      <div class="row" style="justify-content:space-between"><h2 style="margin:0" id="liveTitle">גרף: מסת הנוזל כתלות בזמן</h2>
+        <div class="chips" role="group" aria-label="מה מוצג בציר y" id="yMode"></div></div>
+      <div class="chartbox"><canvas id="chart" aria-label="גרף המסה כתלות בזמן של כל המערכות"></canvas></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+</section>
+
+<section id="t-res" hidden>
+  <div class="card">
+    <h2>טבלת התוצאות</h2>
+    <div id="repRow"></div>
+    <p id="cmpTitle" style="text-align:center;font-weight:700;margin:12px 0 0"></p>
+    <div class="tablewrap"><table><thead id="cmpHead"></thead><tbody id="cmpBody"></tbody></table></div>
+    <p class="small" id="cmpConst"></p>
+    <p class="small muted" id="cmpNote"></p>
+  </div>
+  <div class="card" id="rgCard">
+    <h2>גרף התוצאות של שאלת החקר</h2>
+    <p class="small">בגרף הזה כל מערכת היא נקודה אחת (או עמודה אחת). על ציר x – המשתנה הבלתי תלוי שבדקתם, ועל ציר y – התוצאה.</p>
+    <div id="rgForm"></div>
+    <div class="chartbox" id="rgBox" hidden style="margin-top:10px"><canvas id="rgChart" aria-label="גרף התוצאות של שאלת החקר"></canvas></div>
+    <div id="rgData"></div>
+    <div class="row" id="rgExport" hidden style="margin-top:8px"><button class="btn sec sm" id="rgCopy">העתקת הנתונים ל־Excel</button><button class="btn sec sm" id="rgPng">הורדת הגרף כתמונה</button></div>
+    <div id="rgFb2"></div><textarea id="rgTxt" hidden readonly style="width:100%;margin-top:6px;font-family:var(--fm);direction:ltr"></textarea>
+    <div id="resNext"></div>
+  </div>
+  <div class="card" id="conclCard"></div>
+  <div class="row"><button class="btn sec" data-go="exp">חזרה לניסוי</button><button class="btn" data-go="sub">המשך להגשה</button></div>
+</section>
+
+<section id="t-sub" hidden class="narrow"><div class="card" id="subCard"></div></section>
+</div>
+</div>
+
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const LEVEL='11';const KEY='hemda-evap-explore-g'+LEVEL+'-v2';
+/* ---------- substances (Antoine: mmHg, °C; D: cm²/s at 25 °C; H: kJ/mol at 25 °C) ---------- */
+const LIQ={
+ water:   {n:'מים',f:'H2O',e:10,M:18.02,A:8.07131,B:1730.63,C:233.426,D:.256,H:44.0,cp:4.18,rho:.998,bp:100},
+ methanol:{n:'מתאנול',f:'CH3OH',e:18,M:32.04,A:8.08097,B:1582.271,C:239.726,D:.152,H:37.4,cp:2.53,rho:.792,bp:64.7},
+ ethanol: {n:'אתאנול',f:'C2H5OH',e:26,M:46.07,A:8.20417,B:1642.89,C:230.300,D:.124,H:42.3,cp:2.44,rho:.789,bp:78.4},
+ propanol:{n:'1־פרופאנול',f:'C3H7OH',e:34,M:60.10,A:7.74416,B:1437.686,C:198.463,D:.100,H:47.5,cp:2.39,rho:.803,bp:97.2},
+ butanol: {n:'1־בוטאנול',f:'C4H9OH',e:42,M:74.12,A:7.36366,B:1305.198,C:173.427,D:.087,H:52.4,cp:2.39,rho:.810,bp:117.7},
+ acetone: {n:'אצטון',f:'CH3COCH3',e:32,M:58.08,A:7.11714,B:1210.595,C:229.664,D:.116,H:31.0,cp:2.16,rho:.784,bp:56.1},
+ macetate:{n:'מתיל אצטט',f:'CH3COOCH3',e:40,M:74.08,A:7.06524,B:1157.63,C:219.726,D:.100,H:32.3,cp:1.94,rho:.932,bp:56.9},
+ ether:   {n:'דיאתיל אתר',f:'C2H5OC2H5',e:42,M:74.12,A:6.92032,B:1064.07,C:228.8,D:.090,H:27.1,cp:2.33,rho:.713,bp:34.6},
+ pentane: {n:'פנטאן',f:'C5H12',e:42,M:72.15,A:6.87632,B:1075.78,C:233.205,D:.084,H:26.4,cp:2.32,rho:.626,bp:36.1},
+ hexane:  {n:'הקסאן',f:'C6H14',e:50,M:86.18,A:6.87601,B:1171.17,C:224.41,D:.075,H:31.6,cp:2.26,rho:.659,bp:68.7}};
+const VES={
+ p6:{n:'צלחת פטרי 6 ס״מ',s:'פטרי 6 ס״מ',d:6,h:1.5,beaker:false},
+ p9:{n:'צלחת פטרי 9 ס״מ',s:'פטרי 9 ס״מ',d:9,h:1.5,beaker:false},
+ p12:{n:'צלחת פטרי 12 ס״מ',s:'פטרי 12 ס״מ',d:12,h:1.5,beaker:false},
+ p14:{n:'צלחת פטרי 14 ס״מ',s:'פטרי 14 ס״מ',d:14,h:1.5,beaker:false},
+ c4:{n:'כלי בקוטר 9 ס״מ, גובה 4 ס״מ',s:'קוטר 9, גובה 4',d:9,h:4,beaker:false},
+ c8:{n:'כלי בקוטר 9 ס״מ, גובה 8 ס״מ',s:'קוטר 9, גובה 8',d:9,h:8,beaker:false},
+ b600:{n:'כוס כימית של 600 מ״ל (קוטר 9 ס״מ, גובה 12.5 ס״מ)',s:'כוס כימית 600 מ״ל',d:9,h:12.5,beaker:true}};
+const TEMPS=[15,20,25,30,35],SPEEDS=[1,10,30],DURS=[5,10],VOL=5,LOG_DT=30,MAXS=4;
+const HM=5.2e-3,UB=12,UT=4,LF=.42,RH=.5,Rg=8.314;
+
+/* ---------- state ---------- */
+const RGDEF={kind:'',why:'',x:'',y:'',title:'',built:false,fb:[],trend:'none',rep:'mean'};
+const AIRN=['אוויר שקט','מאוורר חלש','מאוורר בינוני','מאוורר חזק'],AF=[1,1.8,2.6,3.4],ALF=[1,.5,.3,.2];
+const defCond=()=>({liq:'ethanol',ves:'p6',T:15,air:0});
+const G11=()=>LEVEL==='11';
+const LIQ10=['water','methanol','ethanol','acetone'];
+const liqKeys=()=>G11()?Object.keys(LIQ):LIQ10;
+const X10OUT=['e','bp','area'],Y10OUT=['nmol','dT'];
+const xvList=()=>XV.filter(v=>G11()||!X10OUT.includes(v.k));
+const yvList=()=>YV.filter(v=>G11()||!Y10OUT.includes(v.k));
+const newSlot=c=>({cond:{...(c||defCond())},status:'pend',data:[],reps:[],amb:null,h:1});
+const allRuns=s=>[s.data,...(s.reps||[])].filter(d=>d&&d.length>1);
+const MAXREP=3;
+const _t=0;
+const RQDEF={iv:'',dv:'',q:'',hyp:'',ok:false,edit:true,fb:[],concl:'',sup:'',expl:'',trend:'',err:'',valid:'',nq:['','',''],nqRQ:'',gwhy:'',model:'',stale:false};
+function fresh(){return {v:2,tab:'intro',level:LEVEL,runs:[],plan:{vals:['','','',''],k:{liq:'ethanol',d:9,h:1.5,T:25,air:0,vol:5},cols:[],tool:'',dt:30,roomT:+(21.5+Math.random()*5).toFixed(1),ctl:{type:'',val:'',why:''},cSel:'',cWhy:''},prep:{placed:false,poured:false,vol:0,tare:0,tareKind:'none',applied:false},means:{},pre:{pred:'',done:false,ans:'',m0:null,m1:null},hints:[],name:'',school:'',partners:'',date:new Date().toISOString().slice(0,10),dur:5,sensor:false,speed:10,pT:25,pI:2,yMode:'m',sel:0,slots:[],rg:{...RGDEF},rq:{...RQDEF},repQ:{a:'',why:''}};}
+let S;try{S=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){S=null;}
+if(!S||S.v!==2)S=fresh();
+{const F=fresh(),fill=(o,d)=>{for(const k in d){if(o[k]==null)o[k]=d[k];else if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k])&&typeof o[k]==='object')fill(o[k],d[k]);}};fill(S,F);if(!Array.isArray(S.rq.nq))S.rq.nq=['','',''];}
+S.level=LEVEL;if(!S.runs)S.runs=[];
+if(!S.rg)S.rg={...RGDEF};
+S.rg.trend=S.rg.trend||(S.rg.style==='trend'?'lin':'none');S.rg.rep=S.rg.rep||'mean';S.slots.forEach(x=>x.reps=x.reps||[]);
+if(!S.rq)S.rq={...RQDEF};S.dur=5;
+if(!S.hints)S.hints=[];if(!S.pre)S.pre={pred:'',done:false,ans:'',m0:null,m1:null};if(S.level==null)S.level='';
+if(S.name==null){S.name='';S.school='';S.partners='';S.date=new Date().toISOString().slice(0,10);}
+if(['rate','mmol'].includes(S.rq.dv)||(!G11()&&S.rq.dv==='dT')){S.rq.dv='';S.rq.ok=false;S.rq.edit=true;}
+if(['rate','mmol'].includes(S.rg.y)||S.rg.x==='rate'){S.rg.x=S.rg.x==='rate'?'':S.rg.x;S.rg.y=['rate','mmol'].includes(S.rg.y)?'':S.rg.y;S.rg.built=false;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+setInterval(()=>{if(running())save();},2000);
+
+/* ---------- helpers ---------- */
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const f2=x=>(Math.round(x*100)/100).toFixed(2);
+const mmss=s=>{s=Math.floor(s+1e-6);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
+const L=s=>`<span class="ltr">${s}</span>`;
+const sub=f=>f.replace(/(\d+)/g,'<sub>$1</sub>');
+const cssv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COL=()=>['--s1','--s2','--s3','--s4','--s5'].map(cssv);
+const condText=(c,html=true)=>`${LIQ[c.liq].n} · ${VES[c.ves].s} · ${html?L(c.T+' °C'):c.T+' °C'}${c.air?' · '+AIRN[c.air]:''}`;
+
+/* ---------- model ---------- */
+const pvap=(l,T)=>133.322*Math.pow(10,l.A-l.B/(l.C+T));
+function rateOf(r){ // g/s
+  const l=LIQ[r.cond.liq],v=VES[r.cond.ves];if(r.m<=0)return 0;
+  const dm=v.d/100,A=Math.PI*dm*dm/4,Ta=r.Tl+273.15,Dt=l.D*1e-4*Math.pow(Ta/298,1.75);
+  const depth=(r.m/l.rho)/(A*1e4),head=Math.max(.001,v.h/100-depth/100);
+  const drive=r.cond.liq==='water'?Math.max(0,pvap(l,r.Tl)-RH*pvap(l,r.amb)):pvap(l,r.Tl);
+  const c=drive*l.M/(Rg*Ta),af=AF[r.cond.air|0];
+  const hm=HM*r.h*af*Math.pow(l.D/.124,2/3)*Math.pow(v.d/9,-.4),lf=LF*ALF[r.cond.air|0];
+  const hEff=1/(1/hm+lf*head/Dt),film=Math.min(1,Math.max(.1,depth/.03));
+  return hEff*c*A*film;
+}
+function physics(r,dt){
+  const l=LIQ[r.cond.liq],v=VES[r.cond.ves],dm=v.d/100,A=Math.PI*dm*dm/4,af=AF[r.cond.air|0];
+  if(r.m>0){const q=rateOf(r),x=Math.min(r.m,q*dt);r.m-=x;const UA=A*(UB+UT*af),Cc=r.m*l.cp+18*(v.d/9)**2+(v.h>3?7*v.h:0);
+    r.Tl+=(UA*(r.amb-r.Tl)-q*l.H*1000/l.M)/Cc*dt;if(r.m<1e-6)r.m=0;}
+  else r.Tl+=(r.amb-r.Tl)*(1-Math.exp(-dt/150));
+  r.Tp+=(r.Tl-r.Tp)*(1-Math.exp(-dt/5));
+}
+let lastNoise=0;
+function noiseTick(now,force){if(force||now-lastNoise>350){lastNoise=now;(S.runs||[]).forEach(r=>{r.bn=gauss()*(.005+.0045*(r.cond.air|0));r.tn=gauss()*.03;});}}
+const readMass=r=>{let v=Math.round((r.m+(r.off||0)+(r.bn||0))*100)/100;return Math.abs(v)<.005?0:v;};
+const readTemp=r=>Math.round((r.Tp+(r.tn||0))*10)/10;
+
+/* ---------- systems table (plan) ---------- */
+let confirmReset=false;
+const FN={liq:'סוג הנוזל',d:'קוטר הכלי',h:'גובה הכלי',T:'טמפרטורת הסביבה',air:'תנועת האוויר',vol:'נפח הנוזל'};
+const IVF={e:'liq',bp:'liq',liq:'liq',d:'d',h:'h',T:'T',air:'air'};
+const FACT=['liq','d','h','T','air'];
+const CF=['liq','d','h','vol','T','air'];      // factors a grade-11 student can list as constants
+const NEED=['liq','d','h','vol'];               // must be specified to prepare a station
+const FUNIT={liq:'',d:' (ס״מ)',h:' (ס״מ)',T:' (°C)',air:'',vol:' (מ״ל)'};
+const VOLS=[2,3,4,5,6,8,10];
+const TOOLS={cyl10:{n:'משורה של 10 מ״ל',res:.1,sd:.07,res0:[.05,.12],max:10},pip10:{n:'פיפטה מדורגת של 10 מ״ל',res:.05,sd:.02,res0:[.01,.03],max:10},cyl50:{n:'משורה של 50 מ״ל',res:1,sd:.45,res0:[.1,.3],max:50}};
+const LOGS=[15,30,60],DURS11=[5];
+const vesKey=(d,h)=>Object.keys(VES).find(k=>VES[k].d===d&&VES[k].h===h);
+const VM={p6:14,p9:28,p12:46,p14:62,c4:74,c8:118,b600:182}; // approximate empty-vessel masses (g)
+function factOpts(f,k,iv){
+  if(f==='liq')return liqKeys();
+  if(f==='d')return (iv==='h'||(k.h!=null&&k.h!==1.5))?[9]:[6,9,12,14];
+  if(f==='h')return (iv==='d'||(k.d!=null&&k.d!==9))?[1.5]:[1.5,4,8,12.5];
+  if(f==='T')return TEMPS;if(f==='air')return [0,1,2,3];if(f==='vol')return VOLS;return [];}
+const factLabel=(f,v)=>v===''||v==null?'—':f==='liq'?LIQ[v].n:f==='air'?AIRN[v]:f==='h'?(v+(v===1.5?' (צלחת פטרי)':v===12.5?' (כוס כימית)':'')):String(v);
+const factPlain=(f,v)=>f==='liq'?LIQ[v].n:f==='air'?AIRN[v]:f==='T'?'\u2066'+v+' °C\u2069':f==='vol'?v+' מ״ל':v+' ס״מ';
+function ivExtra(v){const iv=S.rq.iv;if(!v)return '';if(iv==='e')return ` · ${LIQ[v].e} אלקטרונים`;if(iv==='bp')return ` · רתיחה ב־${LIQ[v].bp} °C`;return '';}
+const ivF=()=>IVF[S.rq.iv];
+function constCols(){const iv=ivF();return G11()?S.plan.cols.filter(f=>f&&f!==iv):FACT.filter(f=>f!==iv);}
+const listed=f=>f===ivF()||constCols().includes(f)||(!G11()&&f==='vol');
+function fixConsts(){const p=S.plan,iv=ivF();
+  if(iv==='d'&&listed('h'))p.k.h=1.5;if(iv==='h'&&listed('d'))p.k.d=9;
+  if(!factOpts('d',p.k,iv).includes(p.k.d))p.k.d=factOpts('d',p.k,iv)[0];if(!factOpts('h',p.k,iv).includes(p.k.h))p.k.h=1.5;
+  if(!liqKeys().includes(p.k.liq))p.k.liq='ethanol';if(!G11())p.k.vol=VOL;}
+function condFor(val){const p=S.plan,iv=ivF(),c={liq:p.k.liq,d:p.k.d,h:p.k.h,T:p.k.T,air:p.k.air,vol:p.k.vol};
+  if(G11()){if(!listed('T'))c.T=p.roomT;if(!listed('air'))c.air=0;if(iv==='d')c.h=listed('h')?c.h:1.5;if(iv==='h')c.d=listed('d')?c.d:9;}
+  if(iv&&val!==''&&val!=null)c[iv]=(iv==='liq')?val:+val;
+  return {liq:c.liq,ves:vesKey(c.d,c.h)||'p9',T:c.T,air:c.air,vol:c.vol};}
+const hasExtCtl=()=>G11()&&S.plan.ctl.type==='ext';
+function planRows(){const p=S.plan,rows=p.vals.map((v,i)=>({v,ctl:false,i}));if(hasExtCtl())rows.push({v:p.ctl.val,ctl:true});return rows;}
+function syncSlots(){
+  if(S.slots.some(s=>s.status!=='pend')||running()||(G11()&&S.prep&&(S.prep.placed||S.prep.vol>0)))return;
+  S.slots=planRows().map(r=>{const s=newSlot(condFor(r.v));s.ctl=r.ctl;s.val=r.v;return s;});
+  if(S.sel>=S.slots.length)S.sel=0;
+  if(G11()&&S.prep&&S.prep.applied){S.prep=freshPrep();}}
+const locked=()=>S.slots.some(s=>s.status!=='pend')||running()||!!(G11()&&S.prep&&(S.prep.placed||S.prep.vol>0));
+const NEEDTXT={liq:'באיזה סוג נוזל משתמשים',d:'מה קוטר הכלי',h:'מה גובה הכלי',vol:'איזה נפח נוזל מוזגים לכל כלי'};
+function planIssues(){const p=S.plan,out=[],iv=ivF();
+  if(!S.rq.iv){out.push('בחרו משתנה בלתי תלוי בשאלת החקר.');return out;}
+  p.vals.forEach((v,i)=>{if(v==='')out.push(`בחרו ערך של המשתנה הבלתי תלוי למערכת ${i+1}.`);});
+  const seen={};p.vals.forEach((v,i)=>{if(v==='')return;if(seen[v]!=null)out.push(`למערכת ${i+1} ולמערכת ${seen[v]+1} יש אותו ערך. כל מערכת צריכה ערך אחר של המשתנה הבלתי תלוי. חזרות מוסיפים אחר כך בטבלת התוצאות.`);else seen[v]=i;});
+  if(G11()){
+    if(p.cols.some(f=>!f))out.push('בחרו איזה גורם מופיע בכל עמודה של גורם קבוע, או הסירו עמודה ריקה.');
+    const miss=NEED.filter(f=>f!==iv&&!listed(f));if(miss.length)out.push(`כדי להכין את העמדות צריך לדעת ${miss.map(f=>NEEDTXT[f]).join(', ')}. הוסיפו זאת לטבלה.`);
+    const c=p.ctl;if(!c.type)out.push('בחרו את סוג הבקרה.');
+    else{if(c.type==='ext'){if(c.val==='')out.push('בחרו ערך לבקרה החיצונית.');else if(p.vals.includes(c.val))out.push('ערך הבקרה החיצונית זהה לערך של אחת המערכות. בחרו ערך אחר, או בחרו בקרה פנימית השוואתית.');}
+      if(String(c.why||'').trim().length<10)out.push('הסבירו מתחת לטבלה למה בחרתם בבקרה הזאת.');}
+    if(!p.tool)out.push('בחרו כלי למדידת נפח הנוזל.');
+    else if(listed('vol')&&p.k.vol>TOOLS[p.tool].max)out.push('הנפח שבחרתם גדול מהנפח של כלי המדידה.');}
+  if(S.rq.dv==='dT'&&!S.sensor)out.push('המשתנה התלוי בשאלת החקר הוא הפרש טמפרטורות הנוזל. הפעילו את „חיישן טמפרטורה בכל מערכת”, אחרת לא תוכלו למדוד אותו.');
+  S.slots.forEach((sl,i)=>{const l=LIQ[sl.cond.liq];if(l&&sl.cond.T>=l.bp)out.push(`${sl.ctl?'בבקרה':'במערכת '+(i+1)}: ${l.n} רותח ב־${l.bp} מעלות, וטמפרטורת הסביבה שבחרתם היא ${sl.cond.T} מעלות. בטמפרטורה כזו הנוזל רותח, והסימולציה לא מתארת רתיחה. בחרו טמפרטורה נמוכה יותר או נוזל אחר.`);});
+  if(!p.cSel)out.push('בחרו גורם קבוע אחד מתחת לטבלה.');
+  if(String(p.cWhy||'').trim().length<10)out.push('הסבירו למה חשוב שהגורם הקבוע שבחרתם יהיה זהה בכל המערכות.');
+  return out;}
+const planOk=()=>!planIssues().length;
+function constantsList(){const k=S.plan.k,out=[];
+  constCols().forEach(f=>out.push([FN[f],f==='T'?L(k.T+' °C'):f==='vol'?k.vol+' מ״ל':f==='h'?factLabel('h',k.h).replace(/^([\d.]+)/,'$1 ס״מ'):f==='d'?k.d+' ס״מ':factLabel(f,k[f])]));
+  if(!G11())out.push(['נפח הנוזל',L(VOL+' mL')]);
+  out.push(['משך המדידה',S.dur+' דקות']);return out;}
+function constantsText(){return constantsList().map(([k,v])=>`${k}: ${v}`).join(' · ');}
+function ctlText(){const c=S.plan.ctl;if(!G11()||!c.type)return '';return c.type==='int'?'בקרה פנימית השוואתית':`בקרה חיצונית: ${factPlain(ivF(),ivF()==='liq'?c.val:+c.val)}`;}
+function methodText(){if(!G11())return '';const p=S.plan;return `נפח הנוזל נמדד ב${p.tool?TOOLS[p.tool].n:'—'}. ${S.sensor?"המסה והטמפרטורה נמדדו":"המסה נמדדה"} כל ${p.dt} שניות במשך ${S.dur} דקות.`;}
+function selHTML(attr,list,f,sel,dis){return `<select ${attr} ${dis?'disabled':''}><option value="">בחרו</option>${list.map(v=>`<option value="${v}" ${String(v)===String(sel)?'selected':''}>${factLabel(f,v)}${f==='liq'?ivExtra(v):''}</option>`).join('')}</select>`;}
+let confirmEdit=false;
+function renderPlan(){
+  const p=S.plan,ivk=S.rq.iv,iv=IVF[ivk],lk=locked(),col=COL();
+  let h=`<h2>2. טבלת המערכות</h2>`;
+  if(!ivk){h+=`<p class="small muted">בחרו קודם את המשתנה הבלתי תלוי בשאלת החקר. הטבלה תיבנה לפיו.</p>`;$('plan').innerHTML=h;renderRun();renderTabs();return;}
+  fixConsts();syncSlots();
+  const g11=G11(),cols=g11?p.cols:FACT.filter(f=>f!==iv);
+  h+=g11?`<p class="small muted">בחרו ערך של המשתנה הבלתי תלוי לכל מערכת. הוסיפו עמודה לכל גורם קבוע: בחרו את הגורם בכותרת ואת הערך שלו בשורה הצהובה.</p>`
+        :`<p class="small muted">בכל מערכת מוזגים ${L(VOL+' mL')} נוזל לכלי שעל מאזניים מאופסים, והמסה נרשמת כל 30 שניות. את ערכי הגורמים הקבועים בוחרים פעם אחת, והם חלים על כל המערכות.</p>`;
+  if(g11)h+=`<div class="row"><button class="chip" id="sensor" aria-pressed="${S.sensor}" ${lk?'disabled':''}>חיישן טמפרטורה בכל מערכת</button></div>`;
+  const used=f=>cols.includes(f);
+  const colHead=(f,j)=>g11?`<th>גורם קבוע ${j+1}<br><select data-cf="${j}" ${lk?'disabled':''} aria-label="גורם קבוע ${j+1}"><option value="">בחרו גורם</option>${CF.filter(x=>x!==iv&&(x===f||!used(x))).map(x=>`<option value="${x}" ${x===f?'selected':''}>${FN[x]}${FUNIT[x]}</option>`).join('')}</select>${lk?'':`<button class="xbtn" data-cdel="${j}" aria-label="הסרת העמודה">×</button>`}</th>`
+      :`<th>${FN[f]}${FUNIT[f]}<br><span class="small">גורם קבוע</span></th>`;
+  h+=`<div class="tablewrap"><table class="systab"><thead><tr><th>מערכת</th><th class="ivh">${FN[iv]}${FUNIT[iv]}<br><span class="small">משתנה בלתי תלוי</span></th>${cols.map(colHead).join('')}${g11?'':'<th>משך המדידה<br><span class="small">גורם קבוע</span></th>'}</tr></thead><tbody>`;
+  h+=`<tr class="krow"><td>ערך קבוע לכל המערכות</td><td class="muted">—</td>${cols.map(f=>`<td>${f?selHTML(`data-k="${f}" aria-label="${FN[f]} – ערך קבוע"`,factOpts(f,listedK(),iv),f,p.k[f],lk):''}</td>`).join('')}
+    ${g11?'':`<td class="muted">5 דקות</td>`}</tr>`;
+  const cst=cols.map(f=>`<td class="muted">${f?factLabel(f,p.k[f]):''}</td>`).join('')+(g11?'':`<td class="muted">${S.dur} דקות</td>`);
+  if(g11){const c=p.ctl;
+    h+=`<tr class="ctlrow"><td><span class="dot" style="background:${col[4]}"></span>בקרה<br><select data-ctlt ${lk?'disabled':''} aria-label="סוג הבקרה"><option value="">בחרו</option><option value="int" ${c.type==='int'?'selected':''}>פנימית השוואתית</option><option value="ext" ${c.type==='ext'?'selected':''}>חיצונית</option></select></td>`+
+      (c.type==='ext'?`<td>${selHTML(`data-ctlv aria-label="ערך הבקרה"`,factOpts(iv,p.k,iv),iv,c.val,lk)}</td>${cst}`:`<td colspan="${cols.length+1}" class="muted small" style="text-align:right">${c.type==='int'?'המערכות משמשות בקרה זו לזו.':'בחרו את סוג הבקרה.'}</td>`)+`</tr>`;}
+  p.vals.forEach((v,i)=>{h+=`<tr><td><span class="dot" style="background:${col[i]}"></span>${i+1}</td><td>${selHTML(`data-v="${i}" aria-label="${FN[iv]} – מערכת ${i+1}"`,factOpts(iv,p.k,iv),iv,v,lk)}</td>${cst}</tr>`;});
+  h+=`</tbody></table></div>`;
+  {const shown=f=>!g11||cols.includes(f);
+   if(iv==='d'&&shown('h'))h+=`<div class="info small">גובה הכלי קבוע: ${L('1.5')} ס״מ (צלחות פטרי). אין במעבדה כלים בקטרים האלה בגבהים שונים.</div>`;
+   if(iv==='h'&&shown('d'))h+=`<div class="info small">קוטר הכלי קבוע: 9 ס״מ. אין במעבדה כלים בגבהים האלה בקטרים שונים.</div>`;}
+  if(!lk)h+=`<div class="row" style="margin-top:8px">${p.vals.length<MAXS?`<button class="btn sec sm" id="addRow">+ הוספת מערכת</button>`:''}${p.vals.length>2?`<button class="btn sec sm" id="delRow">הסרת מערכת ${p.vals.length}</button>`:''}${g11&&p.cols.length<CF.length-1?`<button class="btn sec sm" id="addCol">+ גורם קבוע</button>`:''}</div>`;
+  if(g11)h+=`<label class="f" for="ctlWhy">למה בחרתם בבקרה הזאת?</label><textarea id="ctlWhy" ${lk?'disabled':''}>${esc(p.ctl.why)}</textarea>
+    <h3>צורת המדידה</h3><div class="form2">
+    <label for="mTool">כלי למדידת נפח הנוזל</label><select id="mTool" ${lk?'disabled':''}><option value="">בחרו</option>${Object.keys(TOOLS).map(k=>`<option value="${k}" ${p.tool===k?'selected':''}>${TOOLS[k].n} (שנתות של ${TOOLS[k].res} מ״ל)</option>`).join('')}</select>
+    <label for="mDt">מדידה כל</label><select id="mDt" ${lk?'disabled':''}>${LOGS.map(v=>`<option value="${v}" ${p.dt===v?'selected':''}>${v} שניות</option>`).join('')}</select>
+    <span>משך המדידה</span><span class="muted">5 דקות (קבוע בכל הניסויים)</span></div>`;
+  {const cl=constantsList().map(([k])=>k);h+=`<div class="stack"><label for="cSel">בחרו גורם קבוע אחד</label><select id="cSel" ${lk?'disabled':''}><option value="">בחרו</option>${cl.map(k=>`<option ${p.cSel===k?'selected':''}>${k}</option>`).join('')}</select></div>
+    <label class="f" for="cWhy">למה חשוב שהגורם הזה יהיה זהה בכל המערכות?</label><textarea id="cWhy" ${lk?'disabled':''}>${esc(p.cWhy)}</textarea>`;}
+  if(lk)h+=`<div class="status st-info">הטבלה נעולה כי כבר התחלתם לבצע את הניסוי.</div><div><button class="btn sec sm" id="editPlan" ${running()?'disabled':''}>שינוי התכנון (הביצוע והתוצאות יימחקו)</button></div>
+    <div class="confirm" id="editC" ${confirmEdit?'':'hidden'}>כל ההכנות והמדידות יימחקו. להמשיך?<div class="row" style="margin-top:6px"><button class="btn sm" id="editY">כן, למחוק ולשנות</button><button class="btn sec sm" id="editN">ביטול</button></div></div>`;
+  const iss=planIssues();
+  h+=`<div id="planFb">${planFbHTML(iss)}</div>`;
+  h+=`<button class="btn full ${S.rq.ok&&planOk()?'pulse':'sec blocked'}" data-go="exp" style="margin-top:8px" ${S.rq.ok&&planOk()?'':'aria-disabled="true" data-need="planFb"'}>המשך לניסוי</button>`;
+  $('plan').innerHTML=h;bindPlan();renderRun();renderTabs();
+}
+function listedK(){const p=S.plan,k={...p.k};if(G11()){if(!listed('h'))k.h=null;if(!listed('d'))k.d=null;}return k;}
+function planFbHTML(iss){const all=[...(S.rq.ok?[]:['לשמור את שאלת החקר וההשערה (בכרטיס „שאלת החקר”).']),...iss];
+  return all.length?`<div class="need" role="alert"><b>⚠ כדי להמשיך לניסוי חסר:</b><ul>${all.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:`<div class="fb st-ok">✓ התכנון מוכן.</div>`;}
+function planChanged(){syncSlots();save();renderPlan();renderBench();renderResults();if(S.rq.ok&&!S.rq.edit)renderRQ();}
+function bindPlan(){
+  const on=(id,f)=>{const e=$(id);if(e)e.onclick=f;},p=S.plan;
+  document.querySelectorAll('[data-k]').forEach(e=>e.onchange=()=>{const f=e.dataset.k;if(e.value==='')return;p.k[f]=f==='liq'?e.value:+e.value;planChanged();});
+  document.querySelectorAll('[data-v]').forEach(e=>e.onchange=()=>{p.vals[+e.dataset.v]=e.value;planChanged();});
+  document.querySelectorAll('[data-cf]').forEach(e=>e.onchange=()=>{p.cols[+e.dataset.cf]=e.value;planChanged();});
+  document.querySelectorAll('[data-cdel]').forEach(e=>e.onclick=()=>{p.cols.splice(+e.dataset.cdel,1);planChanged();});
+  const dd=document.querySelector('[data-dur]');if(dd)dd.onchange=e=>{S.dur=+e.target.value;planChanged();};
+  const ct=document.querySelector('[data-ctlt]');if(ct)ct.onchange=e=>{p.ctl.type=e.target.value;if(p.ctl.type!=='ext')p.ctl.val='';planChanged();};
+  const cv=document.querySelector('[data-ctlv]');if(cv)cv.onchange=e=>{p.ctl.val=e.target.value;planChanged();};
+  const w=$('ctlWhy');if(w){w.oninput=e=>{p.ctl.why=e.target.value;save();const iss=planIssues();$('planFb').innerHTML=planFbHTML(iss);renderTabs();};w.onchange=()=>renderPlan();}
+  const mt=$('mTool');if(mt)mt.onchange=e=>{p.tool=e.target.value;planChanged();};
+  const md=$('mDt');if(md)md.onchange=e=>{p.dt=+e.target.value;planChanged();};
+  const mu=$('mDur');if(mu)mu.onchange=e=>{S.dur=+e.target.value;planChanged();};
+  on('sensor',()=>{S.sensor=!S.sensor;renderYMode();delete $('rgForm').dataset.ready;save();renderPlan();renderBench();renderResults();});
+  on('addRow',()=>{if(p.vals.length<MAXS){p.vals.push('');planChanged();}});
+  on('delRow',()=>{if(p.vals.length>2){p.vals.pop();planChanged();}});
+  on('addCol',()=>{p.cols.push('');planChanged();});
+  if($('cSel'))$('cSel').onchange=e=>{p.cSel=e.target.value;save();renderPlan();renderTabs();};
+  {const w=$('cWhy');if(w){w.oninput=e=>{p.cWhy=e.target.value;save();$('planFb').innerHTML=planFbHTML(planIssues());renderTabs();};w.onchange=()=>setTimeout(renderPlan,0);}}
+  on('editPlan',()=>{confirmEdit=true;renderPlan();});on('editN',()=>{confirmEdit=false;renderPlan();});
+  on('editY',()=>{confirmEdit=false;S.slots.forEach(s=>{s.status='pend';s.data=[];s.reps=[];});S.prep=freshPrep();S.means={};S.rg.built=false;S.repQ={a:'',why:''};if(conclAny())S.rq.stale=true;delete $('conclCard').dataset.ready;delete $('rgForm').dataset.ready;planChanged();});
+}
+
+/* ---------- grade 11: preparing the stations ---------- */
+function freshPrep(){return {placed:false,poured:false,vol:0,tare:0,tareKind:'none',applied:false};}
+const prepVm=i=>{const s=S.slots[i];if(s.vm==null)s.vm=+(VM[s.cond.ves]*(1+gauss()*.03)).toFixed(2);return s.vm;};
+function prepGross(){const P=S.prep,s=S.slots[0];return (P.placed?prepVm(0):0)+(P.poured?P.mL*LIQ[s.cond.liq].rho:0);}
+function prepRead(){return Math.round((prepGross()-S.prep.tare)*100)/100;}
+const toolRead=v=>{const t=TOOLS[S.plan.tool];return Math.round(v/t.res)*t.res;};
+let pouring=false;
+function prepHTML(){
+  const P=S.prep,t=TOOLS[S.plan.tool],s0=S.slots[0];
+  const ck=(ok,txt)=>`<li>${ok?'✓':'○'} ${txt}</li>`;
+  let h=`<h3>הכנת העמדה של ${slotName(0)}</h3><p class="small muted">הכינו את העמדה הראשונה בעצמכם. אחר כך תכינו את שאר העמדות באותו נוהל.</p>
+   <ul class="checks">${ck(P.placed,'הכלי על המאזניים')}${ck(P.tareKind!=='none','המאזניים אופסו')}${ck(P.vol>0,`הנוזל נמדד ב${t.n}`)}${ck(P.poured,'הנוזל נמזג לכלי')}</ul>
+   <div class="row"><button class="btn sec sm" id="pPlace" ${P.placed?'disabled':''}>הנחת הכלי על המאזניים</button><button class="btn sec sm" id="pTare">איפוס המאזניים (TARE)</button></div>
+   <div class="row" style="margin-top:6px"><button class="btn sec sm" id="pFill" ${P.poured?'disabled':''}>מילוי ${t.n} (החזיקו לחוץ)</button><button class="btn sec sm" id="pLess" ${P.poured||P.vol<=0?'disabled':''}>הוצאת מעט נוזל</button><button class="btn sec sm" id="pPour" ${P.poured||P.vol<=0||!P.placed?'disabled':''}>מזיגה לכלי</button></div>
+   <div class="instr two" style="max-width:420px"><div class="lcd"><small>קריאה ב${t.n}</small><strong id="pVol">${P.poured?'—':toolRead(P.vol).toFixed(t.res<1?(t.res<.1?2:1):0)} mL</strong></div><div class="lcd"><small>מאזניים</small><strong id="pBal">${f2(prepRead())} g</strong></div></div>`;
+  if(P.poured)h+=`<button class="btn full pulse" id="pApply" style="margin-top:8px">הכנת שאר העמדות באותו נוהל</button>`;
+  return h;
+}
+function bindPrep(){
+  const P=S.prep,on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
+  on('pPlace',()=>{P.placed=true;save();renderRun();renderBench();renderPlan();});
+  on('pTare',()=>{P.tare=prepGross();P.tareKind=!P.placed?'none':P.poured?'full':'vessel';save();renderRun();renderBench();});
+  on('pLess',()=>{P.vol=Math.max(0,P.vol-rnd(.1,.3)*(S.plan.tool==='cyl50'?3:1));save();renderRun();});
+  on('pPour',()=>{const t=TOOLS[S.plan.tool];P.read=+toolRead(P.vol).toFixed(2);P.mL=Math.max(0,P.vol+gauss()*t.sd-rnd(...t.res0));P.poured=true;save();renderRun();renderBench();renderPlan();});
+  on('pApply',()=>{const t=TOOLS[S.plan.tool];
+    S.slots.forEach((s,i)=>{const vm=prepVm(i);
+      s.mL=i===0?P.mL:Math.max(0,P.read+gauss()*t.sd-rnd(...t.res0));s.readVol=P.read;
+      const m=s.mL*LIQ[s.cond.liq].rho;s.tare=P.tareKind==='vessel'?vm:P.tareKind==='full'?vm+m:0;});
+    P.applied=true;save();renderRun();renderBench();});
+  const f=$('pFill');if(f){const st=e=>{e.preventDefault();pouring=true;},sp=()=>{if(pouring){pouring=false;save();renderRun();renderPlan();}};
+    f.addEventListener('pointerdown',st);['pointerup','pointerleave','pointercancel'].forEach(ev=>f.addEventListener(ev,sp));
+    f.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter')st(e);});f.addEventListener('keyup',sp);f.addEventListener('contextmenu',e=>e.preventDefault());}
+}
+function prepTick(dt){if(!pouring||!G11())return;const t=TOOLS[S.plan.tool];S.prep.vol=Math.min(t.max*1.05,S.prep.vol+dt*rnd(.9,1.4)*(t.max/10));const e=$('pVol');if(e)e.textContent=toolRead(S.prep.vol).toFixed(t.res<1?(t.res<.1?2:1):0)+' mL';}
+function execSummary(){ // grade 11: how the execution matched the plan
+  if(!G11()||!S.prep||!S.prep.applied)return [];const P=S.prep,p=S.plan,out=[];
+  if(listed('vol')){const d=P.read-p.k.vol;out.push([Math.abs(d)<.051,`נפח מתוכנן: ${p.k.vol} מ״ל. נפח שנמדד ב${TOOLS[p.tool].n}: ${P.read} מ״ל${Math.abs(d)<.051?'':` (סטייה של ${L((d>0?'+':'')+d.toFixed(2))} מ״ל)`}.`]);}
+  out.push([P.tareKind==='vessel',P.tareKind==='vessel'?'המאזניים אופסו כשהכלי הריק היה עליהם.':P.tareKind==='full'?'המאזניים אופסו אחרי המזיגה, ולכן המסה ההתחלתית שנרשמה היא כ־0 והמסות שליליות.':'המאזניים לא אופסו לפני המזיגה, ולכן המסות כוללות את מסת הכלי.']);
+  const m0=S.slots.map(s=>s.data.length?s.data[0][1]:null).filter(x=>x!=null);
+  if(m0.length>1&&P.tareKind==='vessel'){const sp=Math.max(...m0)-Math.min(...m0);out.push([true,`המסה ההתחלתית בעמדות נעה בין ${f2(Math.min(...m0))} ל־${f2(Math.max(...m0))} גרם (טווח ${sp.toFixed(2)} גרם).`]);}
+  if(!listed('T'))out.push([false,`טמפרטורת הסביבה לא נקבעה בתכנון. בפועל היא הייתה כ־${p.roomT} °C.`]);
+  if(!listed('air'))out.push([false,'תנועת האוויר לא נקבעה בתכנון. בפועל לא הופעל מאוורר.']);
+  return out;}
+
+/* ---------- running all systems in parallel ---------- */
+const running=()=>!!(S.runs&&S.runs.length);
+function ivValText(s){const ivk=S.rq.iv,iv=IVF[ivk];if(!s||!iv)return '';const c=s.cond;
+  return iv==='liq'?LIQ[c.liq].n+(ivk==='e'?` (${LIQ[c.liq].e})`:ivk==='bp'?` (\u2066${LIQ[c.liq].bp} °C\u2069)`:''):iv==='d'?VES[c.ves].d+' ס״מ':iv==='h'?VES[c.ves].h+' ס״מ':iv==='T'?'\u2066'+Math.round(c.T)+' °C\u2069':AIRN[c.air|0];}
+const slotName=i=>{const s=S.slots[i];if(!s)return '';const v=ivValText(s);return s.ctl?`בקרה${v?' – '+v:''}`:(v||`מערכת ${i+1}`);};
+const slotCol=i=>S.slots[i]&&S.slots[i].ctl?COL()[4]:COL()[i];
+const logDt=()=>G11()?S.plan.dt:LOG_DT;
+function renderRun(){
+  const run=running(),pend=S.slots.filter(s=>s.status==='pend').length,allDone=S.slots.length&&S.slots.every(s=>s.status==='done');
+  let h=`<h2>המערכות</h2>${S.rq.ok?`<div class="rqsum small"><b>${esc(S.rq.q)}</b><br><span class="muted">${G11()?'גורמים קבועים לפי התכנון: ':'קבוע בכל המערכות: '}${constantsText()}${ctlText()?' · '+ctlText():''}</span></div>`:''}
+  <div class="slots">${S.slots.map((s,i)=>{const n=s.status==='done'?allRuns(s).length:0,badge=s.status==='done'?`<span class="badge b-done">✓${n>1?' ×'+n:''}</span>`:s.status==='run'?`<span class="badge b-run">⏳ נמדדת</span>`:`<span class="badge b-pend">ממתינה</span>`;
+    return `<button class="slot" data-rslot="${i}" aria-pressed="${S.sel===i}"><span class="dot" style="background:${slotCol(i)}"></span><span><b>${slotName(i)}</b><br><span class="small">${condText(s.cond)}</span></span>${badge}</button>`;}).join('')}</div>`;
+  const needPrep=G11()&&pend&&!run&&!(S.prep&&S.prep.applied);
+  if(!S.rq.ok||!planOk())h+=`<div class="status st-warn">השלימו קודם את שאלת החקר ואת התכנון.</div><div><button class="btn sec sm" data-go="plan">מעבר לשאלה ותכנון</button></div>`;
+  else if(run)h+=`<div class="status st-info" id="runStatus"></div><button class="btn sec full" id="abort" style="margin-top:6px">עצירת המדידה</button>`;
+  else if(needPrep)h+=prepHTML();
+  else if(pend)h+=`<button class="btn full pulse" id="runAll">הפעלת ${pend===S.slots.length?'כל המערכות':'המערכות שלא נמדדו'} במקביל</button>`;
+  if(!run&&allDone)h+=`<div class="status st-ok">✓ כל המערכות נמדדו</div><p class="small">כדי לבדוק את הדיוק, הוסיפו חזרות: עד ${MAXREP} מדידות לכל מערכת. הכפתור נמצא מעל טבלת התוצאות.</p><button class="btn full pulse" data-go="res">המשך לתוצאות</button>`;
+  $('runCard').innerHTML=h;
+  document.querySelectorAll('[data-rslot]').forEach(b=>b.onclick=()=>{S.sel=+b.dataset.rslot;save();renderRun();renderBench();});
+  const on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
+  on('runAll',startAll);if(needPrep)bindPrep();
+  on('abort',()=>{S.runs.forEach(r=>{const s=S.slots[r.idx];s.status='pend';s.data=[];s.reps=[];});S.runs=[];save();renderPlan();renderBench();renderResults();});
+  updateRunStatus();
+}
+function startAll(){
+  if(running()||!S.rq.ok||!planOk())return;if(G11()&&!(S.prep&&S.prep.applied))return;S.runs=[];
+  S.slots.forEach((s,i)=>{if(s.status!=='pend')return;const l=LIQ[s.cond.liq];
+    s.amb=+(s.cond.T+rnd(-.5,.5)).toFixed(2);s.h=1+gauss()*.06;s.data=[];s.status='run';
+    const mL=G11()?s.mL:VOL+rnd(-.1,.1)-rnd(.05,.12);
+    S.runs.push({idx:i,cond:{...s.cond},phase:'pour',pourT:1.4,t:0,next:0,m:mL*l.rho,Tl:s.amb+rnd(-.3,.2),Tp:s.amb,amb:s.amb,h:s.h,bn:0,tn:0,off:G11()?(prepVm(i)-s.tare):0});});
+  save();renderPlan();renderBench();
+}
+function finishRun(r){const s=S.slots[r.idx];s.status='done';S.runs=S.runs.filter(x=>x!==r);
+  if(!S.runs.length){save();renderPlan();renderBench();renderResults();}}
+function updateRunStatus(){const e=$('runStatus');if(!e||!running())return;const r=S.runs[0];
+  e.textContent=S.runs.some(x=>x.phase==='pour')?'מוזגים את הנוזל לכל הכלים…':`${mmss(r.t)} מתוך ${mmss(S.dur*60)} · ${S.runs.length} מערכות נמדדות`;}
+
+/* ---------- bench: one balance per system ---------- */
+function stationSVG(i,cx,step){
+  const s=S.slots[i],r=(S.runs||[]).find(x=>x.idx===i),cond=s.cond,v=VES[cond.ves],l=LIQ[cond.liq];
+  const last=s.data.length?s.data[s.data.length-1]:null,measuring=r&&r.phase==='measure';
+  const P=S.prep||{},g11=G11(),pre=!r&&!last;
+  const present=!g11||!pre||P.applied||(i===0&&P.placed);
+  const preM=g11&&pre?(P.applied?(s.mL||0)*l.rho:(i===0&&P.poured?P.mL*l.rho:0)):0;
+  const m=measuring?r.m:last&&!r?(g11?(last[1]-((prepVm(i))-(s.tare||0))):Math.max(0,last[1])):preM,showLiq=measuring||(!!last&&!r)||preM>0;
+  const sc=Math.min(.55,(step-14)/280),base=206,w=v.d*20*sc,wall=Math.max(8,v.h*12*sc),x0=cx-w/2,x1=cx+w/2;
+  let g='';
+  const pw=Math.min(150,step-10);g+=`<rect x="${cx-pw/2}" y="208" width="${pw}" height="6" rx="2" class="svg-bal"/><rect x="${cx-pw/2+4}" y="214" width="${pw-8}" height="58" rx="6" class="svg-bal"/>`;
+  const rd=measuring?f2(readMass(r)):(last&&!r?f2(last[1]):g11&&pre?(P.applied?f2(prepVm(i)+preM-(s.tare||0)):i===0?f2(prepRead()):'0.00'):'0.00');
+  g+=`<rect x="${cx-34}" y="228" width="68" height="24" rx="3" fill="#0f1d1f"/><text x="${cx}" y="245" text-anchor="middle" style="fill:#8ff0c8;font:500 14px var(--fm)">${rd} g</text>`;
+  if(!present){g+=`<circle cx="${cx-30}" cy="290" r="5" fill="${slotCol(i)}"/><text x="${cx+6}" y="294" text-anchor="middle" direction="rtl" style="fill:var(--ink);font:700 12px var(--fb)">${slotName(i)}</text>`;return g;}
+  if(showLiq&&m>0){const A=Math.PI*(v.d/2)**2,depth=(m/l.rho)/A*10,lh=Math.max(3,Math.min(wall-3,depth*14*sc*1.4)),top=base-lh;
+    g+=`<path d="M${x0+1.5} ${base-1} L${x0+1.5} ${top-2} Q${cx} ${top+2} ${x1-1.5} ${top-2} L${x1-1.5} ${base-1} Z" fill="var(--liquid)" stroke="var(--meniscus)" stroke-width="1"/>`;}
+  g+=`<path d="M${x0} ${base-wall} L${x0} ${base} L${x1} ${base} L${x1} ${base-wall}" class="svg-glass" stroke-width="2"/>`;
+  if(cond.air){const fx=cx-w/2-14,fy=base-wall-26;g+=`<circle cx="${fx}" cy="${fy}" r="10" fill="none" stroke="var(--acc)" stroke-width="1.5"/><path d="M${fx} ${fy} l6 -7 M${fx} ${fy} l-8 -2 M${fx} ${fy} l2 9" stroke="var(--acc)" stroke-width="1.5"/>${'›'.repeat(0)}`;
+    for(let k=0;k<cond.air;k++)g+=`<path d="M${fx+13} ${fy-6+k*6} q6 -3 12 0" stroke="var(--acc)" fill="none" stroke-width="1.2"/>`;}
+  if(S.sensor&&showLiq)g+=`<path d="M${x1-6} ${base-3} L${x1-6} ${base-wall-30}" stroke="var(--acc)" stroke-width="2"/>`;
+  g+=`<circle cx="${cx-30}" cy="290" r="5" fill="${slotCol(i)}"/><text x="${cx+6}" y="294" text-anchor="middle" direction="rtl" style="fill:var(--ink);font:700 12px var(--fb)">${slotName(i)}</text>`;
+  if(S.sensor){const tv=measuring?readTemp(r).toFixed(1):last&&last[2]!=null&&!r?last[2].toFixed(1):'--';g+=`<text x="${cx}" y="267" text-anchor="middle" style="fill:var(--muted);font:500 11px var(--fm)">${tv} °C</text>`;}
+  if(S.sel===i)g+=`<rect x="${cx-step/2+3}" y="${Math.min(160,base-wall-(cond.air?36:8))}" width="${step-6}" height="${304-Math.min(160,base-wall-(cond.air?36:8))}" rx="8" fill="none" stroke="var(--acc)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  return g;
+}
+function renderBench(){
+  const n=S.slots.length;let s=`<line x1="4" y1="276" x2="556" y2="276" stroke="var(--line)" stroke-width="2"/>`;
+  if(!n){$('bench').innerHTML=s+`<text x="280" y="190" text-anchor="middle" direction="rtl" class="svg-txt">בנו את טבלת המערכות בלשונית „שאלה ותכנון”</text>`;return;}
+  const step=560/n;S.slots.forEach((_,i)=>{s+=stationSVG(i,step*(n-i-.5),step);});
+  const sc=Math.min(.55,(step-14)/280),top=Math.min(...S.slots.map(x=>206-Math.max(8,VES[x.cond.ves].h*12*sc)-(x.cond.air?40:12)));
+  const y0=Math.max(60,Math.min(170,Math.floor(top)));$('bench').setAttribute('viewBox',`0 ${y0} 560 ${306-y0}`);
+  $('bench').innerHTML=s;
+  const sl=S.slots[S.sel];if(sl)$('zoomCap').textContent=`מבט מקרוב על פני הנוזל ב${slotName(S.sel)} (המחשה, לא בקנה מידה): ${LIQ[sl.cond.liq].n}. מולקולות בעלות אנרגיה גבוהה מספיק עוזבות את הנוזל ועוברות לאוויר.`;
+}
+function updateLCD(){
+  const r=running()?S.runs[0]:null;let t=0;
+  if(r&&r.phase==='measure')t=r.t;else{const d=S.slots.find(x=>x.data.length);t=d&&!r?d.data[d.data.length-1][0]:0;}
+  $('lcdTime').textContent=mmss(t);
+}
+
+function renderSpeed(){$('speedChips').innerHTML=SPEEDS.map(v=>`<button class="chip" data-speed="${v}" aria-pressed="${S.speed===v}">×${v}</button>`).join(' ');
+  document.querySelectorAll('[data-speed]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.speed;renderSpeed();save();});}
+
+/* ---------- particle zoom ---------- */
+const zx=$('zoom').getContext('2d');
+let parts=Array.from({length:60},()=>({x:Math.random()*500,y:170+Math.random()*125,vx:0,vy:0})),vap=[],escAcc=0;
+function stepZoom(dt){
+  const r=(S.runs||[]).find(x=>x.idx===S.sel),has=!!(r&&r.phase==='measure'&&r.m>0),T=(r?r.Tl:25)+273.15,sp=55*Math.sqrt(T/293);
+  for(const p of parts){p.vx+=gauss()*sp*.9*dt;p.vy+=gauss()*sp*.9*dt;const v=Math.hypot(p.vx,p.vy);if(v>sp){p.vx*=sp/v;p.vy*=sp/v;}p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.x<6){p.x=6;p.vx=Math.abs(p.vx);}if(p.x>494){p.x=494;p.vx=-Math.abs(p.vx);}if(p.y<171){p.y=171;p.vy=Math.abs(p.vy);}if(p.y>294){p.y=294;p.vy=-Math.abs(p.vy);}}
+  if(has){const mmolMin=rateOf(r)/LIQ[r.cond.liq].M*60000;escAcc+=dt*Math.min(14,2.2*Math.sqrt(mmolMin));
+    while(escAcc>=1){escAcc--;const p=parts[Math.floor(Math.random()*parts.length)];vap.push({x:p.x,y:162,vx:rnd(-30,30)+(r.cond.air?-60:0),vy:rnd(-80,-45),life:4});p.y=rnd(240,294);}}
+  for(const g of vap){g.vx+=gauss()*40*dt;g.vy+=gauss()*30*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;g.life-=dt;}
+  vap=vap.filter(g=>g.life>0&&g.y>-6&&g.x>-6&&g.x<506).slice(-120);
+  zx.clearRect(0,0,500,300);zx.fillStyle=cssv('--card');zx.fillRect(0,0,500,300);
+  const lq=r?LIQ[r.cond.liq]:S.slots[S.sel]?LIQ[S.slots[S.sel].cond.liq]:LIQ.ethanol;
+  if(has){zx.fillStyle=cssv('--acc-soft');zx.fillRect(0,165,500,135);zx.strokeStyle=cssv('--meniscus');zx.lineWidth=2;zx.beginPath();zx.moveTo(0,165);zx.lineTo(500,165);zx.stroke();
+    zx.fillStyle=cssv('--acc');for(const p of parts){zx.beginPath();zx.arc(p.x,p.y,5,0,7);zx.fill();}}
+  zx.fillStyle=cssv('--vap');for(const g of vap){zx.globalAlpha=Math.min(1,g.life/1.5);zx.beginPath();zx.arc(g.x,g.y,5,0,7);zx.fill();}zx.globalAlpha=1;
+  zx.fillStyle=cssv('--muted');zx.font='600 20px Assistant, Arial';zx.textAlign='right';zx.direction='rtl';zx.fillText('אוויר',485,30);if(has)zx.fillText(lq.n+' נוזלי',485,290);
+  if(!has){zx.textAlign='center';zx.fillText(r?'מוזגים את הנוזל…':'הריצו את המערכות כדי לראות את התהליך',250,160);}
+  zx.direction='ltr';
+}
+
+/* ---------- chart ---------- */
+const ch={cv:$('chart'),hover:null,series:[]};
+const mv=e=>{const b=ch.cv.getBoundingClientRect();ch.hover={x:e.clientX-b.left,y:e.clientY-b.top};drawChart();};
+ch.cv.addEventListener('pointermove',mv);ch.cv.addEventListener('pointerdown',mv);ch.cv.addEventListener('pointerleave',()=>{ch.hover=null;drawChart();});
+function niceStep(range,n){const raw=range/n,p=10**Math.floor(Math.log10(raw)),k=raw/p;return (k<1.5?1:k<3?2:k<7?5:10)*p;}
+const yM=()=>S.yMode==='T'&&!S.sensor?'m':S.yMode;
+function seriesData(){const col=COL(),out=[];
+  S.slots.forEach((s,i)=>{const d=s.data;if(!d.length)return;const tr=d=>{const m0=d[0][1];return yM()==='T'?d.filter(r=>r[2]!=null).map(r=>[r[0]/60,r[2]]):d.map(([t,m])=>[t/60,yM()==='m'?m:m0-m]);};
+    out.push({pts:tr(d),color:slotCol(i),label:slotName(i),main:true});(s.reps||[]).forEach(r=>out.push({pts:tr(r),color:slotCol(i),faint:true}));});return out;}
+function linFit(P){const n=P.length;if(n<2)return null;const mx=P.reduce((a,p)=>a+p[0],0)/n,my=P.reduce((a,p)=>a+p[1],0)/n;let sxy=0,sxx=0,syy=0;P.forEach(p=>{sxy+=(p[0]-mx)*(p[1]-my);sxx+=(p[0]-mx)**2;syy+=(p[1]-my)**2;});
+  if(sxx===0)return null;const b=sxy/sxx;return {a:b,b:my-b*mx,r2:syy>0?(sxy*sxy)/(sxx*syy):1};}
+const sig=(v,n=3)=>{if(v===0)return '0';const d=Math.max(0,n-1-Math.floor(Math.log10(Math.abs(v))));return v.toFixed(Math.min(6,d));};
+function expFit(P){if(P.length<4)return null;let best=null;
+  for(let i=0;i<=60;i++){const k=.01*Math.pow(10,i*3/60),Q=P.map(p=>[Math.exp(-k*p[0]),p[1]]),f=linFit(Q);if(f&&(!best||f.r2>best.r2))best={k,A:f.a,C:f.b,r2:f.r2};}
+  return best?{...best,y:t=>best.C+best.A*Math.exp(-best.k*t)}:null;}
+function drawChart(){
+  {const lt=$('liveTitle');if(lt)lt.textContent='גרף: '+(yM()==='m'?'מסת הנוזל':yM()==='T'?'טמפרטורת הנוזל':'מסת הנוזל שהתאדה')+' כתלות בזמן';}
+  const cv=ch.cv,dpr=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const P={l:58,r:14,t:14,b:44},ser=ch.series=seriesData(),pts=ser.flatMap(s=>s.pts);
+  let tMax=S.dur,y0=0,y1=yM()==='m'?5:yM()==='T'?30:1,empty=!pts.length;
+  if(pts.length){y0=Math.min(...pts.map(p=>p[1]));y1=Math.max(...pts.map(p=>p[1]));if(yM()==='dm')y0=Math.min(0,y0);}
+  const span=Math.max(.1,y1-y0);if(!empty){if(yM()!=='dm'){y0-=span*.06;}y1+=span*.06;}
+  const ys=niceStep(y1-y0,5);y0=Math.floor(y0/ys)*ys;y1=Math.ceil(y1/ys)*ys;const xs=niceStep(tMax,5);
+  const X=t=>P.l+t/tMax*(W-P.l-P.r),Y=v=>P.t+(y1-v)/(y1-y0)*(H-P.t-P.b);
+  g.font='12px "IBM Plex Mono", monospace';g.lineWidth=1;const dec=ys<.1?2:ys<1?1:0;
+  for(let v=y0;v<=y1+1e-9;v+=ys){g.strokeStyle=cssv('--grid');g.beginPath();g.moveTo(P.l,Y(v));g.lineTo(W-P.r,Y(v));g.stroke();g.fillStyle=cssv('--muted');g.textAlign='right';g.fillText(v.toFixed(dec),P.l-6,Y(v)+4);}
+  for(let t=0;t<=tMax+1e-9;t+=xs){g.strokeStyle=cssv('--grid');g.beginPath();g.moveTo(X(t),P.t);g.lineTo(X(t),H-P.b);g.stroke();g.fillStyle=cssv('--muted');g.textAlign='center';g.fillText(String(+t.toFixed(1)),X(t),H-P.b+16);}
+  g.strokeStyle=cssv('--muted');g.beginPath();g.moveTo(P.l,P.t);g.lineTo(P.l,H-P.b);g.lineTo(W-P.r,H-P.b);g.stroke();
+  g.fillStyle=cssv('--ink');g.font='600 13px Assistant, Arial';g.textAlign='center';g.direction='rtl';g.fillText('זמן (דקות)',(P.l+W-P.r)/2,H-8);
+  g.save();g.translate(14,(P.t+H-P.b)/2);g.rotate(-Math.PI/2);g.fillText(yM()==='m'?'מסת הנוזל (גרם)':yM()==='T'?'טמפרטורת הנוזל (\u2066°C\u2069)':'מסת הנוזל שהתאדה (גרם)',0,0);g.restore();g.direction='ltr';
+  for(const s of ser){g.fillStyle=s.color;g.globalAlpha=s.faint?.35:1;for(const [t,v] of s.pts){g.beginPath();g.arc(X(t),Y(v),s.faint?2.6:3.4,0,7);g.fill();}}g.globalAlpha=1;
+  if(S.mtTrend&&yM()==='T')for(const s of ser){if(!s.main)continue;const f=expFit(s.pts);if(!f)continue;s.efit=f;g.strokeStyle=s.color;g.lineWidth=1.5;g.setLineDash([6,4]);const xa=s.pts[0][0],xb=s.pts[s.pts.length-1][0];g.beginPath();for(let j=0;j<=40;j++){const t=xa+(xb-xa)*j/40;j?g.lineTo(X(t),Y(f.y(t))):g.moveTo(X(t),Y(f.y(t)));}g.stroke();g.setLineDash([]);}
+  if(S.mtTrend&&yM()!=='T')for(const s of ser){if(!s.main)continue;const f=linFit(s.pts);if(!f)continue;s.fit=f;g.strokeStyle=s.color;g.lineWidth=1.5;g.setLineDash([6,4]);const xa=s.pts[0][0],xb=s.pts[s.pts.length-1][0];g.beginPath();g.moveTo(X(xa),Y(f.a*xa+f.b));g.lineTo(X(xb),Y(f.a*xb+f.b));g.stroke();g.setLineDash([]);}
+  if(!pts.length){g.fillStyle=cssv('--muted');g.font='600 14px Assistant, Arial';g.textAlign='center';g.direction='rtl';g.fillText('הנקודות יופיעו כאן כשתריצו מערכת',(P.l+W-P.r)/2,(P.t+H-P.b)/2);g.direction='ltr';}
+  if(ch.hover&&pts.length){let best=null,bd=1e9;for(const s of ser)for(const p of s.pts){const d=Math.hypot(X(p[0])-ch.hover.x,Y(p[1])-ch.hover.y);if(d<bd){bd=d;best={p,s};}}
+    if(best&&bd<50){const x=X(best.p[0]),y=Y(best.p[1]);g.strokeStyle=cssv('--muted');g.setLineDash([3,3]);g.beginPath();g.moveTo(P.l,y);g.lineTo(x,y);g.lineTo(x,H-P.b);g.stroke();g.setLineDash([]);
+      g.strokeStyle=best.s.color;g.lineWidth=2;g.beginPath();g.arc(x,y,6,0,7);g.stroke();
+      const txt=`t = ${best.p[0].toFixed(1)} min   ${yM()==='T'?'T = '+best.p[1].toFixed(1)+' °C':(yM()==='m'?'m':'Δm')+' = '+best.p[1].toFixed(2)+' g'}`;g.font='500 12px "IBM Plex Mono", monospace';const tw=g.measureText(txt).width+14;
+      const bx=Math.min(W-P.r-tw,Math.max(P.l+2,x-tw/2)),by=y-34<P.t?y+12:y-34;g.fillStyle=cssv('--lcd');g.fillRect(bx,by,tw,24);g.fillStyle=cssv('--lcd-ink');g.textAlign='left';g.fillText(txt,bx+7,by+16);}}
+  $('legend').innerHTML=ser.filter(s=>s.main).map(s=>`<span><i style="background:${s.color}"></i>${s.label}${S.mtTrend&&yM()!=='T'&&s.fit?` – שיפוע ${L(sig(s.fit.a)+' g/min')}`:''}${S.mtTrend&&yM()==='T'&&s.efit?` – מתקרבת ל־${L(s.efit.C.toFixed(1)+' °C')}`:''}</span>`).join('')+(ser.some(s=>s.faint)?'<span class="muted">נקודות חיוורות – חזרות</span>':'');
+}
+function renderYMode(){$('yMode').innerHTML=[['m','מסה'],['dm','מסת הנוזל שהתאדה'],...(S.sensor?[['T','טמפרטורת הנוזל']]:[])].map(([k,t])=>`<button class="chip" data-ym="${k}" aria-pressed="${yM()===k}">${t}</button>`).join('')+`<button class="chip" id="mtTrend" aria-pressed="${!!S.mtTrend}">קווי מגמה</button>`;
+  document.querySelectorAll('[data-ym]').forEach(b=>b.onclick=()=>{S.yMode=b.dataset.ym;save();renderYMode();drawChart();});
+  $('mtTrend').onclick=()=>{S.mtTrend=!S.mtTrend;save();renderYMode();drawChart();};}
+
+/* ---------- comparison table ---------- */
+function mStats(d,l){const t=d[d.length-1][0]/60,dm=d[0][1]-d[d.length-1][1],temps=d.map(x=>x[2]).filter(x=>x!=null);
+  return {m0:d[0][1],dm,t,nmol:dm/l.M*1000,drop:temps.length>1?Math.abs(temps[0]-temps[temps.length-1]):null};}
+function stats(s){const l=LIQ[s.cond.liq],all=allRuns(s).map(d=>mStats(d,l));if(!all.length)return null;
+  const agg=k=>{const v=all.map(x=>x[k]).filter(x=>x!=null);if(!v.length)return null;const mn=Math.min(...v),mx=Math.max(...v);return {mean:v.reduce((a,b)=>a+b,0)/v.length,min:mn,max:mx,range:mx-mn,vals:v};};
+  return {n:all.length,m0:agg('m0'),dm:agg('dm'),nmol:agg('nmol'),drop:agg('drop')};}
+function cellAgg(a,dec){if(!a)return '—';return a.vals.length>1?`${a.mean.toFixed(dec)}<br><span class="small muted">טווח ${a.range.toFixed(dec)}</span>`:a.mean.toFixed(dec);}
+function repeatSlot(i){markStale();
+  const s=S.slots[i],l=LIQ[s.cond.liq];if(s.status!=='done'||allRuns(s).length>=MAXREP||running())return;
+  const amb=+(s.cond.T+rnd(-.5,.5)).toFixed(2);let mL,off=0;
+  if(G11()){const t=TOOLS[S.plan.tool],P=S.prep;mL=Math.max(0,P.read+gauss()*t.sd-rnd(...t.res0));const vm=prepVm(i);off=P.tareKind==='vessel'?0:P.tareKind==='full'?-mL*l.rho:vm;}
+  else mL=VOL+rnd(-.1,.1)-rnd(.05,.12);
+  const r={cond:{...s.cond},m:mL*l.rho,Tl:amb+rnd(-.3,.2),Tp:amb,amb,h:1+gauss()*.06};r.Tp=r.Tl;
+  const sd=.005+.0045*(s.cond.air|0),rd=()=>{let v=Math.round((r.m+off+gauss()*sd)*100)/100;return Math.abs(v)<.005?0:v;},rt=()=>Math.round((r.Tp+gauss()*.03)*10)/10;
+  const dt=logDt(),d=[[0,rd(),S.sensor?rt():null]];let t=0;
+  for(let k=1;k<=S.dur*60/dt;k++){while(t<k*dt-1e-9){const st=Math.min(.5,k*dt-t);physics(r,st);t+=st;}d.push([k*dt,rd(),S.sensor?rt():null]);}
+  (s.reps=s.reps||[]).push(d);}
+function markStale(){if(conclAny()){S.rq.stale=true;delete $('conclCard').dataset.ready;}}
+function repeatAll(){if(running())return;S.slots.forEach((s,i)=>repeatSlot(i));save();renderPlan();renderResults();
+}
+const dvY=()=>YV.find(v=>v.k===(S.rg.y||S.rq.dv))||YV[0];
+function meanOk(i){const Y=dvY(),a=S.slots[i]&&S.slots[i].status==='done'?Y.agg(S.slots[i]):null;if(!a||a.vals.length<2)return true;const v=parseFloat(String(S.means[i]||'').replace(',','.'));return !isNaN(v)&&Math.abs(v-a.mean)<.51*10**-Y.dec+1e-9;}
+const meansOk=()=>!G11()||doneSlots().every(o=>meanOk(o.i));
+function meanCell(i){const v=S.means[i]||'',ok=meanOk(i),bad=v!==''&&!ok;
+  return `<td><input class="meanin ${v===''?'':ok?'ok':'bad'}" data-mean="${i}" inputmode="decimal" value="${esc(v)}" aria-label="ממוצע – ${slotName(i)}">${bad?'<div class="small" style="color:var(--warn)">בדקו: סכום המדידות חלקי מספרן.</div>':''}</td>`;}
+function renderResults(){
+  const sens=S.sensor,iv=IVF[S.rq.iv],ivk=S.rq.iv;
+  const ivHead=!iv?'משתנה בלתי תלוי':ivk==='e'?'סוג הנוזל (מספר האלקטרונים במולקולה)':ivk==='bp'?'סוג הנוזל (טמפרטורת רתיחה)':FN[iv]+FUNIT[iv];
+  const done=doneSlots(),maxN=done.length?Math.max(...done.map(o=>allRuns(o.s).length)):0,NC=Math.max(1,maxN);
+  const Y=dvY();
+  $('cmpTitle').innerHTML=S.rg.title.trim()?esc(S.rg.title):'<span class="muted">כותרת הטבלה והגרף – כתבו אותה בבניית הגרף למטה</span>';
+  $('cmpHead').innerHTML=`<tr><th rowspan="2">${ivHead}</th><th colspan="${NC+2}">${esc(axLabel(Y))}</th></tr>
+    <tr>${Array.from({length:NC},(_,k)=>`<th>מדידה ${k+1}</th>`).join('')}<th>ממוצע</th><th>טווח</th></tr>`;
+  $('cmpBody').innerHTML=S.slots.map((s,i)=>{const st=s.status==='done'?stats(s):null;
+    const first=`<td style="text-align:right"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${slotCol(i)};margin-inline-end:5px"></i>${slotName(i)}</td>`;
+    if(!st)return `<tr>${first}<td colspan="${NC+2}" class="muted">${s.status==='run'?'נמדדת עכשיו':'עדיין לא נמדדה'}</td></tr>`;
+    const a=Y.agg(s);if(!a)return `<tr>${first}<td colspan="${NC+2}" class="muted">אין נתונים</td></tr>`;
+    const vals=a.vals,cells=Array.from({length:NC},(_,k)=>`<td class="num">${vals[k]!=null?vals[k].toFixed(Y.dec):'—'}</td>`).join('');
+    const mean=G11()&&vals.length>1?meanCell(i):`<td class="num"><b>${a.mean.toFixed(Y.dec)}</b></td>`;
+    return `<tr>${first}${cells}${mean}<td class="num">${vals.length>1?a.range.toFixed(Y.dec):'—'}</td></tr>`;}).join('');
+  $('repRow').innerHTML=done.length&&!running()?`<div class="repbox"><b>חזרות</b> · בכל מערכת נעשו ${maxN===1?'מדידה אחת':maxN+' מדידות'} (אפשר עד ${MAXREP}).${G11()&&maxN>1?' חשבו את הממוצע של כל מערכת והקלידו אותו בעמודת הממוצע.':''}
+    ${false?`<div style="margin-top:6px"><label class="small" style="font-weight:700" for="rqEn">האם התוצאות שקיבלתם מספיקות כדי לענות בביטחון על שאלת החקר? מה עוד הייתם רוצים לבדוק?</label>
+      <div class="chips" style="margin:4px 0">${['מספיקות','לא מספיקות'].map(v=>`<button class="chip" data-en="${v}" aria-pressed="${S.repQ.a===v}">${v}</button>`).join('')}</div>
+      <textarea id="rqEn" style="min-height:50px" placeholder="נמקו">${esc(S.repQ.why)}</textarea></div>`:''}
+    <div class="row" style="margin-top:6px">${maxN<MAXREP?`<button class="btn sm" id="repAll">+ חזרה נוספת על הניסוי בכל המערכות (ההרצה מיידית)</button>`:''}${maxN>1?`<button class="btn sec sm" id="unrepAll">− הסרת החזרה האחרונה</button>`:''}</div></div>`:'';
+  const ra=$('repAll');if(ra)ra.onclick=repeatAll;
+  document.querySelectorAll('[data-en]').forEach(b=>b.onclick=()=>{S.repQ.a=b.dataset.en;save();renderResults();});
+  const en=$('rqEn');if(en){en.oninput=e=>{S.repQ.why=e.target.value;save();};en.onchange=()=>setTimeout(renderResults,0);}
+  document.querySelectorAll('[data-mean]').forEach(e=>{e.onchange=()=>{const i=+e.dataset.mean;S.means[i]=e.value;save();renderResults();};});
+  const ua=$('unrepAll');if(ua)ua.onclick=()=>{markStale();S.slots.forEach(sl=>{if(sl.reps&&sl.reps.length&&allRuns(sl).length===maxN)sl.reps.pop();});save();renderPlan();renderResults();};
+  $('cmpConst').innerHTML=S.rq.iv?`קבוע בכל המערכות: ${constantsText()}${ctlText()?' · '+ctlText():''}`:'';
+  if(S.rg.built&&S.rg._n!==doneSlots().length){S.rg.built=false;S.rg.fb=[];}S.rg._n=doneSlots().length;
+  const rgf=$('rgForm');if(doneSlots().length<2)delete rgf.dataset.ready;else if(!rgf.dataset.ready||!$('rgY'))delete rgf.dataset.ready;
+  renderRG();
+  $('cmpNote').textContent=Y.k==='dm'?`מסת הנוזל שהתאדה – ההפרש בין המסה בתחילת המדידה למסה לאחר ${S.dur} דקות.`:Y.k==='nmol'?`מספר המולים שהתאדו מחושב ממסת הנוזל שהתאדה ומהמסה המולרית של הנוזל.`:`הפרש טמפרטורות הנוזל – ההפרש בין טמפרטורת הנוזל בתחילת המדידה לטמפרטורה לאחר ${S.dur} דקות, בערך מוחלט.`;
+  drawChart();
+}
+
+/* ---------- research question ---------- */
+const SYN={e:['אלקטרונ','ענן'],bp:['רתיח'],liq:['נוזל','חומר','סוג'],d:['קוטר','רוחב','שטח','פתח'],h:['גובה','גבוה'],T:['טמפרטור','חימום','חום','חם','קר'],air:['אוויר','מאוורר','רוח'],area:['שטח'],
+  dm:['מסה','מסת','התאד','אידוי','התנדפ','נידוף','כמות','גז'],dmx:['מסה','מסת','התאד','אידוי','התנדפ','נידוף'],nmol:['מול','התאד','אידוי','התנדפ','נידוף'],dT:['טמפרטור','התקרר','קירור','הפרש']};
+const mentions=(t,k)=>(SYN[k]||[]).some(w=>t.includes(w));
+const IVL=['e','bp','liq','d','h','T','air'];const ivList=()=>xvList().filter(v=>IVL.includes(v.k));
+function checkRQ(){const r=S.rq,fb=[],q=r.q.trim();
+  if(!r.iv)fb.push('בחרו את המשתנה הבלתי תלוי.');if(!r.dv)fb.push('בחרו את המשתנה התלוי.');
+  if(!q)fb.push('נסחו את שאלת החקר.');else{if(!/[?؟]\s*$/.test(q))fb.push('שאלת החקר צריכה להיות מנוסחת כשאלה ולהסתיים בסימן שאלה.');
+    if(r.iv&&r.dv&&(!mentions(q,r.iv)||!mentions(q,r.dv))&&r.qOk!==q)fb.push('Q:לא זיהינו בשאלה את המשתנה הבלתי תלוי ואת המשתנה התלוי. נסחו במבנה „כיצד שינוי ב… ישפיע על …?”. אם השאלה שלכם כבר מזכירה את שניהם, לחצו „השאלה מזכירה את שני המשתנים”.');}
+  const h=r.hyp.trim();if(!h)fb.push('כתבו השערה ונמקו אותה.');else if(h.length<15||!/(כי|מפני|משום|מכיוון|בגלל|לכן|היות)/.test(h))fb.push('ההשערה צריכה לכלול נימוק: מה לדעתכם יקרה, ולמה (למשל „…כי…”).');
+  if(r.dv==='dT'&&!S.sensor){if(S.slots.every(x=>x.status==='pend')){S.sensor=true;}else fb.push('הפרש טמפרטורות הנוזל נמדד רק עם חיישן טמפרטורה. התחילו ניסוי חדש עם החיישן.');}
+  r.fb=fb;r.ok=!fb.length;if(r.ok){r.edit=false;syncSlots();if(!S.rg.built||S.rg.x!==r.iv||S.rg.y!==r.dv){S.rg.x=r.iv;S.rg.y=r.dv;S.rg.built=false;delete $('rgForm').dataset.ready;}}save();}
+function renderRQ(){
+  const r=S.rq,box=$('rqCard');
+  if(r.ok&&!r.edit){box.className='card';box.innerHTML=`<h2>1. שאלת החקר</h2><div class="rqsum"><b>${esc(r.q)}</b>
+    <div class="small" style="margin-top:4px">משתנה בלתי תלוי: ${XV.find(v=>v.k===r.iv).n} · משתנה תלוי: ${YV.find(v=>v.k===r.dv).n}</div>
+    <div class="small">השערה: ${esc(r.hyp)}</div></div>
+    ${locked()?'<p class="small muted" style="margin:6px 0 0">שאלת החקר וההשערה נקבעו לפני ביצוע הניסוי, ולכן אי אפשר לשנות אותן עכשיו.</p>':'<button class="btn sec sm" id="rqEdit">עריכת שאלת החקר</button>'}`;
+    if($('rqEdit'))$('rqEdit').onclick=()=>{r.edit=true;save();renderRQ();};return;}
+  box.className='card cur';
+  box.innerHTML=`<h2>1. שאלת החקר</h2><p class="small muted">קבעו מה תבדקו ונסחו שאלה והשערה. טבלת המערכות תיבנה לפי המשתנה הבלתי תלוי שתבחרו.</p>
+   <div class="form2"><label for="rqIv">המשתנה הבלתי תלוי</label><select id="rqIv" ${locked()?'disabled':''}>${opts(ivList(),r.iv)}</select>
+   <label for="rqDv">המשתנה התלוי</label><select id="rqDv">${opts(yvList(),r.dv)}</select></div>
+   <label class="small" for="rqQ" style="font-weight:700">שאלת החקר</label><div class="small muted">השתמשו במבנה: „כיצד שינוי ב… ישפיע על …?”</div><input type="text" id="rqQ" value="${esc(r.q)}">
+   <label class="small" for="rqH" style="font-weight:700;display:block;margin-top:8px">השערה ונימוק</label><textarea id="rqH">${esc(r.hyp)}</textarea>
+   <button class="btn full pulse" id="rqSave" style="margin-top:8px">שמירת שאלת החקר</button>
+   <div id="rqFb">${r.fb&&r.fb.length?`<div class="fb st-warn">${r.fb.map(x=>esc(x.replace(/^Q:/,''))).join('<br>')}${r.fb.some(x=>x.startsWith('Q:'))?'<div style="margin-top:6px"><button class="btn sec sm" id="rqForce">השאלה מזכירה את שני המשתנים</button></div>':''}</div>`:''}</div>`;
+  $('rqIv').onchange=e=>{if(locked())return;const old=IVF[r.iv];r.iv=e.target.value;r.ok=false;if(IVF[r.iv]!==old)S.plan.vals=S.plan.vals.map(()=>'');syncSlots();save();renderPlan();renderBench();};
+  $('rqDv').onchange=e=>{r.dv=e.target.value;r.ok=false;save();};
+  $('rqQ').oninput=e=>{r.q=e.target.value;r.ok=false;save();};
+  $('rqH').oninput=e=>{r.hyp=e.target.value;r.ok=false;save();};
+  $('rqSave').onclick=()=>{checkRQ();renderRQ();renderPlan();renderBench();renderResults();renderTabs();};
+  if($('rqForce'))$('rqForce').onclick=()=>{r.qOk=r.q.trim();checkRQ();renderRQ();renderPlan();renderBench();renderResults();renderTabs();};
+}
+function conclAny(){const r=S.rq;return !!(r.trend.trim()||r.concl.trim()||r.expl.trim()||r.err.trim());}
+function conclDone(){const r=S.rq;return !!(!r.stale&&(r.model||'').trim()&&r.trend.trim()&&r.concl.trim()&&r.sup&&r.expl.trim()&&r.err.trim()&&r.valid.trim()&&r.nq.filter(x=>x.trim()).length>=3&&r.nqRQ!=='');}
+function renderConcl(){
+  const r=S.rq,box=$('conclCard');
+  if(!(r.ok&&S.rg.built)){box.innerHTML=`<h2>ניתוח, מסקנות ודיון</h2><p class="small muted">${r.ok?'אחרי שתבנו את גרף התוצאות למעלה, תוכלו לנתח כאן את התוצאות ולענות על שאלת החקר.':'כדי לכתוב מסקנות, הגדירו קודם שאלת חקר.'}</p>`;return;}
+  if(box.dataset.ready==='1')return;box.dataset.ready='1';
+  const ex=execSummary(),X=XV.find(v=>v.k===r.iv);
+  const ta=(id,k,label,help,big)=>`<label class="f" for="${id}">${label}</label>${help?`<p class="small muted" style="margin:0 0 4px">${help}</p>`:''}<textarea id="${id}" data-c="${k}" ${big?'style="min-height:100px"':''}>${esc(r[k])}</textarea>`;
+  box.innerHTML=`${r.stale?`<div class="need" role="alert">⚠ התוצאות השתנו (ניסוי חוזר או שינוי במספר החזרות), ולכן הטקסט שלמטה נכתב על תוצאות קודמות. עדכנו כל סעיף לפי התוצאות החדשות ואשרו.<div style="margin-top:6px"><button class="btn sm" id="cFresh">עדכנתי את הניתוח לפי התוצאות החדשות</button></div></div>`:''}<h2>ניתוח התוצאות</h2><div class="rqsum small"><b>${esc(r.q)}</b><br>השערה: ${esc(r.hyp)}</div>
+   ${ta('cTrend','trend',X&&X.cat?'תיאור הגרף':'תיאור המגמה',(X&&X.cat?'מה ההבדלים בין ':'מה קורה ל')+(YV.find(v=>v.k===r.dv)||{n:'משתנה התלוי'}).n+(X&&X.cat?' במערכות השונות? ':'')+(X&&X.cat?'':' כשמשנים את '+(X?X.n:'המשתנה הבלתי תלוי')+'?')+' התבססו על הטבלה ועל הגרף, והתייחסו למספרים.')}
+   ${ta('cExp','expl','הסבר התוצאות','הסבירו את המגמה בעזרת ידע מדעי, ברמת החלקיקים.',true)}
+   <h2 style="margin-top:14px">מסקנות</h2>
+   ${ta('cAns','concl','התשובה לשאלת החקר','המסקנה צריכה להתאים לכל התוצאות, כולל החזרות.')}
+   <div class="stack"><label for="cSup">האם ההשערה אוששה?</label><select id="cSup"><option value="">בחרו</option>${['אוששה','אוששה חלקית','לא אוששה'].map(v=>`<option ${r.sup===v?'selected':''}>${v}</option>`).join('')}</select></div>
+   <h2 style="margin-top:14px">דיון</h2>
+   ${ex.length?`<div class="info"><b>ביצוע לפי התכנון</b><ul style="margin:4px 0;padding-inline-start:18px">${ex.map(([ok,t])=>`<li>${ok?'✓':'•'} ${t}</li>`).join('')}</ul></div>`:''}
+   ${ta('cErr','err','גורמי שגיאה','התייחסו לגורם אנושי (למשל מדידה לא מדויקת במשורה), לדיוק המכשירים ולטעות בביצוע או בתכנון. לכל גורם הסבירו איך הוא השפיע על התוצאות.',true)}
+   ${ta('cVal','valid',G11()?'תוקף המסקנות':'מגבלות הניסוי','לאיזה תחום המסקנה תקפה? ציינו את הטווח של המשתנה הבלתי תלוי שנבדק, את הערכים של הגורמים הקבועים ואת מספר החזרות.',true)}
+   ${ta('cModel','model','מודל ומציאות','האם לדעתכם ניסוי אמיתי במעבדה היה נותן בדיוק את אותן תוצאות כמו הסימולציה? מדוע? חשבו על מה שהסימולציה מחשבת לפי חוקים קבועים מראש, ועל מה שקורה במעבדה אמיתית.')}
+   <label class="f">שאלות חדשות שעולות בעקבות הניסוי</label><p class="small muted" style="margin:0 0 4px">כתבו שלוש שאלות. סמנו את השאלה שניסחתם כשאלת חקר.</p>
+   ${[0,1,2].map(k=>`<div class="row" style="flex-wrap:nowrap;margin:4px 0"><input type="radio" name="nqRQ" value="${k}" ${r.nqRQ===String(k)?'checked':''} aria-label="שאלה ${k+1} היא שאלת חקר"><input type="text" data-nq="${k}" value="${esc(r.nq[k]||'')}" aria-label="שאלה ${k+1}"></div>`).join('')}
+   <p class="small muted" id="cMiss"></p>`;
+  const upd=()=>{save();renderTabs();$('cMiss').textContent=conclDone()?'':(r.stale?'אשרו שעדכנתם את הניתוח לפי התוצאות החדשות. ':'')+'השלימו את כל הסעיפים: מגמה, הסבר, תשובה לשאלת החקר, השערה, גורמי שגיאה, '+(G11()?'תוקף המסקנות':'מגבלות הניסוי')+', מודל ומציאות ושלוש שאלות שאחת מהן מסומנת כשאלת חקר.';};upd();
+  box.querySelectorAll('[data-c]').forEach(t=>t.oninput=()=>{r[t.dataset.c]=t.value;upd();});
+  $('cSup').onchange=e=>{r.sup=e.target.value;upd();};
+  if($('cFresh'))$('cFresh').onclick=()=>{r.stale=false;save();delete box.dataset.ready;renderConcl();renderTabs();};
+  box.querySelectorAll('[data-nq]').forEach(t=>t.oninput=()=>{r.nq[+t.dataset.nq]=t.value;upd();});
+  box.querySelectorAll('[name=nqRQ]').forEach(t=>t.onchange=()=>{r.nqRQ=t.value;upd();});
+}
+
+/* ---------- results graph of the research question ---------- */
+const XV=[
+ {k:'e',n:'מספר האלקטרונים במולקולה',u:'',get:s=>LIQ[s.cond.liq].e},
+ {k:'bp',n:'טמפרטורת הרתיחה של הנוזל',u:'°C',get:s=>LIQ[s.cond.liq].bp},
+ {k:'T',n:'טמפרטורת הסביבה',u:'°C',get:s=>s.cond.T},
+ {k:'d',n:'קוטר הכלי',u:'ס״מ',get:s=>VES[s.cond.ves].d},
+ {k:'area',n:'שטח פני הנוזל',u:'סמ״ר',get:s=>+(Math.PI*(VES[s.cond.ves].d/2)**2).toFixed(1)},
+ {k:'h',n:'גובה הכלי',u:'ס״מ',get:s=>VES[s.cond.ves].h},
+ {k:'dmx',get n(){return `מסת הנוזל שהתאדה בתוך ${S.dur} דקות`},u:'גרם',get:s=>+stats(s).dm.mean.toFixed(2)},
+ {k:'liq',n:'סוג הנוזל',u:'',cat:true,get:s=>LIQ[s.cond.liq].n},
+ {k:'air',n:'תנועת אוויר',u:'',cat:true,get:s=>AIRN[s.cond.air|0]}];
+const YV=[
+ {k:'dm',get n(){return `מסת הנוזל שהתאדה בתוך ${S.dur} דקות`},u:'גרם',dec:2,agg:s=>stats(s).dm},
+ {k:'nmol',get n(){return `מספר המולים שהתאדו בתוך ${S.dur} דקות`},u:'mmol',dec:2,agg:s=>stats(s).nmol},
+ {k:'dT',get n(){return `הפרש טמפרטורות הנוזל לאחר ${S.dur} דקות (ערך מוחלט)`},u:'°C',dec:1,sensor:true,agg:s=>stats(s).drop}];
+YV.forEach(v=>v.get=s=>{const a=v.agg(s);return a?a.mean:null;});
+const axLabel=v=>v.n+(v.u?` (${v.u})`:'');
+const doneSlots=()=>S.slots.map((s,i)=>({s,i})).filter(o=>o.s.status==='done');
+function varied(){const d=doneSlots();if(d.length<2)return [];const b=d[0].s.cond,f=[];
+  if(d.some(o=>o.s.cond.liq!==b.liq))f.push('הנוזל');if(d.some(o=>o.s.cond.ves!==b.ves))f.push('הכלי');if(d.some(o=>o.s.cond.T!==b.T))f.push('טמפרטורת הסביבה');if(d.some(o=>o.s.cond.air!==b.air))f.push('תנועת האוויר');return f;}
+function opts(list,sel){return `<option value="">בחרו</option>`+list.map(v=>`<option value="${v.k}" ${v.k===sel?'selected':''}>${axLabel(v)}</option>`).join('');}
+function checkRG(){
+  const g=S.rg,fb=[],X=XV.find(v=>v.k===g.x),Y=YV.find(v=>v.k===g.y),d=doneSlots();
+  if(!X)fb.push('בחרו מה יוצג על ציר x.');if(!Y)fb.push('בחרו מה יוצג על ציר y.');
+  if(X&&Y&&(X.k===Y.k||(X.k==='dmx'&&Y.k==='dm')))fb.push('אותו גודל לא יכול להופיע על שני הצירים.');
+  if(X){const vals=new Set(d.map(o=>String(X.get(o.s))));if(vals.size<2){const vf=varied();fb.push(`${X.n} זהה בכל המערכות שמדדתם, ולכן הוא לא המשתנה הבלתי תלוי בניסוי הזה.${vf.length?' בניסוי שלכם השתנה: '+vf.join(', ')+'.':''}`);}}
+  if(Y&&Y.sensor&&!S.sensor)fb.push('כדי להציג את הפרש הטמפרטורות, צריך למדוד עם חיישן טמפרטורה.');
+  if(!g.kind)fb.push('בחרו את סוג הגרף.');
+  else if(X&&X.cat&&g.kind==='scatter')fb.push(`האם יש ערך אפשרי בין ${X.n==='סוג הנוזל'?'מים לאתאנול':'שני ערכים'} של ${X.n}? האם אפשר לסדר את הערכים בסדר אחד נכון? חשבו מה זה אומר על סוג הגרף.`);
+  else if(X&&!X.cat&&g.kind==='bar')fb.push(`האם יש ערכים אפשריים של ${X.n} בין שני ערכים שבדקתם? האם הסדר שלהם קבוע? חשבו מה זה אומר על סוג הגרף.`);
+  if(String(g.why||'').trim().length<15)fb.push('נמקו במשפט למה בחרתם בסוג הגרף הזה.');
+  if(!meansOk())fb.push('חשבו את הממוצע של כל מערכת בטבלת התוצאות שלמעלה.');
+  if(!g.title.trim())fb.push('כתבו כותרת לטבלה ולגרף.');
+  else if(X&&Y){const hasX=mentions(g.title,X.k),hasY=mentions(g.title,Y.k);
+    if(!hasX||!hasY)fb.push('הכותרת צריכה לציין את שני המשתנים, למשל במבנה „השפעת <המשתנה הבלתי תלוי> על <המשתנה התלוי>”.');}
+  g.note=(S.rq.ok&&X&&Y&&(X.k!==S.rq.iv||Y.k!==S.rq.dv))?`שימו לב: שאלת החקר שלכם`:'';
+  if(g.note)g.note+=` עוסקת בהשפעה של ${XV.find(v=>v.k===S.rq.iv).n} על ${YV.find(v=>v.k===S.rq.dv).n}. הגרף שבניתם עונה על שאלה אחרת. לגרף שעונה על שאלת החקר: ${XV.find(v=>v.k===S.rq.iv).n} על ציר x ו${YV.find(v=>v.k===S.rq.dv).n} על ציר y.`;
+  g.fb=fb;g.built=!fb.length;save();
+}
+function renderRG(){
+  const g=S.rg,d=doneSlots(),form=$('rgForm');
+  if(d.length<2){form.innerHTML=`<p class="small muted">כדי לבנות גרף תוצאות, הריצו לפחות שתי מערכות.</p>`;$('rgBox').hidden=true;$('rgExport').hidden=true;$('rgData').innerHTML='';delete $('conclCard').dataset.ready;renderConcl();return;}
+  const vf=varied(),X=XV.find(v=>v.k===g.x);
+  if(!form.dataset.ready){
+    form.innerHTML=`<div class="form2"><label for="rgX">ציר x – המשתנה הבלתי תלוי</label><select id="rgX">${opts(xvList(),g.x)}</select>
+    <label for="rgY">ציר y – התוצאה</label><select id="rgY">${opts(yvList().filter(v=>!v.sensor||S.sensor),g.y)}</select>
+</div>
+    <label class="small" for="rgT" style="font-weight:700">כותרת הטבלה והגרף</label><div class="small muted">אותה כותרת מופיעה מעל טבלת התוצאות ומעל הגרף.</div><input type="text" id="rgT" value="${esc(g.title)}">
+    <div class="stack"><label for="rgK">סוג הגרף</label><select id="rgK"><option value="">בחרו</option><option value="scatter" ${g.kind==='scatter'?'selected':''}>גרף פיזור</option><option value="bar" ${g.kind==='bar'?'selected':''}>גרף עמודות</option></select></div>
+    <label class="small" for="rgW" style="font-weight:700">למה בחרתם בסוג הגרף הזה?</label><textarea id="rgW" style="min-height:60px">${esc(g.why)}</textarea>
+    <div id="rgHint"></div>
+    <button class="btn full" id="rgBuild" style="margin-top:8px">בדיקה ובניית הגרף</button><div id="rgFb"></div>`;
+    form.dataset.ready='1';
+    const ch=(id,k)=>$(id).onchange=e=>{g[k]=e.target.value;g.built=false;g.fb=[];save();renderRG();};
+    ch('rgX','x');ch('rgY','y');ch('rgK','kind');$('rgY').addEventListener('change',()=>{S.means={};renderResults();});
+    $('rgW').oninput=e=>{g.why=e.target.value;if(g.built)g.built=false;save();};$('rgW').onchange=()=>setTimeout(renderRG,0);
+    $('rgT').oninput=e=>{g.title=e.target.value;if(g.built){g.built=false;}save();$('cmpTitle').innerHTML=g.title.trim()?esc(g.title):'';};
+    $('rgT').onchange=()=>renderRG();
+    $('rgBuild').onclick=()=>{checkRG();renderRG();};
+  }
+  $('rgHint').innerHTML=`<p class="small muted" style="margin:4px 0">${vf.length?'בניסוי שלכם השתנה: '+vf.join(', ')+'.':'בכל המערכות התנאים זהים – זו חזרה על אותה מדידה.'}${vf.length>1?' שימו לב: השתנה יותר מגורם אחד.':''}${X&&X.cat?' משתנה שאינו מספרי מוצג כגרף עמודות.':''}</p>`;
+  $('rgFb').innerHTML=g.fb&&g.fb.length?`<div class="fb st-warn">${g.fb.map(esc).join('<br>')}</div>`:g.built?`<div class="fb st-ok">✓ הגרף בנוי לפי הכללים.</div>${g.note?`<div class="fb st-info">${esc(g.note)}</div>`:''}`:'';
+  $('rgBox').hidden=!g.built;$('rgExport').hidden=!g.built;
+  if(g.built){const Y=YV.find(v=>v.k===g.y),anyRep=d.some(o=>stats(o.s).n>1);if(!anyRep)g.rep='mean';
+    const fitTxt=drawRG($('rgChart'));
+    let ctl=`<div class="row" style="margin-top:8px"><span class="small" style="font-weight:700">קו מגמה:</span>${X.cat?'<span class="small muted">לא זמין למשתנה שאינו מספרי</span>':[['none','ללא'],['lin','ליניארי'],...(G11()?[['exp','מעריכי']]:[])].map(([k,t])=>`<button class="chip" data-tr="${k}" aria-pressed="${g.trend===k}">${t}</button>`).join('')}</div>`;
+    if(anyRep)ctl+=`<div class="row"><span class="small" style="font-weight:700">חזרות:</span>${[['mean','ממוצע וטווח'],['all','כל המדידות']].map(([k,t])=>`<button class="chip" data-rm="${k}" aria-pressed="${g.rep===k}">${t}</button>`).join('')}</div>`;
+    if(fitTxt)ctl+=`<div class="info" style="direction:ltr;text-align:left;font-family:var(--fm)">${fitTxt}</div>`;
+    const rows=g.rep==='all'?d.flatMap(o=>Y.agg(o.s)?Y.agg(o.s).vals.map((v,j)=>`<tr><td>${slotName(o.i)}</td><td>${j+1}</td><td class="${X.cat?'':'num'}">${esc(X.get(o.s))}</td><td class="num">${v.toFixed(Y.dec)}</td></tr>`):[]).join('')
+      :d.map(o=>{const a=Y.agg(o.s);return `<tr><td>${slotName(o.i)}</td><td class="${X.cat?'':'num'}">${esc(X.get(o.s))}</td><td class="num">${a?a.mean.toFixed(Y.dec):'—'}</td><td class="num">${a&&a.vals.length>1?a.range.toFixed(Y.dec):'—'}</td><td>${a?a.vals.length:0}</td></tr>`;}).join('');
+    const head=g.rep==='all'?`<th>מערכת</th><th>מדידה</th><th>${esc(axLabel(X))}</th><th>${esc(axLabel(Y))}</th>`:`<th>מערכת</th><th>${esc(axLabel(X))}</th><th>${esc(axLabel(Y))}${anyRep?' – ממוצע':''}</th><th>טווח</th><th>מדידות</th>`;
+    $('rgData').innerHTML=ctl;
+    document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{g.trend=b.dataset.tr;save();renderRG();});
+    document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{g.rep=b.dataset.rm;save();renderRG();});}
+  else $('rgData').innerHTML='';
+  if(!g.built)delete $('conclCard').dataset.ready;renderConcl();
+  $('resNext').innerHTML='';renderTabs();
+}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function rgPoints(){const g=S.rg,X=XV.find(v=>v.k===g.x),Y=YV.find(v=>v.k===g.y),out=[];
+  doneSlots().forEach(o=>{const a=Y.agg(o.s);if(!a)return;const x=X.get(o.s);
+    if(g.rep==='all')a.vals.forEach((v,j)=>out.push({x,y:v,c:slotCol(o.i),i:o.i,j}));else out.push({x,y:a.mean,lo:a.min,hi:a.max,c:slotCol(o.i),i:o.i});});return out;}
+function fitRG(pts){const g=S.rg;if(g.trend==='lin'){const f=linFit(pts.map(p=>[p.x,p.y]));return f&&{f:x=>f.a*x+f.b,txt:`y = ${sig(f.a)}x ${f.b<0?'−':'+'} ${sig(Math.abs(f.b))}    R² = ${f.r2.toFixed(3)}`};}
+  if(g.trend==='exp'){if(pts.some(p=>p.y<=0))return {err:'קו מגמה מעריכי אפשרי רק כשכל הערכים חיוביים.'};const f=linFit(pts.map(p=>[p.x,Math.log(p.y)]));
+    return f&&{f:x=>Math.exp(f.b)*Math.exp(f.a*x),txt:`y = ${sig(Math.exp(f.b))}·e^(${sig(f.a)}x)    R² = ${f.r2.toFixed(3)}`};}return null;}
+function drawRG(cv,opts={}){
+  const g=S.rg,X=XV.find(v=>v.k===g.x),Y=YV.find(v=>v.k===g.y);if(!X||!Y)return '';
+  const dpr=opts.W?1:(devicePixelRatio||1),W=opts.W||cv.clientWidth,H=opts.H||cv.clientHeight;if(!W)return '';
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  const light=!!opts.W,col=v=>light?{'--card':'#fff','--ink':'#111','--muted':'#444','--grid':'#e3e3e3','--acc':'#19576c'}[v]:cssv(v);
+  const PAL=['#19576c','#c2672b','#7a4fa8','#2f8a4c','#6b7b80'],pc=p=>light?(S.slots[p.i]&&S.slots[p.i].ctl?PAL[4]:PAL[p.i]):p.c;
+  const k=opts.W?W/600:Math.min(1.15,Math.max(.9,W/600)),P={l:64*k,r:16*k,t:40*k,b:54*k},pts=rgPoints();
+  c.fillStyle=col('--card');c.fillRect(0,0,W,H);
+  const hiY=Math.max(...pts.map(p=>p.hi??p.y),0),loY=Math.min(0,...pts.map(p=>p.lo??p.y));
+  let y1=hiY,y0=loY;y1+=(y1-y0)*.1||1;
+  const ys=niceStep(y1-y0,5);y0=Math.floor(y0/ys)*ys;y1=Math.ceil(y1/ys)*ys;const Yp=v=>P.t+(y1-v)/(y1-y0)*(H-P.t-P.b);
+  c.lineWidth=1;c.font=`${12*k}px "IBM Plex Mono",monospace`;const dec=ys<.01?3:ys<.1?2:ys<1?1:0;
+  for(let v=y0;v<=y1+1e-9;v+=ys){c.strokeStyle=col('--grid');c.beginPath();c.moveTo(P.l,Yp(v));c.lineTo(W-P.r,Yp(v));c.stroke();c.fillStyle=col('--muted');c.textAlign='right';c.fillText(v.toFixed(dec),P.l-6*k,Yp(v)+4*k);}
+  const ebar=(x,p)=>{if(p.hi==null||p.hi-p.lo<1e-9)return;c.strokeStyle=col('--ink');c.lineWidth=1.5*k;c.beginPath();c.moveTo(x,Yp(p.lo));c.lineTo(x,Yp(p.hi));c.moveTo(x-5*k,Yp(p.lo));c.lineTo(x+5*k,Yp(p.lo));c.moveTo(x-5*k,Yp(p.hi));c.lineTo(x+5*k,Yp(p.hi));c.stroke();};
+  let fitTxt='';
+  if(X.cat){const cats=[...new Set(pts.map(p=>p.i))],n=cats.length,bw=(W-P.l-P.r)/n;
+    cats.forEach((ci,j)=>{const ps=pts.filter(p=>p.i===ci),x=P.l+bw*j+bw*.2,w=bw*.6,cx=x+w/2;
+      if(g.rep==='all'){ps.forEach((p,q)=>{c.fillStyle=pc(p);c.beginPath();c.arc(cx+(q-(ps.length-1)/2)*12*k,Yp(p.y),5*k,0,7);c.fill();});}
+      else{const p=ps[0];c.fillStyle=pc(p);c.fillRect(x,Yp(Math.max(0,p.y)),w,Math.abs(Yp(p.y)-Yp(0)));ebar(cx,p);}
+      c.fillStyle=col('--ink');c.font=`600 ${12*k}px Assistant, Arial`;c.textAlign='center';c.direction='rtl';c.fillText(String(ps[0].x),cx,H-P.b+16*k);c.direction='ltr';});}
+  else{let x0=Math.min(...pts.map(p=>p.x)),x1=Math.max(...pts.map(p=>p.x));if(x0>0&&x0<(x1-x0)*1.5)x0=0;const sp=(x1-x0)||1;x1+=sp*.08;if(x0!==0)x0-=sp*.08;
+    const xs=niceStep(x1-x0,5);x0=Math.floor(x0/xs)*xs;x1=Math.ceil(x1/xs)*xs;const Xp=v=>P.l+(v-x0)/(x1-x0)*(W-P.l-P.r);const dx=xs<.01?3:xs<.1?2:xs<1?1:0;
+    for(let v=x0;v<=x1+1e-9;v+=xs){c.strokeStyle=col('--grid');c.beginPath();c.moveTo(Xp(v),P.t);c.lineTo(Xp(v),H-P.b);c.stroke();c.fillStyle=col('--muted');c.textAlign='center';c.font=`${12*k}px "IBM Plex Mono",monospace`;c.fillText(v.toFixed(dx),Xp(v),H-P.b+16*k);}
+    const nX=new Set(pts.map(p=>p.x)).size,fit=g.trend!=='none'&&nX<3?{err:'קו מגמה דורש לפחות שלושה ערכים שונים על ציר x. דרך שתי נקודות עובר תמיד קו מושלם, ולכן R² = 1 לא אומר דבר.'}:pts.length>1?fitRG(pts):null;
+    if(fit&&fit.err)fitTxt=fit.err;
+    else if(fit){const xa=Math.min(...pts.map(p=>p.x)),xb=Math.max(...pts.map(p=>p.x));c.save();c.beginPath();c.rect(P.l,P.t,W-P.l-P.r,H-P.t-P.b);c.clip();c.strokeStyle=col('--muted');c.lineWidth=1.5*k;c.setLineDash([6*k,4*k]);c.beginPath();
+      for(let q=0;q<=60;q++){const x=xa+(xb-xa)*q/60,yy=Yp(fit.f(x));q?c.lineTo(Xp(x),yy):c.moveTo(Xp(x),yy);}c.stroke();c.setLineDash([]);c.restore();fitTxt=fit.txt;
+      c.font=`500 ${12*k}px "IBM Plex Mono",monospace`;const tw=c.measureText(fit.txt).width+12*k;c.fillStyle=col('--card');c.globalAlpha=.85;c.fillRect(W-P.r-tw-4*k,P.t+4*k,tw,20*k);c.globalAlpha=1;c.fillStyle=col('--ink');c.textAlign='right';c.fillText(fit.txt,W-P.r-10*k,P.t+18*k);}
+    pts.forEach(p=>{ebar(Xp(p.x),p);c.fillStyle=pc(p);c.beginPath();c.arc(Xp(p.x),Yp(p.y),(g.rep==='all'?4.5:5.5)*k,0,7);c.fill();});}
+  c.strokeStyle=col('--ink');c.lineWidth=1;c.beginPath();c.moveTo(P.l,P.t);c.lineTo(P.l,H-P.b);c.lineTo(W-P.r,H-P.b);c.stroke();
+  c.fillStyle=col('--ink');c.textAlign='center';c.direction='rtl';c.font=`600 ${13*k}px Assistant, Arial`;c.fillText(axLabel(X),(P.l+W-P.r)/2,H-12*k);
+  c.save();c.translate(16*k,(P.t+H-P.b)/2);c.rotate(-Math.PI/2);c.fillText(axLabel(Y)+(g.rep!=='all'&&pts.some(p=>p.hi!=null&&p.hi>p.lo)?' – ממוצע':''),0,0);c.restore();
+  c.font=`700 ${15*k}px Rubik, Assistant, Arial`;c.fillText(g.title,W/2,24*k);c.direction='ltr';
+  return fitTxt;
+}
+function rgTSV(){const X=XV.find(v=>v.k===S.rg.x),Y=YV.find(v=>v.k===S.rg.y),P=rgPoints();
+  if(S.rg.rep==='all')return ['מערכת\tמדידה\t'+axLabel(X)+'\t'+axLabel(Y),...P.map(p=>`${p.i+1}\t${p.j+1}\t${p.x}\t${p.y.toFixed(Y.dec)}`)].join('\n');
+  return ['מערכת\t'+axLabel(X)+'\t'+axLabel(Y)+' – ממוצע\tטווח',...P.map(p=>`${p.i+1}\t${p.x}\t${p.y.toFixed(Y.dec)}\t${(p.hi-p.lo).toFixed(Y.dec)}`)].join('\n');}
+$('rgCopy').onclick=async()=>{const t=rgTSV();try{await navigator.clipboard.writeText(t);$('rgFb2').innerHTML='<div class="fb st-ok">✓ הנתונים הועתקו. הדביקו אותם בגיליון Excel.</div>';}catch(e){const a=$('rgTxt');a.hidden=false;a.value=t;a.select();$('rgFb2').innerHTML='<div class="fb st-warn">ההעתקה האוטומטית לא הצליחה. הנתונים מסומנים – העתיקו אותם ידנית (Ctrl+C).</div>';}};
+$('rgPng').onclick=()=>{const cv=document.createElement('canvas');drawRG(cv,{W:1200,H:760});cv.toBlob(b=>{try{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='גרף תוצאות – אידוי.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);
+  $('rgFb2').innerHTML='<div class="fb st-info">אם ההורדה לא התחילה, אפשר לצלם את המסך או להעתיק את הנתונים ל־Excel.</div>';}catch(e){}});};
+
+/* ---------- loop ---------- */
+let prev=null,uiAcc=0;
+function loop(now){
+  const dtR=prev===null?0:Math.min(.1,(now-prev)/1000);prev=now;noiseTick(now);
+  for(const r of [...(S.runs||[])]){const s=S.slots[r.idx];
+    if(r.phase==='pour'){r.pourT+=dtR;if(r.pourT>=1.4){r.phase='measure';r.t=0;noiseTick(now,true);s.data=[[0,readMass(r),S.sensor?readTemp(r):null]];r.next=logDt();save();renderResults();}}
+    else{let dt=dtR*S.speed;const end=S.dur*60;
+      while(dt>1e-9){const st=Math.min(.5,dt,r.next-r.t);physics(r,st);r.t+=st;dt-=st;
+        if(r.t>=r.next-1e-6){r.t=r.next;r.bn=gauss()*(.005+.0045*(r.cond.air|0));r.tn=gauss()*.03;s.data.push([Math.round(r.t),readMass(r),S.sensor?readTemp(r):null]);r.next+=logDt();
+          if(r.t>=end-1e-6){finishRun(r);break;}}}}
+  }
+  if(running()&&S.tab==='exp'&&uiAcc<.02)drawChart();
+  if(S.tab==='intro'){pStep(Math.min(dtR,.05));pDraw();if(uiAcc<.02){$('pCnt').textContent=P.mols.length<25?'הנוזל כמעט התאדה כולו – לחצו על „מילוי מחדש”':`עזבו את הנוזל: ${P.esc} מולקולות`;$('pTl').textContent=`טמפרטורת הנוזל (בהמחשה): \u2066${P.Tl.toFixed(1)} °C\u2069`;}
+    if(preRun){let dt=dtR*15;while(dt>1e-9&&preRun){const st=Math.min(.5,dt,120-preRun.t);physics(preRun.r,st);preRun.t+=st;dt-=st;if(preRun.t>=120-1e-6){S.pre.done=true;S.pre.m0=preRun.m0;S.pre.m1=Math.round(preRun.r.m*100)/100;preRun=null;save();renderPre();renderTabs();break;}}
+      if(preRun){preRun.disp=Math.round((preRun.r.m+gauss()*.005)*100)/100;$('preT').textContent=mmss(preRun.t);$('preM').textContent=f2(preRun.disp)+' g';}}}
+  prepTick(dtR);updateLCD();stepZoom(dtR);uiAcc+=dtR;if(uiAcc>.15){uiAcc=0;if(running()){renderBench();renderResults();}updateRunStatus();}
+  requestAnimationFrame(loop);
+}
+/* ---------- intro: particles + pre-experiment ---------- */
+const pc=$('pcv'),px=pc.getContext('2d'),PW=560,PH=320,SURF0=150;
+let P={mols:[],gas:[],esc:0,Tl:25,t0:0,N0:110};
+const IL=['חלש','בינוני','חזק'];
+if(S.pT==null)S.pT=25;if(S.pI==null)S.pI=2;
+function pSpeed(T){const sg=38*(1+(T-25)/60);return sg*Math.sqrt(-2*Math.log(Math.random()||1e-9));}
+function pFill(){P.mols=Array.from({length:P.N0},()=>{const a=Math.random()*6.283,v=pSpeed(S.pT);return {x:rnd(8,PW-8),y:rnd(SURF0+6,PH-6),vx:Math.cos(a)*v,vy:Math.sin(a)*v};});P.gas=[];P.esc=0;P.Tl=S.pT;P.t0=performance.now();}
+pFill();
+function surfY(){return PH-(PH-SURF0)*P.mols.length/P.N0;}
+function pStep(dt){
+  const T=S.pT,vEsc=[60,75,95][(S.level==='11'?S.pI:2)-1],sy=surfY();
+  P.Tl+=(T-P.Tl)*(1-Math.exp(-dt/6));
+  for(let i=P.mols.length-1;i>=0;i--){const m=P.mols[i];
+    if(Math.random()<dt*3){const a=Math.random()*6.283,v=pSpeed(P.Tl);m.vx=Math.cos(a)*v;m.vy=Math.sin(a)*v;}
+    m.x+=m.vx*dt;m.y+=m.vy*dt;
+    if(m.x<6){m.x=6;m.vx=Math.abs(m.vx);}if(m.x>PW-6){m.x=PW-6;m.vx=-Math.abs(m.vx);}if(m.y>PH-6){m.y=PH-6;m.vy=-Math.abs(m.vy);}
+    if(m.y<sy+6){const sp=Math.hypot(m.vx,m.vy);
+      if(m.vy<0&&sp>vEsc){P.mols.splice(i,1);P.gas.push({x:m.x,y:sy-4,vx:m.vx*.5,vy:-Math.max(30,-m.vy*.6),life:5});P.esc++;P.Tl-=.35*(sp/vEsc);continue;}
+      m.y=sy+6;m.vy=Math.abs(m.vy);}}
+  for(const g of P.gas){g.vx+=gauss()*30*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;g.life-=dt;}
+  P.gas=P.gas.filter(g=>g.life>0&&g.y>-8&&g.x>-8&&g.x<PW+8);
+}
+function pDraw(){
+  const sy=surfY();px.clearRect(0,0,PW,PH);px.fillStyle=cssv('--card');px.fillRect(0,0,PW,PH);
+  px.fillStyle=cssv('--acc-soft');px.fillRect(0,sy,PW,PH-sy);px.strokeStyle=cssv('--meniscus');px.lineWidth=2;px.beginPath();px.moveTo(0,sy);px.lineTo(PW,sy);px.stroke();
+  const vmax=[60,75,95][(S.level==='11'?S.pI:2)-1];
+  const colr=sp=>{const f=Math.min(1,sp/(vmax*1.1));const a=[59,125,216],b=[217,130,43];return `rgb(${a.map((c,i)=>Math.round(c+(b[i]-c)*f)).join(',')})`;};
+  for(const m of P.mols){px.fillStyle=colr(Math.hypot(m.vx,m.vy));px.beginPath();px.arc(m.x,m.y,5,0,7);px.fill();}
+  for(const g of P.gas){px.globalAlpha=Math.min(1,g.life/2);px.fillStyle='#d9822b';px.beginPath();px.arc(g.x,g.y,5,0,7);px.fill();}px.globalAlpha=1;
+  px.fillStyle=cssv('--muted');px.font='600 18px Assistant, Arial';px.textAlign='right';px.direction='rtl';px.fillText('אוויר',PW-12,26);px.fillText('נוזל',PW-12,PH-12);px.direction='ltr';
+}
+function renderIntro(){
+  if(S.pT==null)S.pT=25;if(S.pI==null)S.pI=2;if(!P.mols.length||!isFinite(P.Tl))pFill();
+  $('pT').value=S.pT;$('pI').value=S.pI;$('pTv').textContent='\u2066'+S.pT+' °C\u2069';$('pIv').textContent=IL[S.pI-1];
+  const g11=S.level==='11';$('pI').hidden=$('pIl').hidden=!g11;
+  $('pQ').innerHTML=g11?'נסו: הגדילו את חוזק האינטראקציות. מה קורה למספר המולקולות שעוזבות? ולטמפרטורת הנוזל?':'נסו: העלו את הטמפרטורה. מה קורה למהירות המולקולות ולמספר המולקולות שעוזבות?';
+  renderPre();
+}
+$('pT').oninput=e=>{S.pT=+e.target.value;$('pTv').textContent='\u2066'+S.pT+' °C\u2069';save();};
+$('pI').oninput=e=>{S.pI=+e.target.value;$('pIv').textContent=IL[S.pI-1];save();};
+$('pReset').onclick=pFill;
+/* pre-experiment: ethanol only */
+let preRun=null;
+function renderPre(){
+  const pr=S.pre,running=!!preRun;
+  const mShow=running?f2(preRun.disp):pr.done?f2(pr.m1):'0.00',tShow=running?mmss(preRun.t):pr.done?'02:00':'00:00';
+  $('preCard').innerHTML=`<h2>ניסוי מקדים: אתאנול על המאזניים</h2>
+   <p class="small">מוזגים ${L('5 mL')} אתאנול לצלחת פטרי שעל מאזניים מאופסים, ומשאירים את הצלחת פתוחה במשך 2 דקות.</p>
+   <div class="glabel">מה לדעתכם יקרה למסה שהמאזניים מראים?</div>
+   <div class="chips">${['המסה תגדל','המסה תקטן','המסה לא תשתנה'].map(v=>`<button class="chip" data-pred="${v}" aria-pressed="${pr.pred===v}" ${running?'disabled':''}>${v}</button>`).join('')}</div>
+   <div class="instr two" style="max-width:420px"><div class="lcd"><small>טיימר</small><strong id="preT">${tShow}</strong></div><div class="lcd"><small>מאזניים</small><strong id="preM">${mShow} g</strong></div></div>
+   <button class="btn ${pr.done?'sec':'pulse'}" id="preGo" style="margin-top:8px" ${!pr.pred||running?'disabled':''}>${pr.done?'הרצה חוזרת':'הרצת הניסוי המקדים'}</button>
+   ${!pr.pred?'<div class="need">⚠ כדי להריץ, בחרו קודם מה לדעתכם יקרה למסה.</div>':''}
+   ${pr.done&&!running?`<div class="fb ${pr.pred==='המסה תקטן'?'st-ok':'st-warn'}">המסה ירדה מ־${f2(pr.m0)} גרם ל־${f2(pr.m1)} גרם בתוך 2 דקות. ${pr.pred==='המסה תקטן'?'ההשערה שלכם אוששה.':'ההשערה שלכם לא אוששה.'}</div>
+   <label class="f" for="preA">למה ירידה במסה מראה שהאתאנול מתאדה? לאן הגיעו המולקולות שעזבו את הצלחת?</label><textarea id="preA">${esc(pr.ans)}</textarea>`:''}`;
+  document.querySelectorAll('[data-pred]').forEach(b=>b.onclick=()=>{pr.pred=b.dataset.pred;save();renderPre();});
+  const go=$('preGo');if(go)go.onclick=()=>{const l=LIQ.ethanol,amb=25+rnd(-.5,.5);preRun={r:{cond:{liq:'ethanol',ves:'p9',T:25,air:0},m:(VOL-rnd(.05,.12))*l.rho,Tl:amb,Tp:amb,amb,h:1+gauss()*.06},t:0,disp:0};
+    preRun.m0=Math.round(preRun.r.m*100)/100;preRun.disp=preRun.m0;renderPre();};
+  const a=$('preA');if(a)a.oninput=e=>{pr.ans=e.target.value;save();renderTabs();};
+}
+
+/* ---------- hints ---------- */
+const HINTS=[
+ {id:'v1',g:'י׳',t:'מבנה הכלי',x:'בחרו כמשתנה בלתי תלוי את קוטר הכלי או את גובה הכלי. כלים בגבהים שונים קיימים רק בקוטר 9 ס״מ.'},
+ {id:'v2',g:'י׳',t:'טמפרטורה',x:'בחרו כמשתנה בלתי תלוי את טמפרטורת הסביבה. בשורת הערך הקבוע קבעו נוזל אחד וכלי אחד לכל המערכות.'},
+ {id:'v3',g:'י׳',t:'סוג הנוזל',x:'השוו בין אתאנול, אצטון ומים. מה אתם יודעים על טמפרטורת הרתיחה של כל אחד מהם? זה יכול לעזור לכם לנסח השערה.'},
+ {id:'v4',g:'י׳',t:'תנועת אוויר',x:'בחרו כמשתנה בלתי תלוי את תנועת האוויר, ותנו לכל מערכת עוצמה אחרת. כדאי להוסיף חזרות.'},
+ {id:'e1',g:'י״א',t:'אורך השרשרת',x:'בסדרה מתאנול, אתאנול, 1־פרופאנול ו־1־בוטאנול מספר האלקטרונים במולקולה גדל בכל פעם ב־8.'},
+ {id:'e2',g:'י״א',t:'ענן אלקטרונים דומה',x:'לפנטאן, לדיאתיל אתר, למתיל אצטט ול־1־בוטאנול יש 40–42 אלקטרונים במולקולה. במה הם שונים זה מזה?'},
+ {id:'e3',g:'י״א',t:'אידוי והתקררות',x:'הפעילו את „חיישן טמפרטורה בכל מערכת” מעל טבלת המערכות. בגרף התוצאות אפשר לשים על ציר x את מסת הנוזל שהתאדה ועל ציר y את ירידת הטמפרטורה.'},
+ {id:'e4',g:'י״א',t:'טמפרטורת רתיחה',x:'בחרו כמשתנה בלתי תלוי את טמפרטורת הרתיחה של הנוזל, ובחרו ארבעה נוזלים שונים.'},
+ {id:'e5',g:'י״א',t:'בקרה',x:'בקרה חיצונית היא מערכת שאליה משווים את כל השאר, למשל נוזל מוכר או תנאי החדר. בקרה פנימית השוואתית מתאימה כשכל המערכות שונות רק במשתנה הבלתי תלוי ומושוות זו לזו.'},
+ {id:'g1',g:'כללי',t:'קו מגמה',x:'אם הנקודות לא מסודרות על קו ישר, נסו גם קו מגמה מעריכי, והשוו את ערכי R².'}];
+function renderHints(){
+  const used=new Set(S.hints.map(h=>h.id)),open=$('hintDet')?$('hintDet').open:false;
+  $('hintCard').innerHTML=`<details id="hintDet" ${open?'open':''}><summary>רעיונות ורמזים לשאלות חקר</summary>
+   <p class="small muted">כל רמז שתפתחו יירשם בסיכום ההגשה.</p>
+   ${HINTS.filter(h=>G11()?h.g!=='י׳':h.g==='י׳').map(h=>`<div class="hint"><b>${h.t}</b>${used.has(h.id)?`<div class="small">${h.x}</div><div class="small muted">✓ נעשה שימוש ברמז</div>`:`<button class="btn sec sm" data-hint="${h.id}" style="margin-top:4px">הצגת רמז</button>`}</div>`).join('')}</details>`;
+  document.querySelectorAll('[data-hint]').forEach(b=>b.onclick=()=>{if(!S.hints.some(h=>h.id===b.dataset.hint))S.hints.push({id:b.dataset.hint,at:Date.now()});save();renderHints();});
+}
+/* ---------- global reset ---------- */
+$('gReset').onclick=()=>{$('gResetC').hidden=false;};$('gResetN').onclick=()=>{$('gResetC').hidden=true;};
+$('gResetY').onclick=()=>{const lv=S.level;S=fresh();S.level=lv;save();$('gResetC').hidden=true;delete $('rgForm').dataset.ready;delete $('conclCard').dataset.ready;renderAll();renderIntro();go('intro');};
+/* ---------- submission ---------- */
+function subItems(){const d=doneSlots();return [[!!S.name.trim(),'שם','sub'],[S.rq.ok,'שאלת חקר והשערה','plan'],[d.length>=2,'לפחות שתי מערכות שנמדדו','exp'],[!!S.rg.built,'גרף התוצאות','res'],[conclDone(),'ניתוח, מסקנות ודיון','res']];}
+function reportHTML(img){
+  const r=S.rq,d=doneSlots(),sens=S.sensor,X=XV.find(v=>v.k===S.rg.x),Y=YV.find(v=>v.k===S.rg.y);
+  const used=HINTS.filter(h=>S.hints.some(u=>u.id===h.id));
+  const rows=d.map(o=>{const l=LIQ[o.s.cond.liq];return allRuns(o.s).map((dd,j)=>{const m=mStats(dd,l);return `<tr><td>${slotName(o.i)}</td><td>${j+1}</td><td>${f2(m.m0)}</td><td>${f2(m.dm)}</td>${G11()?`<td>${m.nmol.toFixed(2)}</td>`:''}${sens?`<td>${m.drop==null?'—':m.drop.toFixed(1)}</td>`:''}</tr>`;}).join('')+(allRuns(o.s).length>1?(()=>{const st=stats(o.s);return `<tr><td>${slotName(o.i)}</td><td><b>ממוצע (טווח)</b></td><td>${f2(st.m0.mean)}</td><td>${st.dm.mean.toFixed(2)} (${st.dm.range.toFixed(2)})</td>${G11()?`<td>${st.nmol.mean.toFixed(2)} (${st.nmol.range.toFixed(2)})</td>`:''}${sens?`<td>${st.drop?st.drop.mean.toFixed(1)+' ('+st.drop.range.toFixed(1)+')':'—'}</td>`:''}</tr>`;})():'');}).join('');
+  const fit=S.rg.built&&X&&!X.cat&&S.rg.trend!=='none'?fitRG(rgPoints()):null;
+  return `<h1>חקר: אידוי נוזלים</h1>
+  <p>מגישים: ${esc(S.name)}${S.partners.trim()?', '+esc(S.partners):''}${S.school.trim()?' · '+esc(S.school):''}<br>${esc(new Date(S.date).toLocaleDateString('he-IL'))}</p>
+  <h2>שאלת החקר</h2><p><b>${r.ok?esc(r.q):'—'}</b></p>
+  ${r.ok?`<p>המשתנה הבלתי תלוי: ${XV.find(v=>v.k===r.iv).n}<br>המשתנה התלוי: ${YV.find(v=>v.k===r.dv).n}<br></p>`:''}
+  ${S.pre.done?`<h2>ניסוי מקדים</h2><p>השערה: ${esc(S.pre.pred)}. תוצאה: מסת האתאנול ירדה מ־${f2(S.pre.m0)} g ל־${f2(S.pre.m1)} g בתוך 2 דקות.</p><p>${esc(S.pre.ans)}</p>`:''}
+  <h2>השערה ונימוק</h2><p>${esc(r.hyp)||'—'}</p>
+  <h2>טבלת המערכות</h2><table><thead><tr><th>מערכת</th><th>${S.rq.iv?esc(FN[IVF[S.rq.iv]]):'משתנה בלתי תלוי'} (משתנה בלתי תלוי)</th></tr></thead><tbody>${S.slots.map((x,i)=>`<tr><td>${x.ctl?'בקרה':i+1}</td><td>${S.rq.iv?esc(factPlain(IVF[S.rq.iv],IVF[S.rq.iv]==='liq'?x.cond.liq:IVF[S.rq.iv]==='d'?VES[x.cond.ves].d:IVF[S.rq.iv]==='h'?VES[x.cond.ves].h:x.cond[IVF[S.rq.iv]])):''}</td></tr>`).join('')}</tbody></table>
+  <p>גורמים קבועים: ${S.rq.iv?constantsText().replace(/class="ltr"/g,'dir="ltr"'):'—'}</p>${S.plan.cSel?`<p><b>חשיבות גורם קבוע (${esc(S.plan.cSel)}):</b> ${esc(S.plan.cWhy)}</p>`:''}
+  ${G11()&&S.plan.ctl.type?`<p><b>בקרה:</b> ${esc(ctlText())}<br><b>נימוק לבחירת הבקרה:</b> ${esc(S.plan.ctl.why)}</p>`:''}
+  <p>${G11()?methodText():`בכל מערכת נמזגו ${VOL} mL נוזל, והמסה נמדדה במשך ${S.dur} דקות.`}</p>
+  <h2>תוצאות</h2>${S.rg.title.trim()?`<p style="text-align:center"><b>${esc(S.rg.title)}</b></p>`:''}<table><thead><tr><th>מערכת</th><th>מדידה</th><th>מסה התחלתית (g)</th><th>מסת הנוזל שהתאדה בתוך ${S.dur} דקות (g)</th>${G11()?'<th>מספר המולים שהתאדו (mmol)</th>':''}${sens?`<th>ירידת הטמפרטורה לאחר ${S.dur} דקות (°C)</th>`:''}</tr></thead><tbody>${rows}</tbody></table>
+  ${S.rg.built?`<h2>גרף התוצאות</h2><p style="text-align:center">${img?`<img src="${img}" width="600" alt="${esc(S.rg.title)}">`:''}</p>${fit&&fit.txt?`<p dir="ltr" style="text-align:center">קו מגמה: ${fit.txt}</p>`:''}${S.rg.rep==='mean'&&d.some(o=>stats(o.s).n>1)?'<p>בגרף מוצגים הממוצעים, והקווים האנכיים מראים את הטווח.</p>':''}`:''}
+  ${S.rg.kind?`<p><b>סוג הגרף:</b> ${S.rg.kind==='bar'?'גרף עמודות':'גרף פיזור'}. ${esc(S.rg.why)}</p>`:''}<h2>ניתוח התוצאות</h2><p>${esc(r.trend)||'—'}</p><h2>הסבר התוצאות</h2><p>${esc(r.expl)||'—'}</p>
+  <h2>מסקנות</h2><p>${esc(r.concl)||'—'}</p><p>ההשערה ${esc(r.sup)||'—'}.</p>
+  <h2>דיון</h2>${execSummary().length?`<p><b>ביצוע לפי התכנון:</b></p><ul>${execSummary().map(([,t])=>`<li>${t}</li>`).join('')}</ul>`:''}
+  <p><b>גורמי שגיאה:</b> ${esc(r.err)||'—'}</p><p><b>${G11()?'תוקף המסקנות':'מגבלות הניסוי'}:</b> ${esc(r.valid)||'—'}</p><p><b>מודל ומציאות:</b> ${esc(r.model)||'—'}</p>
+  <h2>שאלות חדשות</h2><ol>${r.nq.map((q,k)=>`<li>${esc(q)}${r.nqRQ===String(k)?' (שאלת חקר)':''}</li>`).join('')}</ol>
+  <h2>שימוש ברמזים</h2><p>${used.length?'נעשה שימוש ברמזים: '+used.map(h=>h.t).join(', ')+'.':'לא נעשה שימוש ברמזים.'}</p>`;
+}
+function reportText(){const div=document.createElement('div');div.innerHTML=reportHTML('');div.querySelectorAll('tr').forEach(tr=>tr.replaceWith(document.createTextNode([...tr.children].map(c=>c.textContent).join(' | ')+'\n')));
+  div.querySelectorAll('h1,h2,p,table,br').forEach(e=>e.after('\n'));return div.textContent.replace(/\n{3,}/g,'\n\n').trim();}
+function graphImg(){if(!S.rg.built)return '';const c=document.createElement('canvas');drawRG(c,{W:900,H:570});return c.toDataURL('image/png');}
+function renderSub(){
+  const it=subItems();
+  $('subCard').innerHTML=`<h2>הגשה</h2><p>ההגשה אינה חובה. אם המורה ביקש להגיש, מלאו את הפרטים והעתיקו את הסיכום.</p>
+   <label class="f" for="sName">שם מלא</label><input type="text" id="sName" value="${esc(S.name)}">
+   <label class="f" for="sPart">שמות השותפים (אם יש)</label><input type="text" id="sPart" value="${esc(S.partners)}">
+   <label class="f" for="sSch">בית ספר</label><input type="text" id="sSch" value="${esc(S.school)}">
+   <label class="f" for="sDate">תאריך</label><input type="date" id="sDate" value="${esc(S.date)}" style="max-width:200px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)">
+   <ul style="list-style:none;padding:0" id="sChk"></ul>
+   <ol><li>העתיקו את הסיכום בלחיצה על הכפתור.</li><li>פתחו מסמך Word חדש, או את המקום שבו אתם מגישים.</li><li>הדביקו את הסיכום, בדקו אותו ושלחו.</li></ol>
+   <button class="btn full pulse" id="sCopy">העתקת הסיכום (כולל טבלאות וגרף)</button><div id="sFb"></div>
+   <details><summary>הצגת הסיכום</summary><div class="report" id="sPrev" tabindex="0"></div></details>
+   <div style="margin-top:10px"><button class="btn sec sm" data-go="res">חזרה לתוצאות ומסקנות</button></div>`;
+  const upd=()=>{$('sChk').innerHTML=subItems().map(([ok,t,tab])=>`<li>${ok?'✓':'○'} ${t}${ok?'':tab==='sub'?' – מלאו למעלה':` – <a href="#" data-go="${tab}">להשלמה</a>`}</li>`).join('');$('sPrev').innerHTML=reportHTML(graphImg());};upd();
+  [['sName','name'],['sPart','partners'],['sSch','school'],['sDate','date']].forEach(([id,k])=>{$(id).oninput=e=>{S[k]=e.target.value;save();};$(id).onchange=upd;});
+  $('sCopy').onclick=async()=>{upd();const html=`<div dir="rtl" style="font-family:Arial">${reportHTML(graphImg())}</div>`;
+    try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([reportText()],{type:'text/plain'})})]);$('sFb').innerHTML='<div class="fb st-ok">✓ הסיכום הועתק. הדביקו אותו במסמך Word (Ctrl+V).</div>';}
+    catch(e){const dd=$('sPrev').closest('details');dd.open=true;const rg=document.createRange();rg.selectNodeContents($('sPrev'));const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);$('sFb').innerHTML='<div class="fb st-warn">ההעתקה האוטומטית לא הצליחה. הסיכום מסומן למטה – העתיקו אותו ידנית (Ctrl+C, או לחיצה ארוכה ובחירה ב„העתקה” בטלפון).</div>';}};
+}
+const TABS=[['intro','מבוא'],['plan','שאלה ותכנון'],['exp','ניסוי'],['res','תוצאות ומסקנות'],['sub','הגשה']];
+function tabDone(id){if(id==='intro')return !!(S.pre.done&&S.pre.ans.trim());const done=S.slots.length>=2&&S.slots.every(s=>s.status==='done');
+  return id==='plan'?(S.rq.ok&&planOk()):id==='exp'?done:id==='res'?!!(S.rg.built&&conclDone()):!!S.subSeen;}
+function renderTabs(){$('tabs').innerHTML=TABS.map(([id,n])=>`<button class="tab" role="tab" data-tab="${id}" aria-selected="${S.tab===id}"><span class="d ${tabDone(id)?'done':''}"></span>${n}</button>`).join('');}
+function go(id){S.tab=id;if(id==='sub')S.subSeen=true;for(const [t] of TABS)$('t-'+t).hidden=t!==id;renderTabs();
+  if(id==='exp'){renderRun();renderBench();renderYMode();drawChart();}
+  if(id==='res'){renderResults();delete $('conclCard').dataset.ready;renderConcl();}
+  if(id==='plan'){renderRQ();renderPlan();renderHints();}
+  if(id==='intro'){renderIntro();}
+  if(id==='sub'){S.subSeen=true;renderSub();}
+  save();scrollTo({top:0});}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t){go(t.dataset.tab);return;}const g=e.target.closest('[data-go]');if(g&&g.dataset.need){e.preventDefault();const n=$(g.dataset.need);if(n){n.scrollIntoView({behavior:'smooth',block:'center'});const w=n.querySelector('.need')||n;w.classList.remove('flash');void w.offsetWidth;w.classList.add('flash');}return;}if(g&&!g.disabled){e.preventDefault();go(g.dataset.go);}});
+function renderAll(){renderRQ();renderHints();renderPlan();renderBench();renderSpeed();renderYMode();renderResults();}
+addEventListener('resize',()=>{drawChart();if(S.rg.built)drawRG($('rgChart'));});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',renderAll);
+syncSlots();
+renderAll();renderIntro();go(S.tab||'intro');
+(()=>{let seen=false;try{seen=sessionStorage.getItem('evapx-session')==='1';}catch(e){}
+  const done=S.slots.filter(x=>x.status==='done').length,has=done||S.rq.ok||S.pre.done||S.hints.length||(S.name||'').trim()||(S.rq.q||'').trim();
+  const mark=()=>{try{sessionStorage.setItem('evapx-session','1');}catch(e){}};
+  if(!has){mark();return;}
+  const items=[];if((S.name||'').trim())items.push(`שם: ${esc(S.name)}`);
+  if(S.rq.ok)items.push(`שאלת חקר: ${esc(S.rq.q)}`);if(done)items.push(`${done} מערכות נמדדו`);if(S.hints.length)items.push(`נעשה שימוש ב־${S.hints.length} רמזים`);
+  document.body.classList.add('locked');const box=$('resume');box.hidden=false;
+  box.innerHTML=`<h2>להמשיך את העבודה הקודמת או להתחיל מחדש?</h2><ul class="small">${items.map(t=>`<li>${t}</li>`).join('')||'<li>יש התקדמות שמורה</li>'}</ul>
+   <p class="small">אם זו העבודה שלכם, המשיכו. אם מישהו אחר עבד במחשב הזה לפניכם, התחילו מחדש.</p>
+   <div class="row"><button class="btn" id="resGo">המשך בעבודה</button><button class="btn sec" id="resNew">התחלה מחדש</button></div>`;
+  $('resGo').onclick=()=>{mark();box.hidden=true;document.body.classList.remove('locked');};
+  $('resNew').onclick=()=>{mark();S=fresh();save();box.hidden=true;document.body.classList.remove('locked');delete $('rgForm').dataset.ready;delete $('conclCard').dataset.ready;renderAll();renderIntro();go('intro');};
+})();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

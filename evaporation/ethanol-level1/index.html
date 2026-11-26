@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -84,6 +84,7 @@ textarea{min-height:76px;resize:vertical}
 .obs th:first-child,.obs td:first-child{width:110px}
 @media (max-width:760px){.obs thead{display:none}.obs tr{display:block;border-bottom:2px solid var(--line);padding:6px 0}.obs td{display:block;border:0;padding:4px 6px}.obs td[data-h]::before{content:attr(data-h);display:block;font-weight:700;font-size:.85rem;color:var(--acc)}.obs td:first-child{width:auto;font-weight:700}}
 .fb{font-size:.92rem;border-radius:8px;padding:6px 10px;margin:6px 0}
+.fb.st-warn,.need{font-size:1rem;font-weight:600;border:2px solid var(--warn);background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 12px;margin:8px 0}.need:empty{display:none}
 .narrow{max-width:900px}
 .gate{max-width:460px;margin:20px auto}
 .eqbox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;direction:ltr;justify-content:center;background:var(--bg);border-radius:8px;padding:12px;margin:8px 0}
@@ -104,6 +105,14 @@ ol.steps li{margin:4px 0}
 .svg-txt{fill:var(--muted);font:600 13px var(--fb)}
 .svg-tick{stroke:var(--ink);stroke-width:1}
 </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">RTYED43HRRCR-535375568-6648795</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">2ad117e9-0120-4960-b522-c97770fa078c</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://hemda.sharepoint.com/sites/MyDoc/_layouts/15/DocIdRedir.aspx?ID=RTYED43HRRCR-535375568-6648795, RTYED43HRRCR-535375568-6648795</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
 </head>
 <body>
 <div class="wrap">
@@ -156,7 +165,7 @@ ol.steps li{margin:4px 0}
     <p>הקלידו את שמכם. השם יופיע בדו״ח.</p>
     <label class="f" for="nm">שם מלא</label><input type="text" id="nm" autocomplete="name">
     <label class="f" for="sch">בית ספר</label><input type="text" id="sch">
-    <button class="btn full pulse" id="gateGo" style="margin-top:12px" disabled>התחלת הניסוי</button>
+    <button class="btn full pulse" id="gateGo" style="margin-top:12px" disabled>התחלת הניסוי</button><div class="need" id="gateNeed"></div>
   </div>
 </section>
 
@@ -282,14 +291,14 @@ function go(id){
   save();scrollTo({top:0});
 }
 document.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t){e.preventDefault();go(t.dataset.tab);}const g=e.target.closest('[data-go]');if(g)go(g.dataset.go);});
-function needExp(){return S.phase!=='done'?`<div class="card"><p>השלימו קודם את הניסוי.</p><button class="btn" data-go="exp">חזרה לניסוי</button></div>`:'';}
+function needExp(){return S.phase!=='done'?`<div class="card"><div class="need">⚠ השלימו קודם את הניסוי.</div><button class="btn" data-go="exp">חזרה לניסוי</button></div>`:'';}
 
 /* intro + gate */
 $('resetAll').onclick=()=>{$('resetAllConfirm').hidden=false;};
 $('resetAllNo').onclick=()=>{$('resetAllConfirm').hidden=true;};
 $('resetAllYes').onclick=()=>{const n=S.name,s=S.school;S=fresh();S.name=n;S.school=s;$('resetAllConfirm').hidden=true;save();go('intro');};
 $('nm').value=S.name;$('sch').value=S.school;
-const gateCheck=()=>{$('gateGo').disabled=!filled($('nm').value);};$('nm').oninput=gateCheck;gateCheck();
+const gateCheck=()=>{const ok=filled($('nm').value);$('gateGo').disabled=!ok;$('gateNeed').innerHTML=ok?'':'⚠ כדי להתחיל, כתבו את שמכם.';};$('nm').oninput=gateCheck;gateCheck();
 $('gateGo').onclick=()=>{S.name=$('nm').value.trim();S.school=$('sch').value.trim();go('exp');};
 
 /* ---------- step card ---------- */
@@ -344,6 +353,7 @@ function renderStep(){
     h+=`<div class="status st-ok">✓ הניסוי הסתיים</div><p>המדידות והתצפיות נשמרו. השלב הבא: השלמת טבלת התצפיות והפרשנות.</p>
     <button class="btn full pulse" data-go="obs">המשך לתצפיות ופרשנות</button>`;
   }
+  if(S.phase!=='done')h+='<div class="need" id="stepNeed" role="status"></div>';
   h+=`<details><summary>הוראות הניסוי המלאות</summary><ol class="steps small">
    <li>רשמו תצפיות בתחילת הניסוי.</li><li>מדדו ${L('5 mL')} אתאנול באמצעות משורה.</li>
    <li>הניחו על המאזניים צלחת פטרי ריקה ואפסו את המאזניים.</li><li>מזגו את האתאנול מהמשורה לצלחת הפטרי והפעילו טיימר.</li>
@@ -397,6 +407,13 @@ function updateLive(){
     ms.innerHTML=t;const b=$('act5');if(b)b.disabled=!(allRead()&&filled(S.obs.during));
     const r=$('actRec');if(r)r.disabled=S.readings.length>=MAX_READS;const u=$('actUndo');if(u)u.disabled=S.readings.length<2;}
   const a1=$('act1');if(a1)a1.disabled=!filled(S.obs.before);const a6=$('act6');if(a6)a6.disabled=!filled(S.obs.end);
+  const nd=$('stepNeed');if(nd){const st=S.step;let t='';
+    if(st===1&&!filled(S.obs.before))t='כדי להמשיך, כתבו תצפית לפני הניסוי.';
+    else if(st===2){const v=volRead();if(!(v>=VT[0]&&v<=VT[1]))t=`כדי להמשיך, תחתית המניסקוס צריכה להיות בסימון ${L('5 mL')}.`;}
+    else if(st===3){if(!S.dish)t='כדי להמשיך, הניחו את הצלחת על המאזניים ואפסו אותם.';else if(!S.tareOk)t='כדי להמשיך, אפסו את המאזניים כשהצלחת עליהם.';}
+    else if(st===5){if(!allRead())t='כדי לסיים את המדידה, רשמו את המסה בכל דקה שלמה, עד 5 דקות.';else if(!filled(S.obs.during))t='כדי לסיים את המדידה, כתבו תצפיות בצלחת במהלך המדידה.';}
+    else if(st===6&&!filled(S.obs.end))t='כדי לסיים את הניסוי, כתבו תצפית בסוף הניסוי.';
+    const html=t?'⚠ '+t:'';if(nd.innerHTML!==html)nd.innerHTML=html;}
 }
 
 /* ---------- measurements table ---------- */
@@ -543,8 +560,8 @@ function renderObs(){
   <label class="f" for="eqp">שם התהליך</label><select id="eqp">${opt(['התכה','קיפאון','אידוי','רתיחה','עיבוי','המראה','ריבוץ'],S.eq.proc)}</select>
   <div style="margin-top:8px"><button class="btn" id="eqCheck">בדיקה</button></div><div id="eqFb">${eqFb()}</div></div>
   <button class="btn full pulse" data-go="res" id="obsNext" ${obsDone()?'':'disabled'}>המשך לתוצאות</button>
-  <p class="small muted" id="obsMiss">${obsDone()?'':'כדי להמשיך, מלאו את כל התאים בטבלה ונסחו את התהליך.'}</p>`;
-  const upd=()=>{save();renderTabs();$('obsNext').disabled=!obsDone();$('obsMiss').textContent=obsDone()?'':'כדי להמשיך, מלאו את כל התאים בטבלה ונסחו את התהליך.';};
+  <div class="need" id="obsMiss">${obsDone()?'':'⚠ כדי להמשיך, מלאו את כל התאים בטבלה ונסחו את התהליך.'}</div>`;
+  const upd=()=>{save();renderTabs();$('obsNext').disabled=!obsDone();$('obsMiss').textContent=obsDone()?'':'⚠ כדי להמשיך, מלאו את כל התאים בטבלה ונסחו את התהליך.';};
   box.querySelectorAll('[data-act]').forEach(t=>t.oninput=()=>{S.act[t.dataset.act]=t.value;upd();});
   box.querySelectorAll('[data-int]').forEach(t=>t.oninput=()=>{S.interp[t.dataset.int]=t.value;upd();});
   box.querySelectorAll('[data-o2]').forEach(t=>{const w=()=>{$('ow2-'+t.dataset.o2).innerHTML=looksInterp(t.value)?`<div class="status st-warn small">יש כאן פרשנות? העבירו אותה לעמודת הפרשנות.</div>`:'';};w();t.oninput=()=>{S.obs[t.dataset.o2]=t.value;w();upd();};});
